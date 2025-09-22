@@ -1,0 +1,6 @@
+.bg-landing-gradient-header{
+  background: linear-gradient(180deg, #AC39D4 0%, #4073F1 100%);
+}
+.bg-landing-gradient-footer{
+  background: linear-gradient(360deg, #AC39D4 0%, #4073F1 100%);
+}
