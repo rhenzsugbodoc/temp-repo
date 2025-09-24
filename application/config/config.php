@@ -23,7 +23,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/homecare_ci3-hmvc/';
+$config['base_url'] = 'http://localhost/intern-rhenz-project/'; 
+                     # http://localhost/homecare_ci3-hmvc/ wont work on mine.. has to match w folder name..
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,7 @@ $config['base_url'] = 'http://localhost/homecare_ci3-hmvc/';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = 'index.php';
+$config['index_page'] = ''; 
 
 /*
 |--------------------------------------------------------------------------
