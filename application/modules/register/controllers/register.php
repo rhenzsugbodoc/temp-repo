@@ -6,6 +6,10 @@ class Register extends MX_Controller{
         $this->load->view('register_page');
     }
     
+    public function show(){
+        
+    }
+
 }
 
 ?>
