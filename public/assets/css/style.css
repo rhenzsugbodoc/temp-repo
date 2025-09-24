@@ -1064,13 +1064,13 @@ a.btn.disabled, fieldset:disabled a.btn {
 
 .btn-primary {
   color: #fff !important;
-  background-color: #4454c3;
-  border-color: #4454c3;
+  background-color: #5631ae;
+  border-color: #5631ae;
   box-shadow: 0 0px 10px -5px rgba(68, 84, 195, 0.5); }
   .btn-primary:hover {
     color: #fff !important;
-    background-color: #3d4bb7;
-    border-color: #3d4bb7; }
+    background-color: #02298a;
+    border-color: #02298a; }
   .btn-primary:focus, .btn-primary.focus {
     box-shadow: 0 0 0 2px rgba(45, 102, 247, 0.5);
     color: #fff !important;
@@ -19522,7 +19522,7 @@ select [aria-selected=true] {
   vertical-align: text-top !important; }
 
 .bg-primary {
-  background-color: #4454c3 !important; }
+  background-color: #5631ae !important; } /* changed to violet */
 
 a.bg-primary:hover, a.bg-primary:focus {
   background-color: #24987E !important; }
