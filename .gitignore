@@ -31,5 +31,3 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /tests/tests/
 /tests/results/
 
-# Frontend react node_modules
-frontend/node_modules/

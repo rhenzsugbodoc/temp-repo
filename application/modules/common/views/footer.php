@@ -1,6 +1,6 @@
-						</div>
-				</div><!-- end app-content-->
-			</div>
+						</div> <!-- end side-app -->
+				</div><!-- end app-content main-content-->
+			</div> <!-- end page-main-->
 
 			<!--Footer-->
 			<footer class="footer">
@@ -13,7 +13,7 @@
 				</div>
 			</footer>
 			<!-- End Footer-->
-		</div>
+		</div>  <!-- end page-->
 
 		<!-- Back to top -->
 		<a href="#top" id="back-to-top">

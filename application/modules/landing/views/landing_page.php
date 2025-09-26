@@ -11,7 +11,7 @@
 
   <!-- Style css -->
   <link href="<?php echo base_url('public/assets/css/style.css'); ?>" rel="stylesheet" />
-  <link href="<?php echo base_url('Assets/css/custom_css.css'); ?>" rel="stylesheet" />
+  <link href="<?php echo base_url('public/assets/css/custom_css.css'); ?>" rel="stylesheet" />
 
   <!-- Bootstrap Icons -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
