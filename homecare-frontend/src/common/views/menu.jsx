@@ -1,6 +1,7 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 export default function Menu() {
+
   return (
     <>
     {/* <div className="app sidebar-mini light-mode default-sidebar"> */}
@@ -20,112 +21,19 @@ export default function Menu() {
                     </a>
                     </div>
                 </div>
+                    
                     <aside className="app-sidebar app-sidebar3">
-                
-                        {/* <!-- <div className="app-sidebar__user">
-                            <div className="dropdown user-pro-body text-center">
-                                <div className="user-pic">
-                                    <img src="/assets/images/users/16.jpg" alt="user-img" className="avatar-xl rounded-circle mb-1" />
-                                </div>
-                                <div className="user-info">
-                                    <h5 className="mb-1 font-weight-bold">John Thomson</h5>
-                                    <span className="text-muted app-sidebar__user-name text-sm">Patient</span>
-                                </div>
-                            </div>
-                        </div> --> */}
+                        
                         <ul className="side-menu">
                             <li className="slide">
-                                <a className="side-menu__item" href="/Dashboard">
+                                <Link className="side-menu__item" to="/dashboard">
                                 <svg className="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                <span className="side-menu__label">Dashboard</span><i className="angle fa fa-angle-right"></i></a>
+                                <span className="side-menu__label">Dashboard</span><i className="angle fa fa-angle-right"></i></Link>
                             </li>
                             <li className="slide">
-                                <a className="side-menu__item" data-toggle="slide" href="#">
-                                <img src="/assets/images/png/ScheduleSymbol.png" className="side-menu__icon" />
-                                <span className="side-menu__label">Today's Schedule</span><i className="angle fa fa-angle-right"></i></a>
-                                <ul className="slide-menu">
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Horizontal</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Horizontal-Centerlogo</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-light-centerlogo"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-dark-centerlogo"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-light-centerlogo-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/horizontal-dark-centerlogo-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Sidemenu-Icon</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icon-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icon-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icon-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icon-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Sidemenu-Closed</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-closed-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-closed-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-closed-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-closed-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Sidemenu-Toggle</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-toggle-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-toggle-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-toggle-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-toggle-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Sidemenu-Icontext</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icontext-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icontext-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icontext-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-icontext-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Sidemenu-Iconoverlay</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-iconoverlay-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-iconoverlay-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-iconoverlay-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-iconoverlay-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Menu-hoversubmenu</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-light"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-dark"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-light-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-dark-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="sub-slide">
-                                        <a className="sub-side-menu__item" data-toggle="sub-slide" href="#"><span className="sub-side-menu__label">Menu-hoversubmenu-1</span><i className="sub-angle fe fe-chevron-down"></i></a>
-                                        <ul className="sub-slide-menu">
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-light-style1"><span>Light</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-dark-style1"><span>Dark</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-light-style1-boxed"><span>Light-Boxed</span></a></li>
-                                            <li><a className="sub-slide-item" href="/pages/sidemenu-hoversubmenu-dark-style1-boxed"><span>Dark-Boxed</span></a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                                <Link className="side-menu__item" to="/schedule">
+                                <svg className="side-menu__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span className="side-menu__label">Schedule</span><i className="angle fa fa-angle-right"></i></Link>
                             </li>
                             <li className="slide">
                                 <a className="side-menu__item" data-toggle="slide" href="#">
@@ -358,6 +266,7 @@ export default function Menu() {
                             </div>
                         </div>  
                     </aside>
+                    
                     {/* aside closed */}
 
 
