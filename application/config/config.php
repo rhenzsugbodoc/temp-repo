@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(FCPATH); 
+$dotenv->load();
+
+$config['composer_autoload'] = FCPATH. 'vendor'. DIRECTORY_SEPARATOR . 'autoload.php';
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
@@ -24,8 +28,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 $config['base_url'] = 'http://localhost/homecare_ci3-hmvc/'; 
-                     # http://localhost/homecare_ci3-hmvc/ wont work on mine.. has to match w folder name..
-
 /*
 |--------------------------------------------------------------------------
 | Index File

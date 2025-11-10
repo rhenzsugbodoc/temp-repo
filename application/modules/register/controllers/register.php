@@ -3,9 +3,9 @@
 class Register extends MX_Controller{
 
     public function index (){
-        $this->load->view('register_page');
-    }
-    
+            $this->load->view('register_page');
+        }
+
 }
 
 ?>
