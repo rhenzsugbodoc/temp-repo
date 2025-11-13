@@ -11,14 +11,14 @@ export default function PatientDashboard() {
 
 
   const items = [
-      { name: 'heart-outline', label: 'Health Records' },
-      { name: 'time-outline', label: 'Visit History' },
-      { name: 'people-outline', label: 'Care Providers' },
-      { name: 'document-text-outline', label: 'Clinical Notes' },
-      { name: 'home-outline', label: 'Services' },
-      { name: 'calendar-outline', label: 'Calendar' },
-      { name: 'folder-outline', label: 'Files' },
-      { name: 'card-outline', label: 'Bills' },
+      { id: 1, name: 'heart-outline', label: 'Health Records' },
+      { id: 2, name: 'time-outline', label: 'Visit History' },
+      { id: 3, name: 'people-outline', label: 'Care Providers' },
+      { id: 4, name: 'document-text-outline', label: 'Clinical Notes' },
+      { id: 5, name: 'home-outline', label: 'Services' },
+      { id: 6, name: 'calendar-outline', label: 'Calendar' },
+      { id: 7, name: 'folder-outline', label: 'Files' },
+      { id: 8, name: 'card-outline', label: 'Bills' },
     ];
    const items2 = [
       { name: 'person-outline', label: 'Clement Bonachita' },
@@ -48,7 +48,7 @@ export default function PatientDashboard() {
         <View style={[styles.card, { backgroundColor: "#4454c3" }]}>
           <Text style={{color: 'white'}}>No plans for today</Text>
         </View>
-
+    
         <View style={styles.card}>
           <View style={styles.grid}>
             {items.map((item, index) => (
@@ -66,11 +66,12 @@ export default function PatientDashboard() {
           Care Team</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} 
         contentContainerStyle={{flexDirection: 'row' ,justifyContent: 'space-between'}}>
-            {items2.map((item, index) => (
-              <View key={index} style={styles.card}>
+            {items2.map(item => (
+              <View key={item.id} style={styles.card}>
                 <Pressable style={styles.iconCircle}>
                   <Ionicons name={item.name} size={24} color="#6366f1" />
                   <Text style={styles.label}>{item.label}</Text>
+
                 </Pressable>
               </View>
             ))}
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
     borderRadius: 15,
-    padding: 15,
+    padding: 35,
     marginHorizontal:10,
     marginVertical: 5,
     shadowColor: '#000',
@@ -105,12 +106,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   iconCircle: {
-    width: 50,
-    height: 50,
     borderRadius: 25,
     backgroundColor: '#eef2ff',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   label: {
     fontSize: 12,

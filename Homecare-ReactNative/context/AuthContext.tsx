@@ -2,20 +2,20 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 
 export type User = {
-  firstName: string,
-  middleName: string,
-  lastName: string,
-  phoneNumber: string,
-  emailAddress: string,
-  password: string,
-  confirmPassword: string,  
-  gender: 'Male'|'Female',
-  dob: Date,
-  homeAddress: string,
-  medicalConditions: string[],
-  allergies: string[],
-  emergencyContact: string,
-  currentMedications: string[]
+  first__name?: string;
+  middle__name?: string;
+  last__name?: string;
+  phone__number?: string;
+  email__address?: string;
+  password?: string;
+  confirm__password?: string;
+  gender?: 'Male' | 'Female';
+  dob?: Date;
+  home__address?: string;
+  medical__conditions?: string[];
+  allergies?: string[];
+  emergency__contact?: string;
+  current__medications?: string[];
 
 }
 

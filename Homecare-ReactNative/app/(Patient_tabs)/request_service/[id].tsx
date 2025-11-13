@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable} from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView} from 'react-native';
 import { useRouter, useLocalSearchParams  } from 'expo-router';
 import { getCompanyOptions} from '../../../options/companyQueryOptions';
 import { useQuery} from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 const CompanyDetails = () => {
     
     const router = useRouter();
@@ -12,7 +11,9 @@ const CompanyDetails = () => {
     const { companyId } = useLocalSearchParams();
     const {data, isLoading, isError} = useQuery(getCompanyOptions(Number(companyId)));
 
-
+    const handlePress = () =>{
+      router.push(`/request/request_service?companyID=${companyId}`);  
+    }
     const company = {
         id: companyId,
         company_name: 'Life Care Cebu',
@@ -46,7 +47,7 @@ const CompanyDetails = () => {
             <Text>{company.description}</Text>
           </View>
           
-          <View>
+          <View >
             <Text>Services Offered</Text>
             <View style={styles.grid}>
               {servicesList.map(service => (
@@ -56,8 +57,8 @@ const CompanyDetails = () => {
                 ))}
             </View>
 
-            <View>
-              <Pressable>Request a Service</Pressable>
+            <View style= {{marginTop: 'auto', alignItems: 'center'}}>
+              <Pressable onPress={handlePress} style={{backgroundColor: '#2b4ba2', padding: 10, borderRadius: 20}}>Request a Service</Pressable>
             </View>
           </View>
         </ScrollView>
@@ -74,13 +75,13 @@ grid: {
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'space-between',
-  gap: 10,
+  gap: 5,
 },
 serviceType: {
   backgroundColor: '#2b4ba2',
   color: 'white',
   borderRadius: 20,
-  width: '50%',
+  width: '33%',
 }
 });
 

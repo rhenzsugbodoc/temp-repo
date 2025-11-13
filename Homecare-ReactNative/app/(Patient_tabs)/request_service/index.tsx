@@ -9,11 +9,11 @@ import { useQuery} from '@tanstack/react-query';
 
 export default function RequestList() {
   const router = useRouter();
+  const {data, isLoading, isError} = useQuery(getCompanyListOptions());
 
-  useEffect(() => {
-    // Fetch company list or any other data if needed
-    const {data, isLoading, isError} = useQuery(getCompanyListOptions());
-  }, []);
+  // useEffect(() => {
+  //   // Fetch company list or any other data if needed
+  // }, []);
    const companyList = [
       { id: 1, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
       { id: 2, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
@@ -25,16 +25,11 @@ export default function RequestList() {
       { id: 8, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
       { id: 9, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
     ];
-  const handleLogout = () => {
-    // TODO: implement logout behavior
-  };
+
   const [selectedValue, setSelectedValue] = useState('Assisted Living');
 
   const handleCompanyPress = (company: any) => {
-    router.push({
-      pathname: '/(Patient_tabs)/request/company/[id]',
-      params: { id: String(company.id) },
-    });
+    router.push(`/request/${company.id}`);  
   }
   return <SafeAreaView style={{
     flex: 1,

@@ -31,7 +31,7 @@ export default function PatientTabLayout() {
         }}
       />
       <Tabs.Screen
-        name="request"
+        name="request_service"
         options={{
           title: 'Request',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="bad-add-outline" color={color} />,
