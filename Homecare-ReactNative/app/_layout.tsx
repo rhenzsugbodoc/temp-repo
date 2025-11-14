@@ -15,11 +15,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 
-SplashScreen.preventAutoHideAsync();
+//SplashScreen.preventAutoHideAsync();
+
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-
+  useEffect(() => {
+    async function hideSplash() {
+      await SplashScreen.hideAsync(); 
+    }
+    hideSplash();
+  }, []);
   const queryClient = new QueryClient();
   return (
     

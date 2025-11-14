@@ -8,14 +8,14 @@ const CompanyDetails = () => {
     
     const router = useRouter();
 
-    const { companyId } = useLocalSearchParams();
-    const {data, isLoading, isError} = useQuery(getCompanyOptions(Number(companyId)));
+    const { id } = useLocalSearchParams();
+    const {data, isLoading, isError} = useQuery(getCompanyOptions(Number(id)));
 
     const handlePress = () =>{
-      router.push(`/request/request_service?companyID=${companyId}`);  
+      router.push(`/request_service/requesting_service?companyID=${id}`);  
     }
     const company = {
-        id: companyId,
+        id: id,
         company_name: 'Life Care Cebu',
         address: 'B. Rodriguez St. Cebu City 6000 Cebu',
         phone_number: '123-456-7890',
@@ -32,34 +32,33 @@ const CompanyDetails = () => {
       { id: 6, service_name: 'Vaccination' },
     ]
     return (
-      <SafeAreaView>
-        <ScrollView>
+      <SafeAreaView style={{flex:1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {/* header blue */}
-          <View style={{ backgroundColor: '2b4ba2' , justifyContent: 'center', alignItems: 'center', height: 150}}> 
-            <Text style= {[styles.companyHeaderText, { fontWeight: 'bold' }]}>{company.company_name}</Text>
+          <View style={{ backgroundColor: '#4454c3' , justifyContent: 'center', alignItems: 'center', height: 150}}> 
+            <Text style= {[styles.companyHeaderText, { fontWeight: 'bold', fontSize: 20 }]}>{company.company_name}</Text>
             <Text style= {styles.companyHeaderText}>{company.address}</Text>
             <Text style= {styles.companyHeaderText}>{company.phone_number}</Text>
             <Text style= {styles.companyHeaderText}>{company.email}</Text>
           </View>
 
-          <View style= {{borderBottomColor: 'black', borderBottomWidth: 1}}>
-            <Text>About Us</Text>
-            <Text>{company.description}</Text>
+          <View style= {{borderBottomColor: 'black', borderBottomWidth: 1 , padding: 25}}>
+            <Text style={{color: '#53346A', fontFamily: 'poppins', fontWeight: 'bold' }}>ABOUT US</Text>
+            <Text style= {{color: '#53346A', fontFamily: 'poppins' }}>{company.description}</Text>
           </View>
           
-          <View >
-            <Text>Services Offered</Text>
+          <View style={{padding: 25}}>
+            <Text style={{color: '#53346A', fontFamily: 'poppins', fontWeight: 'bold', marginBottom: 20 }}>SERVICES OFFERED</Text>
             <View style={styles.grid}>
               {servicesList.map(service => (
                   <View  key={service.id} style={styles.serviceType}>
-                    <Text>{service.service_name}</Text>
+                    <Text style={{color:'white', textAlign: 'center'}}>{service.service_name}</Text>
                   </View>
                 ))}
             </View>
-
-            <View style= {{marginTop: 'auto', alignItems: 'center'}}>
-              <Pressable onPress={handlePress} style={{backgroundColor: '#2b4ba2', padding: 10, borderRadius: 20}}>Request a Service</Pressable>
-            </View>
+          </View>
+          <View style= {{marginTop: 'auto', padding: 30}}>
+            <Pressable onPress={handlePress} style={{backgroundColor: '#2b4ba2', padding: 10, borderRadius: 20}}><Text style={{color: 'white', textAlign: 'center'}}>Request a Service</Text></Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -69,7 +68,7 @@ const CompanyDetails = () => {
 const styles = StyleSheet.create({
  companyHeaderText: {
   color: 'white' ,
-  fontSize: 12,
+  fontSize: 14,
  },
 grid: {
   flexDirection: 'row',
@@ -79,9 +78,10 @@ grid: {
 },
 serviceType: {
   backgroundColor: '#2b4ba2',
+  padding: 10,
   color: 'white',
   borderRadius: 20,
-  width: '33%',
+  width: '48%',
 }
 });
 

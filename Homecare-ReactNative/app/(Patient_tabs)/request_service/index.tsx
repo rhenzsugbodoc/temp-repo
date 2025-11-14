@@ -29,53 +29,74 @@ export default function RequestList() {
   const [selectedValue, setSelectedValue] = useState('Assisted Living');
 
   const handleCompanyPress = (company: any) => {
-    router.push(`/request/${company.id}`);  
-  }
+    router.push(`/request_service/${company.id}`);
+  };
   return <SafeAreaView style={{
     flex: 1,
-    backgroundColor: '#f5f7fa',
-    padding: 10,
+    backgroundColor: '#f4f7fa',
+    
   }} edges={['top']}>
 
-    <View style={{ height: 60}}>
-      <Text style={{color: '#8c82c6' , fontSize: 20}}>Requests</Text>
+    {/* categoryLabel */}
+    <View style={{ height: 90, backgroundColor: '#4454c3', justifyContent:'center', paddingHorizontal:30}}>
+      <Text style={{color: 'white' , fontFamily: 'poppins', fontSize: 25}}>Requests</Text>
     </View>
 
-    <ScrollView>
+    <ScrollView style={{paddingHorizontal: 20}}>
+      {/* searchInput */}
+      <View style={{borderWidth: 1, borderColor: '#ccc', marginVertical: 10, borderRadius: 25, padding: 10}}>
+        <TextInput placeholder="Search Facility" />
+      </View>
+      {/* pickerContainer  && pickerBox*/}
+      <View style={{flexDirection: 'row', gap: 10}}>
+          <View style={{ flex: 3, borderWidth: 1, borderRadius: 25, borderColor: '#ccc', overflow: 'hidden' }}>
+            <Picker
+              selectedValue={selectedValue}
+              onValueChange={(itemValue) => setSelectedValue(itemValue)}
+              style={{ flex: 1, color: '#b6b6b6'}}
+            >
+              <Picker.Item label="Assisted Living" value="assisted_living" />
+              <Picker.Item label="Nursing Care" value="nursing_care" />
+              <Picker.Item label="Companionship" value="companionship" />
+              <Picker.Item label="Therapy" value="nursing_care" />
+            </Picker>
+          </View>
 
-      <View>
-        <TextInput placeholder="Search Requests" style={{borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 10, width: '100%'}} />
+          {/* Second Picker */}
+          <View style={{ flex: 2, borderWidth: 1, borderRadius: 25, borderColor: '#ccc', overflow: 'hidden' }}>
+            <Picker
+              selectedValue={selectedValue}
+              onValueChange={(itemValue) => setSelectedValue(itemValue)}
+              style={{ flex: 1, color: '#b6b6b6' }}
+            >
+              <Picker.Item label="Sort By: Name" value="name" />
+              <Picker.Item label="Sort By: Popularity" value="popularity" />
+            </Picker>
+          </View>
+        
       </View>
 
-      <View style={{flexDirection: 'row', width: '100%'}}>
-        <Picker style={{flex: 1,}} selectedValue={selectedValue} onValueChange={(itemValue) => setSelectedValue(itemValue)}>
-          <Picker.Item label="Assisted Living" value="assisted_living" />
-          <Picker.Item label="Nursing Care" value="nursing_care" />
-          <Picker.Item label="Companionship" value="companionship" />
-          <Picker.Item label="Therapy" value="nursing_care" />
-        </Picker>
 
-        <Picker style={{flex: 1,}} selectedValue={selectedValue} onValueChange={(itemValue) => setSelectedValue(itemValue)}>
-          <Picker.Item label="Sort By: Name" value="name" />
-          <Picker.Item label="Sort By: Popularity" value="popularity" />
-        </Picker>
-      </View>
-
-
-
-      <View style={{gap: 10}}>
+      {/* companyList */}
+      <View style={{gap: 5}}>
         {companyList.map(company => (
-          <Pressable  key={company.id} onPress={() => handleCompanyPress(company)}
-            style={({ pressed }) => [styles.card,{ flexDirection: 'row', opacity: pressed ? 0.8 : 1 }]}>
-            <Image source={require('../../../assets/images/MisterMatres.png')} style={{ borderRadius: 20, flex: 1}} />
-            <View style={{flex: 1}}>
-              <Text style={{fontWeight: 'bold'}}>{company.company_name}</Text>
-              <Text>{company.address}</Text>
-              <Text>{company.description}</Text>
+          <Pressable key={company.id} onPress={() => handleCompanyPress(company)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
+            <View style={[styles.card, {gap: 10, flexDirection: 'row'}]}>
+              <View style={{ flex: 1 }}>
+                <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
+                  style={{ borderRadius: 10, width: '100%', height: 150 }} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 2, color: '#434e79', fontFamily: 'poppins' }}>{company.company_name}</Text>
+                <Text style={{ color: '#cacaca', fontSize: 12, marginBottom: 5, fontFamily: 'poppins' }}>{company.address}</Text>
+                <Text style={{ color: '#cbcbcb', fontSize: 13, fontFamily: 'poppins' }}>{company.description}</Text>
+              </View>
             </View>
           </Pressable>
         ))}
       </View>
+
+
     </ScrollView>
   </SafeAreaView>;
 }
@@ -84,16 +105,18 @@ export default function RequestList() {
 const styles = StyleSheet.create({
 
   card: {
-    backgroundColor: 'white',
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
     borderRadius: 15,
     padding: 15,
-    marginHorizontal:10,
+    marginHorizontal: 5,
     marginVertical: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
+    alignItems: 'center',
   },
 
 });
