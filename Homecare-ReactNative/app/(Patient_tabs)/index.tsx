@@ -21,11 +21,11 @@ export default function PatientDashboard() {
       { id: 8, name: 'card-outline', label: 'Bills' },
     ];
    const items2 = [
-      { name: 'person-outline', label: 'Clement Bonachita' },
-      { name: 'person-outline', label: 'Mike Tyson' },
-      { name: 'person-outline', label: 'Djen Orejola' },
-      { name: 'person-outline', label: 'Sam Sung' },
-      { name: 'person-outline', label: 'John Jon' },
+      { id: 1, name: 'person-outline', label: 'Clement Bonachita' },
+      { id: 2, name: 'person-outline', label: 'Mike Tyson' },
+      { id: 3, name: 'person-outline', label: 'Djen Orejola' },
+      { id: 4, name: 'person-outline', label: 'Sam Sung' },
+      { id: 5, name: 'person-outline', label: 'John Jon' },
     ];
   return <SafeAreaView style={{
     flex: 1,
@@ -59,7 +59,7 @@ export default function PatientDashboard() {
             {items.map((item, index) => (
               <View key={index} style={styles.item}>
                 <Pressable style={styles.iconCircle}>
-                  <Ionicons name={String(item.name)} size={30} color="#6366f1" />
+                  <Ionicons name={item.name as any} size={30} color="#6366f1" />
                 </Pressable>
                 <Text style={styles.label}>{item.label}</Text>
               </View>
@@ -73,7 +73,7 @@ export default function PatientDashboard() {
             {items2.map(item => (
               <View key={item.id} style={[styles.card, {width: 120, alignItems:'center'}]}>
                 <Pressable style={[styles.iconCircle, {width: 50, height: 50, borderRadius: 25,}]}>
-                  <Ionicons name={String(item.name)} size={30} color="#6366f1" />
+                  <Ionicons name={item.name as any} size={30} color="#6366f1" />
                 </Pressable>
                 <Text style={styles.label}>{item.label}</Text>
               </View>
