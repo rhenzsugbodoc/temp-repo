@@ -26,7 +26,9 @@ export default function RequestList() {
       { id: 9, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
     ];
 
+
   const [selectedValue, setSelectedValue] = useState('Assisted Living');
+  const [selectedSort, setSelectedSort] = useState('Sort By: Name');
 
   const handleCompanyPress = (company: any) => {
     router.push(`/request_service/${company.id}`);
@@ -37,48 +39,60 @@ export default function RequestList() {
     
   }} edges={['top']}>
 
-    {/* categoryLabel */}
-    <View style={{ height: 90, backgroundColor: '#4454c3', justifyContent:'center', paddingHorizontal:30}}>
-      <Text style={{color: 'white' , fontFamily: 'poppins', fontSize: 25}}>Requests</Text>
-    </View>
 
-    <ScrollView style={{paddingHorizontal: 20}}>
-      {/* searchInput */}
-      <View style={{borderWidth: 1, borderColor: '#ccc', marginVertical: 10, borderRadius: 25, padding: 10}}>
-        <TextInput placeholder="Search Facility" />
-      </View>
+
+    <ScrollView >
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>Request</Text>
+          <View style={styles.headerIcons}>
+            <Ionicons name="time-outline" size={22} color="white" />
+            <Ionicons name="location-outline" size={22} color="white" />
+          </View>
+        </View>
+
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+            <TextInput
+              placeholder="Search"
+              style={styles.searchInput}
+            />
+            <Ionicons name="search" size={20} color="#999" />
+          </View>
+        </View>
+
       {/* pickerContainer  && pickerBox*/}
-      <View style={{flexDirection: 'row', gap: 10}}>
-          <View style={{ flex: 3, borderWidth: 1, borderRadius: 25, borderColor: '#ccc', overflow: 'hidden' }}>
-            <Picker
-              selectedValue={selectedValue}
-              onValueChange={(itemValue) => setSelectedValue(itemValue)}
-              style={{ flex: 1, color: '#b6b6b6'}}
-            >
-              <Picker.Item label="Assisted Living" value="assisted_living" />
-              <Picker.Item label="Nursing Care" value="nursing_care" />
-              <Picker.Item label="Companionship" value="companionship" />
-              <Picker.Item label="Therapy" value="nursing_care" />
-            </Picker>
-          </View>
+        <View style={{flexDirection: 'row', gap: 10, marginVertical: 12, paddingHorizontal: 40}}>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={selectedValue}
+                onValueChange={(itemValue) => setSelectedValue(itemValue)}
+                style={{ flex: 1, color: '#b7aac0' }}
+                
+              >
+                <Picker.Item label="Assisted Living" value="assisted_living" />
+                <Picker.Item label="Nursing Care" value="nursing_care" />
+                <Picker.Item label="Companionship" value="companionship" />
+                <Picker.Item label="Therapy" value="nursing_care" />
+              </Picker>
+            </View>
 
-          {/* Second Picker */}
-          <View style={{ flex: 2, borderWidth: 1, borderRadius: 25, borderColor: '#ccc', overflow: 'hidden' }}>
-            <Picker
-              selectedValue={selectedValue}
-              onValueChange={(itemValue) => setSelectedValue(itemValue)}
-              style={{ flex: 1, color: '#b6b6b6' }}
-            >
-              <Picker.Item label="Sort By: Name" value="name" />
-              <Picker.Item label="Sort By: Popularity" value="popularity" />
-            </Picker>
-          </View>
-        
-      </View>
+            {/* Second Picker */}
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={selectedSort}
+                onValueChange={(itemValue) => setSelectedSort(itemValue)}
+                style={{ flex: 1, color: '#b7aac0' }}
+              >
+                <Picker.Item label="Sort By: Name" value="name" />
+                <Picker.Item label="Sort By: Popularity" value="popularity" />
+              </Picker>
+            </View>
+          
+        </View>
 
 
       {/* companyList */}
-      <View style={{gap: 5}}>
+      <View style={{gap: 5, marginHorizontal: 20}}>
         {companyList.map(company => (
           <Pressable key={company.id} onPress={() => handleCompanyPress(company)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
             <View style={[styles.card, {gap: 10, flexDirection: 'row'}]}>
@@ -119,4 +133,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+    headerContainer: {
+    backgroundColor: '#4F46E5',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 25,
+    paddingVertical: 30,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  headerTitle: {
+    color: 'white',
+    fontSize: 30,
+    fontWeight: 'bold',
+    fontFamily: 'poppins'
+  },
+
+  headerIcons: {
+    // position: 'absolute',
+    // right: 20,
+    // top: 20,
+    flexDirection: 'row',
+    gap: 15,
+  },
+
+  searchWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: -20,
+  },
+
+  searchContainer: {
+    width: '85%',
+    backgroundColor: 'white',
+    height: 40,
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 4,
+
+  },
+
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    height: 45,
+  },
+  pickerContainer: {
+    backgroundColor: '#ffffff',
+    flex: 1,
+    height: 35,
+    justifyContent: 'center',
+    borderWidth: 0.1,
+    borderRadius: 25,
+    borderColor: '#ccc',
+    overflow: 'hidden',
+  },
 });

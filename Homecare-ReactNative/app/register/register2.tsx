@@ -30,11 +30,11 @@ export default function Register() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top']}>
       <View style={styles.topContent}>
         <Text style={styles.logoTitle}>Patient Registration</Text>
-        <Text style={{color: 'white', fontSize: 24}}>Basic Information</Text>
+        <Text style={{color: 'black', fontSize: 24}}>Basic Information</Text>
       </View>
 
       <View style={styles.form}>     
-       <Text style={styles.label}>Date of Birth</Text>
+  
         <TouchableOpacity
           style={[styles.input, { justifyContent: 'center' }]}
           onPress={() => setShowDatePicker(true)}
@@ -82,15 +82,15 @@ export default function Register() {
         <TextInput
             placeholder="Home Address"
             placeholderTextColor="#888"
-            value={user.homeAddress || ''}
-            onChangeText={value => handleChange('homeAddress', value)}
+            value={user.home_address || ''}
+            onChangeText={value => handleChange('home_address', value)}
             style={styles.input}
         />
         <TextInput
             placeholder="Emergency Contact"
             placeholderTextColor="#888"
-            value={user.emergencyContact || ''}
-            onChangeText={value => handleChange('emergencyContact', value)}
+            value={user.emergency_contact || ''}
+            onChangeText={value => handleChange('emergency_contact', value)}
             style={styles.input}
         />
        
@@ -123,8 +123,9 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   topContent: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginTop: 40,
+    paddingHorizontal: 24,
   },
   logoImage: {
     width: 80,
@@ -133,26 +134,28 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logoTitle: {
-    color: 'white',
+    color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
   },
 
   form: {
     marginTop: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: 40,
   },
   input: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 25,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 16,
-    color: 'white',
+    color: '#c2c2c2',
     fontSize: 16,
   },
   label: {
-    color: 'white',
+    color: '#c2c2c2',
     marginBottom: 8,
     fontSize: 14,
   },
@@ -173,27 +176,31 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     marginHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#1e1e1e',
+    borderRadius: 25,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
     alignItems: 'center',
   },
   genderSelected: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#4454c3',
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   genderText: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
   },
 
   signupButton: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#4454c3',
     borderRadius: 25,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
   },
   signupButtonText: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -225,11 +232,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   loginText: {
-    color: 'white',
+    color: '#717171',
     marginTop: 8,
   },
   loginLink: {
-    color: '#1DB954',
+    color: '#0575e6',
     fontWeight: 'bold',
   },
 });

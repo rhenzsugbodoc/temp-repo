@@ -14,13 +14,13 @@ export default function RequestService() {
         justifyContent: 'center',
         alignItems: 'center',
         }} edges={['top']}>
-            <Image source={require('../../../assets/images/successful_booking.png')} resizeMode="cover" 
-                style={{ borderRadius: 10, width: '100%', height: 150 }} />
+            <Image source={require('../../../assets/images/successful_booking.png')} resizeMode="contain" 
+                style={{ width: '100%', height: 120, marginBottom: 10 }} />
             <View>
-                <Text style={[styles.bookingText, {fontSize: 20, fontWeight: 'bold'}]}>BOOKING CONFIRMED!</Text>
+                <Text style={[styles.bookingText, {fontSize: 18, fontWeight: 'bold'}]}>BOOKING CONFIRMED!</Text>
                 <Text style={styles.bookingText}>Updates on your request status {'\n'} will be sent via the app {'\n'} and to your email/phone number.</Text>
             </View>
-            <View>
+            <View style={{marginTop: 20}}>
                 <Pressable style= {styles.submitButton} onPress={() => router.push('/(Patient_tabs)')}>
                     <Text style={{color: 'white', textAlign: 'center', fontFamily: 'poppins'}}>Back to Home</Text></Pressable>
             </View>
@@ -29,15 +29,15 @@ export default function RequestService() {
 }
 const styles = StyleSheet.create({
     bookingText: {
-        fontSize: 18,
+        fontSize: 14,
         textAlign: 'center',
         color: '#434e79',
         fontFamily: 'poppins'
     },
     submitButton: {
         backgroundColor: '#4454c3',
-        padding: 25,
-        borderRadius: 10,
+        padding: 15,
+        borderRadius: 15,
     },
 
 });

@@ -12,12 +12,12 @@ export default function RequestList() {
     const [selectedType, setSelectedType] = useState<'One-Time Service' | 'Routine Service'>('One-Time Service');
 
     const serviceList = [
-    { id: 1, service_name: 'Basic Chores', service_type: "One-Time Service", address: 'B. Rodriguez St. Cebu City 6000 Cebu', date:"", time: "", caregiver_name: "", status: "In progress" },
-    { id: 2, service_name: 'Medication Reminder', service_type: "Routine Service", address: 'M. L. Quezon St. Cebu City 6000 Cebu', date: "2025-11-15", time: "09:00 AM", caregiver_name: "Maria Santos", status: "Scheduled" },
-    { id: 3, service_name: 'Meal Preparation', service_type: "Routine Service", address: 'Gen. Maxilom Ave. Cebu City 6000 Cebu', date: "2025-11-16", time: "11:00 AM", caregiver_name: "Juan Dela Cruz", status: "Cancelled" },
-    { id: 4, service_name: 'Laundry Service', service_type: "One-Time Service", address: 'Osmeña Blvd. Cebu City 6000 Cebu', date: "2025-11-17", time: "02:00 PM", caregiver_name: "Ana Reyes", status: "Scheduled" },
-    { id: 5, service_name: 'Physical Therapy', service_type: "Routine Service", address: 'C. Padilla St. Cebu City 6000 Cebu', date: "2025-11-18", time: "10:00 AM", caregiver_name: "Carlos Lim", status: "In progress" },
-    { id: 6, service_name: 'Grocery Assistance', service_type: "One-Time Service", address: 'A. Soriano St. Cebu City 6000 Cebu', date: "2025-11-19", time: "03:00 PM", caregiver_name: "Liza Tan", status: "Scheduled" }
+    { id: 1, service_name: 'BASIC CHORES', service_type: "One-Time Service", address: 'B. Rodriguez St. Cebu City 6000 Cebu', date:"2025-11-15", time: "09:00 AM", caregiver_name: "Carlos Lim", status: "In progress" },
+    { id: 2, service_name: 'MEDICATION REMINDER', service_type: "Routine Service", address: 'M. L. Quezon St. Cebu City 6000 Cebu', date: "2025-11-15", time: "09:00 AM", caregiver_name: "Maria Santos", status: "Scheduled" },
+    { id: 3, service_name: 'MEAL PREPARATION', service_type: "One-Time Service", address: 'Gen. Maxilom Ave. Cebu City 6000 Cebu', date: "2025-11-16", time: "11:00 AM", caregiver_name: "Juan Dela Cruz", status: "Cancelled" },
+    { id: 4, service_name: 'LAUNDRY SERVICE', service_type: "One-Time Service", address: 'Osmeña Blvd. Cebu City 6000 Cebu', date: "2025-11-17", time: "02:00 PM", caregiver_name: "Ana Reyes", status: "Scheduled" },
+    { id: 5, service_name: 'PHYSICAL THERAPY', service_type: "One-Time Service", address: 'C. Padilla St. Cebu City 6000 Cebu', date: "2025-11-18", time: "10:00 AM", caregiver_name: "Carlos Lim", status: "In progress" },
+    { id: 6, service_name: 'GROCERY ASSISTANCE', service_type: "One-Time Service", address: 'A. Soriano St. Cebu City 6000 Cebu', date: "2025-11-19", time: "03:00 PM", caregiver_name: "Liza Tan", status: "Scheduled" }
     ];
     const episodeList = [
         {id: 1, episode_name: 'Chronic Disease Management (Diabetes)'},
@@ -41,12 +41,20 @@ export default function RequestList() {
             </Pressable>
         );
     };
+
+    const renderOneTimeService = () => {
+        return (
+           <Text>Hello</Text> 
+
+           
+        );
+    };
     const handleServicePress = (service: any) => {
-        router.push(`/care_plan/service${service.id}`);
+        // router.push(`/care_plan/service${service.id}`);
     }
 
     const handleEpisodePress = (episode: any) => {
-        router.push(`/care_plan/episode${episode.id}`);
+        router.push(`/care_plan/${episode.id}`);
     }
 
 
@@ -61,39 +69,61 @@ return <SafeAreaView style={{
       <Text style={{color: 'white' , fontFamily: 'poppins', fontSize: 25}}>My Plans</Text>
     </View>
 
-    <View style={{flexDirection: 'row'}}>
-        {renderServiceTypeButton('One-Time Service')};
-        {renderServiceTypeButton('Routine Service')};
+    <View style={{flexDirection: 'row', marginBottom: 10}}>
+        {renderServiceTypeButton('One-Time Service')}
+        {renderServiceTypeButton('Routine Service')}
     </View>
     <ScrollView >
+      {/* OneTime Tab*/}
+      {selectedType === 'One-Time Service' && serviceList.filter(service => service.service_type === 'One-Time Service').map((service) => (
+          <Pressable key={service.id} onPress={() => handleServicePress(service)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
+              <View style={styles.card} key={service.id}>
+                  <View style={{flexDirection: 'row', flex: 1}}>
+                      <View style={{ flex: 4}}>
+                          <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="contain" 
+                          style={{  width: '100%', height: 120 , borderRadius: 30 }} />
+                      </View>
+                      <View style={{ flex: 5, gap:5,  justifyContent: 'center'}}>
+                        
+                          <Text style={{ fontWeight: 'bold', fontSize: 14, marginBottom: 2, color: '#7d71bf', fontFamily: 'poppins' }}>{service.service_name}</Text>
+                          {/* Date */}
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <Ionicons name="calendar-outline" size={12} color="#7066ac" />
+                            <Text style={styles.serviceDetails}>{service.date}</Text>
+                          </View>
 
-    {selectedType === 'One-Time Service' && serviceList.filter(service => service.service_type === 'One-Time Service').map((service) => (
-        <Pressable key={service.id} onPress={() => handleServicePress(service)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-            <View style={styles.card} key={service.id}>
-                <View style={{flexDirection: 'row', flex: 1}}>
-                    <View style={{ flex: 1 }}>
-                        <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
-                        style={{ borderRadius: 10, width: '100%', height: 150 }} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 2, color: '#434e79', fontFamily: 'poppins' }}>{service.service_name}</Text>
-                        <Text style={{ color: '#cacaca', fontSize: 12, marginBottom: 5, fontFamily: 'poppins' }}>{service.date}</Text>
-                        <Text style={{ color: '#cbcbcb', fontSize: 13, fontFamily: 'poppins' }}>{service.caregiver_name}</Text>
-                        <Text style={{ color: '#cbcbcb', fontSize: 13, fontFamily: 'poppins' }}>{service.status}</Text>
+                          {/* Caregiver */}
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <Ionicons name="person-outline" size={12} color="#7066ac" />
+                            <Text style={styles.serviceDetails}>{service.caregiver_name}</Text>
+                          </View>
 
-                    </View>
-                </View>
-            </View>
-        </Pressable>
-    ))}
+                          {/* Status */}
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <Ionicons name="checkmark-circle-outline" size={12} color="#7066ac" />
+                            <Text style={styles.serviceDetails}>{service.status}</Text>
+                          </View>
+                        
+                      </View>
+                  </View>
+              </View>
+          </Pressable>
+      ))}
+      {/* RoutineTab */}
+      {selectedType === 'Routine Service' && (
+        <View>
+          <Text style={{fontFamily: 'poppins', color: '#434e79', fontSize: 18, fontWeight: 'bold', marginBottom: 10, marginLeft: 20}}>Select Episode of Care</Text>
+          {episodeList.map(episode => (
+            <Pressable key={episode.id} onPress={() => handleEpisodePress(episode)} style={({ pressed }) => [styles.card,{opacity: pressed ? 0.8 : 1}]}>
+              <View style={[styles.card, {paddingHorizontal: 20, alignItems: 'center', borderWidth: 1, borderColor: '#b1b1b1'}]}>
+                <Text style={{textAlign: 'center', fontFamily: 'poppins', color: '#434e79'}}>{episode.episode_name}</Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      )}
 
-    {selectedType === 'Routine Service' && episodeList.map(episode => (
-        <Pressable key={episode.id} onPress={() => handleEpisodePress(episode)} style={({ pressed }) => [styles.card, { opacity: pressed ? 0.8 : 1 }]}>
-            <Text>{episode.episode_name}</Text>
-        </Pressable>
-    ))
-    }
-
+     
     </ScrollView>
   </SafeAreaView>;
 }
@@ -106,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 15,
     padding: 15,
-    marginHorizontal: 5,
+    marginHorizontal: 30,
     marginVertical: 5,
     shadowColor: '#000',
     shadowOpacity: 0.05,
@@ -134,4 +164,10 @@ const styles = StyleSheet.create({
   serviceTypeTextSelected: {
     color: '#5a3d70',
   },
+  serviceDetails: {
+  color: '#7066ac',
+  fontSize: 10,
+  fontFamily: 'poppins'
+},
+
 });

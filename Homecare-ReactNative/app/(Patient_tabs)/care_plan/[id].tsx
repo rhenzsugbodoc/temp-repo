@@ -8,56 +8,55 @@ import React, { useState } from 'react';
 import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function PatientDashboard() {
 
-  const handleLogout = () => {
-    // TODO: implement logout behavior
-  };
+  const router = useRouter();
+
 
 
   const categoryList = [
       { id: 1, name: 'Assessment'},
       { id: 2, name: "Nurse's Diagnosis" },
-      { id: 3, name: 'Outcome and' },
+      { id: 3, name: 'Outcome and goals' },
+      { id: 4, name: 'Evaluation' },
     
    
     ];
 
   return <SafeAreaView style={{
     flex: 1,
-    backgroundColor: '#f5f7fa'
+    backgroundColor: '#f5f7fa',
+    padding: 10
   }} edges={['top']}>
 
     <View style={styles.header}>
-
-      <Text style={{color: 'white' , fontWeight: 'bold', fontSize: 12}}>All</Text>
-
+        <Text style={styles.headerText}>
+          ALL</Text>
     </View>
 
 
-    <View style={{paddingHorizontal: 15, }}>
-
-        <Text style={styles.categoryLabel}>
-          Today's Schedule</Text>
-
-
-        <Text style={styles.categoryLabel}>Care Team</Text>
+    <View style={{paddingHorizontal: 1 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} 
         contentContainerStyle={{flexDirection: 'row' ,justifyContent: 'space-between'}}>
-            {categoryList.map(category => (
-              <View key={category.id} style={[styles.card, {width: 120, alignItems:'center'}]}>
-                <Pressable style={[styles.iconCircle, {width: 50, height: 50, borderRadius: 25,}]}>
-                    <Text>{category.name}</Text>
-                </Pressable>
-            
-              </View>
-            ))}
-        </ScrollView>
+          {categoryList.map(category => (
+            <View key={category.id} style={{ alignItems: 'center', marginHorizontal: 5 }}>
+              <Pressable style={[styles.card, { width: 110, height: 100, alignItems: 'center' }]}>
+                {/* <Pressable style={{ width: 50, height: 50, borderRadius: 25 }} /> */}
+              </Pressable>
+              <Text style={styles.categoryLabel}>{category.name}</Text>
+            </View>
+          ))}
 
-        <View style={styles.card}>
-            <Text>Interventions</Text>
-        </View>
+        </ScrollView>
+    </View>
+    <View style={[styles.card, { marginTop: 30, flex: 1, padding: 30 }]}>
+      <Pressable onPress={() => router.push('/care_plan/interventions')}>
+        <Text style={{ color: '#53346a', fontSize: 17, fontFamily: 'poppins', fontWeight: 'bold' }}>
+          Interventions
+        </Text>
+      </Pressable>
     </View>
   </SafeAreaView>;
 }
@@ -81,13 +80,15 @@ const styles = StyleSheet.create({
     height: 60, 
     alignItems: 'center',  
     flexDirection: 'row',
-    marginVertical:10,
+    paddingHorizontal: 20,
+    marginVertical: 20,
+    //backgroundColor: '#53346a',
     justifyContent: 'space-between',
-    gap: 10
+    gap: 0
   },
-  categoryLabel:{
+  headerText:{
     color: '#434e79', 
-    fontSize: 20, 
+    fontSize: 30, 
     
     margin:10,
     fontWeight: 'bold'
@@ -107,11 +108,13 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#eef2ff',
   },
-  label: {
+
+  categoryLabel:{
     fontSize: 12,
-    color: '#4b5563',
+    fontFamily: 'poppins',
+    color: '#6c6c6c',
     textAlign: 'center',
-    marginTop: 6,
-  },
+    marginTop: 5,
+  }
 
 });

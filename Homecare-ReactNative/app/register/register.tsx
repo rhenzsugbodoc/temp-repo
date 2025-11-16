@@ -26,38 +26,39 @@ export default function Register() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top']}>
       <View style={styles.topContent}>
         <Text style={styles.logoTitle}>Patient Registration</Text>
-        <Text style={{color: 'white', fontSize: 24}}>Basic Information</Text>
+        <Text style={{color: '#717171', fontSize: 24}}>Basic Information</Text>
+
       </View>
 
       <View style={styles.form}>     
           <TextInput
               placeholder="First Name"
               placeholderTextColor="#888"
-              value={user.firstName || ''}
-              onChangeText={value => handleChange('firstName', value)}
+              value={user.first_name || ''}
+              onChangeText={value => handleChange('first_name', value)}
               style={styles.input}
           />
           <TextInput
               placeholder="Middle Name"
               placeholderTextColor="#888"
-              value={user.middleName || ''}
-              onChangeText={value => handleChange('middleName', value)}
+              value={user.middle_name || ''}
+              onChangeText={value => handleChange('middle_name', value)}
               style={styles.input}
           />
           <TextInput
               placeholder="Last Name"
               placeholderTextColor="#888"
               secureTextEntry
-              value={user.lastName || ''}
-              onChangeText={value => handleChange('lastName', value)}
+              value={user.last_name || ''}
+              onChangeText={value => handleChange('last_name', value)}
               style={styles.input}
           />
           <TextInput
               placeholder="Phone Number"
               placeholderTextColor="#888"
               secureTextEntry
-              value={user.phoneNumber || ''}
-              onChangeText={value => handleChange('phoneNumber', value)}
+              value={user.phone_number || ''}
+              onChangeText={value => handleChange('phone_number', value)}
               style={styles.input}
           />
           <TextInput
@@ -72,28 +73,19 @@ export default function Register() {
               placeholder="Confirm Password"
               placeholderTextColor="#888"
               secureTextEntry
-              value={user.confirmPassword || ''}
-              onChangeText={value => handleChange('confirmPassword', value)}
+              value={user.confirm_password || ''}
+              onChangeText={value => handleChange('confirm_password', value)}
               style={styles.input}
           />
 
        
         <TouchableOpacity style={styles.signupButton} onPress={handleRegister}>
-          <Text style={styles.signupButtonText}>Sign Up</Text>
+          <Text style={styles.signupButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
 
      
       <View style={styles.altLogin}>
-        {/* <Text style={styles.altText}>Sign Up With</Text>
-        <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialText}>f</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialText}>G</Text>
-          </TouchableOpacity>
-        </View> */}
         <Text style={styles.loginText}>
           Already have an account?{' '}
           <Text style={styles.loginLink} onPress={() => router.push('/login')}>
@@ -107,8 +99,9 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   topContent: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginTop: 40,
+    paddingHorizontal: 24,
   },
   logoImage: {
     width: 80,
@@ -117,18 +110,20 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logoTitle: {
-    color: 'white',
+    color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
   },
 
   form: {
     marginTop: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: 40,
   },
   input: {
     backgroundColor: '#ffffff',
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 25,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 16,
@@ -209,7 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   loginText: {
-    color: 'white',
+    color: '#717171',
     marginTop: 8,
   },
   loginLink: {

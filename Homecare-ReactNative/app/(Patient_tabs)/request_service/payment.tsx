@@ -10,6 +10,8 @@ export default function RequestService() {
     const router = useRouter();
     const serviceList = [
         { id: 1, service_name: 'Doctor\'s Home Visit', service_price: 100, date: new Date('2024-07-01') },
+        { id: 2, service_name: 'Basic Chores', service_price: 100, date: new Date('2024-07-01') },
+        { id: 3, service_name: 'Personal Hygiene Assistance', service_price: 100, date: new Date('2024-07-01') },
     ]
     const company = {
         name: 'Life Care Cebu',
@@ -22,22 +24,24 @@ export default function RequestService() {
         contact: '123-456-7890',
         City: 'Cebu City',
     }
-
+    const handleBookService = () => {
+        router.push('/request_service/confirm');
+    }
     return (
     <SafeAreaView style={{
         flex: 1,
         backgroundColor: '#f4f7fa',
-        padding: 10,
+        
         }} edges={['top']}>
 
-            <View style={{ height: 60}}>
-                <Text style={{color: '#8c82c6' , fontSize: 20}}>Payment</Text>
+            <View style={{padding: 20, backgroundColor: '#4454c3' , height: 70, justifyContent: 'center'}}>
+                <Text style={{color: '#ffffff' , fontSize: 20, marginLeft: 10}}>Payment</Text>
             </View>
 
             <ScrollView contentContainerStyle={{flexGrow:1}}>
-                <View style={[styles.card, {marginBottom: 10}]}>
-                    <Text>Patient Information</Text>
-                    <Text style={[styles.userInfo, {fontSize: 20, fontWeight: 'bold' }]}>{userDetails.name}</Text>
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>Patient Information</Text>
+                    <Text style={styles.userInfo}>{userDetails.name}</Text>
                     <Text style={styles.userInfo}>{userDetails.address}</Text>
                     <Text style={styles.userInfo}>{userDetails.contact}</Text>
                     <Text style={styles.userInfo}>{userDetails.City}</Text>
@@ -48,8 +52,8 @@ export default function RequestService() {
                     {serviceList.map( service=> (
                         <View key={service.id} style={styles.serviceItem}>
                             <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
-                            style={{ flex:3 , borderRadius: 10, width: '100%', height: 150 }} />
-                            <View style={{flex: 4}}>
+                            style={{ flex:2 , borderRadius: 10, width: '100%', height: 80 }} />
+                            <View style={{flex: 3}}>
                                 <Text style={styles.serviceName}>{service.service_name}</Text>
                                 <Text style={styles.serviceDetails}>{service.date.toDateString()}</Text>
                                 <Text style={styles.serviceDetails}>${service.service_price}</Text>
@@ -57,36 +61,35 @@ export default function RequestService() {
                         </View>
                     ) )}
                 </View>
-                <View style={styles.card}>
+                <View style={[styles.card, {alignItems: 'flex-start'}]}>
                     <Text style={styles.cardTitle}>Payment Method</Text>
-                    <Image source={require('../../../assets/images/gcash_logo.png')} resizeMode="contain" 
-                    style={{ height: 150 }} />
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                        <Image source={require('../../../assets/images/gcash_logo.png')} resizeMode="contain" 
+                        style={{ width: 50, height: 50 }} />
+                        <Text style={[styles.serviceDetails, {fontSize: 14}]}> ****1234</Text>
+                    </View>
                 </View>
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Payment Details</Text>
                     {serviceList.map( service=> (
                         <View key={service.id} style={[styles.serviceItem, {justifyContent: 'space-between'}]}>
                             <Text style={styles.serviceDetails}>{service.service_name}</Text>
-                            <Text style={styles.serviceDetails}>{service.service_price}</Text>
+                            <Text style={styles.serviceDetails}>₱{service.service_price}</Text>
                         </View>
                     ) )}
-                    <Text style={styles.serviceDetails}>Total Payment {totalAmount}</Text>
+                    <Text style={[styles.serviceDetails, {borderTopWidth: 1, borderTopColor: '#ccc', paddingTop: 5}]}>Total Payment {totalAmount}</Text>
 
                 </View>
 
-                <View style= {styles.card}>
-                    <Text>Total</Text>
-                    <Text>₱{totalAmount}</Text>
-                    <Pressable>Book Service</Pressable>
-                </View>
+ 
             </ScrollView>
             {/* Next Button */}
-            <View style={styles.card}>
+            <View style={[styles.card, {marginBottom: 0}]}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10}}>
-                    <Text style={styles.cardTitle}>Total Amount</Text>
-                    <Text style={styles.cardTitle}>₱{totalAmount}</Text>
+                    <Text style={styles.amountText}>Total Amount</Text>
+                    <Text style={styles.amountText}>₱{totalAmount}</Text>
                 </View>
-                <Pressable style= {styles.submitButton}>
+                <Pressable style= {styles.submitButton} onPress={()=> (handleBookService())}>
                     <Text style={styles.submitButtonText}>Book Service</Text>
                 </Pressable>
             </View>
@@ -97,16 +100,15 @@ const styles = StyleSheet.create({
 
 card: {
     backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 15,
-    marginHorizontal: 5,
-    marginVertical: 5,
+    marginBottom: 10,
+    padding: 20,
+    paddingHorizontal: 25,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
-    alignItems: 'center',
+    
   },
 
   userInfo:{
@@ -115,6 +117,9 @@ card: {
   },
   serviceItem: {
     flexDirection: 'row',
+    flex: 1,
+    gap: 20,
+    paddingBottom: 10
   },
   serviceDetails: {
     color: '#969cb4',
@@ -122,26 +127,36 @@ card: {
     fontFamily: 'poppins'
   },
   serviceName: {
-    color: '#7c84a2',
+    color: '#434e79',
     fontSize: 14,
     fontFamily: 'poppins',
     fontWeight: 'bold'
   },
   cardTitle: {
-    color: '#7c84a2',
+    color: '#4e5981',
     fontSize: 18,
     fontFamily: 'poppins',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    paddingBottom: 10
   },
   submitButton: {
     backgroundColor: '#22449e',
-    padding: 20,
-    marginTop: 'auto'
+    padding: 10,
+    marginTop: 'auto',
+    borderRadius: 25,
   },
   submitButtonText: {
     color: 'white',
     fontSize: 20,
     textAlign: 'center',
-    fontFamily: 'poppins'
-  }
+    fontFamily: 'poppins',
+
+  },
+  amountText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4454c3',
+    fontFamily: 'inter'
+  },
+
 });

@@ -21,8 +21,8 @@ export default function Register() {
     }))
   }
   const handleRegister = () => {
-    if (!user.emailAddress || !user.firstName || !user.middleName || 
-        !user.lastName || !user.password || !user.dob || !user.gender) {
+    if (!user.email_address || !user.first_name || !user.middle_name || 
+        !user.last_name || !user.password || !user.dob || !user.gender) {
       alert('Please fill out all required fields');
       return;
     }
@@ -35,15 +35,15 @@ export default function Register() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }} edges={['top']}>
       <View style={styles.topContent}>
         <Text style={styles.logoTitle}>Patient Registration</Text>
-        <Text style={{color: 'white', fontSize: 24}}>Basic Information</Text>
+        <Text style={{color: 'black', fontSize: 24}}>Basic Information</Text>
       </View>
 
       <View style={styles.form}>     
         <TextInput
         placeholder="Medical Conditions"
         placeholderTextColor="#888"
-        value={user.medicalConditions ? user.medicalConditions.join(', ') : ''}
-        onChangeText={value => handleChange('medicalConditions', value.split(',').map(s => s.trim()).filter(Boolean))}
+        value={user.medical_conditions ? user.medical_conditions.join(', ') : ''}
+        onChangeText={value => handleChange('medical_conditions', value.split(',').map(s => s.trim()).filter(Boolean))}
         style={styles.input}
         />
         <TextInput
@@ -56,8 +56,8 @@ export default function Register() {
         <TextInput
         placeholder="Current Medications"
         placeholderTextColor="#888"
-        value={user.currentMedications ? user.currentMedications.join(', ') : ''}
-        onChangeText={value => handleChange('currentMedications', value.split(',').map(s => s.trim()).filter(Boolean))}
+        value={user.current_medications ? user.current_medications.join(', ') : ''}
+        onChangeText={value => handleChange('current_medications', value.split(',').map(s => s.trim()).filter(Boolean))}
         style={styles.input}
         />
        
@@ -92,8 +92,9 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   topContent: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginTop: 40,
+    paddingHorizontal: 24,
   },
   logoImage: {
     width: 80,
@@ -102,26 +103,28 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logoTitle: {
-    color: 'white',
+    color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
   },
 
   form: {
     marginTop: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: 40,
   },
   input: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 25,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 16,
-    color: 'white',
+    color: '#c2c2c2',
     fontSize: 16,
   },
   label: {
-    color: 'white',
+    color: '#c2c2c2',
     marginBottom: 8,
     fontSize: 14,
   },
@@ -147,15 +150,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   genderSelected: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#0575e6',
   },
   genderText: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
   },
 
   signupButton: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#0575e6',
     borderRadius: 25,
     paddingVertical: 14,
     alignItems: 'center',
@@ -194,11 +197,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   loginText: {
-    color: 'white',
+    color: '#717171',
     marginTop: 8,
   },
   loginLink: {
-    color: '#1DB954',
+    color: '#0575e6',
     fontWeight: 'bold',
   },
 });

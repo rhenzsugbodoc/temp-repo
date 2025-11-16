@@ -2,20 +2,20 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 
 export type User = {
-  first__name?: string;
-  middle__name?: string;
-  last__name?: string;
-  phone__number?: string;
-  email__address?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  email_address?: string;
   password?: string;
-  confirm__password?: string;
+  confirm_password?: string;
   gender?: 'Male' | 'Female';
   dob?: Date;
-  home__address?: string;
-  medical__conditions?: string[];
+  home_address?: string;
+  medical_conditions?: string[];
   allergies?: string[];
-  emergency__contact?: string;
-  current__medications?: string[];
+  emergency_contact?: string;
+  current_medications?: string[];
 
 }
 
