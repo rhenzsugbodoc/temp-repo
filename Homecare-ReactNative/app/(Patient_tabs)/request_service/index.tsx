@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { getCompanyListOptions} from '../../../options/companyQueryOptions';
 import { useQuery} from '@tanstack/react-query';
-
+import { companyListStyles } from '../../../assets/styles/patient/request/requestStyles';
 export default function RequestList() {
   const router = useRouter();
   const {data, isLoading, isError} = useQuery(getCompanyListOptions());
@@ -42,31 +42,31 @@ export default function RequestList() {
 
 
     <ScrollView >
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Request</Text>
-          <View style={styles.headerIcons}>
+        <View style={companyListStyles.headerContainer}>
+          <Text style={companyListStyles.headerTitle}>Request</Text>
+          <View style={companyListStyles.headerIcons}>
             <Ionicons name="time-outline" size={22} color="white" />
             <Ionicons name="location-outline" size={22} color="white" />
           </View>
         </View>
 
-        <View style={styles.searchWrapper}>
-          <View style={styles.searchContainer}>
+        <View style={companyListStyles.searchWrapper}>
+          <View style={companyListStyles.searchContainer}>
             <TextInput
               placeholder="Search"
-              style={styles.searchInput}
+              style={companyListStyles.searchInput}
             />
             <Ionicons name="search" size={20} color="#999" />
           </View>
         </View>
 
       {/* pickerContainer  && pickerBox*/}
-        <View style={{flexDirection: 'row', gap: 10, marginVertical: 12, paddingHorizontal: 40}}>
-            <View style={styles.pickerContainer}>
+        <View style={companyListStyles.pickerWrapper}>
+            <View style={companyListStyles.pickerContainer}>
               <Picker
                 selectedValue={selectedValue}
                 onValueChange={(itemValue) => setSelectedValue(itemValue)}
-                style={{ flex: 1, color: '#b7aac0' }}
+                style={companyListStyles.pickerItem}
                 
               >
                 <Picker.Item label="Assisted Living" value="assisted_living" />
@@ -77,11 +77,11 @@ export default function RequestList() {
             </View>
 
             {/* Second Picker */}
-            <View style={styles.pickerContainer}>
+            <View style={companyListStyles.pickerContainer}>
               <Picker
                 selectedValue={selectedSort}
                 onValueChange={(itemValue) => setSelectedSort(itemValue)}
-                style={{ flex: 1, color: '#b7aac0' }}
+                style={companyListStyles.pickerItem}
               >
                 <Picker.Item label="Sort By: Name" value="name" />
                 <Picker.Item label="Sort By: Popularity" value="popularity" />
@@ -92,18 +92,18 @@ export default function RequestList() {
 
 
       {/* companyList */}
-      <View style={{gap: 5, marginHorizontal: 20}}>
+      <View style={companyListStyles.companyContainer}>
         {companyList.map(company => (
           <Pressable key={company.id} onPress={() => handleCompanyPress(company)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-            <View style={[styles.card, {gap: 10, flexDirection: 'row'}]}>
+            <View style={[companyListStyles.card, {gap: 10, flexDirection: 'row'}]}>
               <View style={{ flex: 1 }}>
                 <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
                   style={{ borderRadius: 10, width: '100%', height: 150 }} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 2, color: '#434e79', fontFamily: 'poppins' }}>{company.company_name}</Text>
-                <Text style={{ color: '#cacaca', fontSize: 12, marginBottom: 5, fontFamily: 'poppins' }}>{company.address}</Text>
-                <Text style={{ color: '#cbcbcb', fontSize: 13, fontFamily: 'poppins' }}>{company.description}</Text>
+                <Text style={companyListStyles.companyText1}>{company.company_name}</Text>
+                <Text style={companyListStyles.companyText2}>{company.address}</Text>
+                <Text style={companyListStyles.companyText3}>{company.description}</Text>
               </View>
             </View>
           </Pressable>
@@ -114,82 +114,3 @@ export default function RequestList() {
     </ScrollView>
   </SafeAreaView>;
 }
-
-
-const styles = StyleSheet.create({
-
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 15,
-    marginHorizontal: 5,
-    marginVertical: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-    alignItems: 'center',
-  },
-
-    headerContainer: {
-    backgroundColor: '#4F46E5',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 25,
-    paddingVertical: 30,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
-
-  headerTitle: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
-    fontFamily: 'poppins'
-  },
-
-  headerIcons: {
-    // position: 'absolute',
-    // right: 20,
-    // top: 20,
-    flexDirection: 'row',
-    gap: 15,
-  },
-
-  searchWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: -20,
-  },
-
-  searchContainer: {
-    width: '85%',
-    backgroundColor: 'white',
-    height: 40,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 4,
-
-  },
-
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    height: 45,
-  },
-  pickerContainer: {
-    backgroundColor: '#ffffff',
-    flex: 1,
-    height: 35,
-    justifyContent: 'center',
-    borderWidth: 0.1,
-    borderRadius: 25,
-    borderColor: '#ccc',
-    overflow: 'hidden',
-  },
-});

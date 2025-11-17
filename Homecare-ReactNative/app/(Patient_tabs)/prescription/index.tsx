@@ -3,9 +3,12 @@ import { View, ScrollView, Image, TextInput, ImageBackground, Pressable, StyleSh
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 
 export default function PatientDashboard() {
 
+    const router= useRouter();
 
    const companyList = [
       { id: 1, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
@@ -109,6 +112,12 @@ export default function PatientDashboard() {
                           style={{ flex: 1, justifyContent: 'flex-end', padding: 20, opacity: 0.9 }} 
                           imageStyle={{ borderRadius: 10 }}
                         >
+                          <LinearGradient
+                            colors={['transparent', 'rgba(0,0,0,0.6)']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                            style={styles.gradientStyle}
+                          />
                           <Text style={[styles.categoryText, {width: 250, textAlign: 'left'}]}>{pharmacy.name}</Text>
                         </ImageBackground>
                       </Pressable>
@@ -128,6 +137,12 @@ export default function PatientDashboard() {
                     style={{ flex: 1, justifyContent: 'flex-end', padding: 20, opacity: 0.9 }} 
                     imageStyle={{ borderRadius: 10 }}
                   >
+                    <LinearGradient
+                      colors={['transparent', 'rgba(0,0,0,0.6)']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                      style={styles.gradientStyle}
+                    />
                     <Text style={[styles.categoryText, {width: 300, textAlign: 'left'}]}>{pharmacy.name}</Text>
                   </ImageBackground>
                 </Pressable>
@@ -136,7 +151,7 @@ export default function PatientDashboard() {
           </ScrollView>
         </View>
     </ScrollView>
-    <Pressable style={styles.cartButton}>
+    <Pressable onPress={()=> router.push(`prescription/cart`)} style={styles.cartButton}>
       <Ionicons name="cart" size={30} color="#53346a" />
     </Pressable>
   </SafeAreaView>;
@@ -244,10 +259,19 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 13,
-    color: '#53346A',
+    color: 'white',
     textAlign: 'center',
     marginTop: 6,
     width: 100
+  },
+  gradientStyle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '40%',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
   },
   cartButton: {
     position: 'absolute',

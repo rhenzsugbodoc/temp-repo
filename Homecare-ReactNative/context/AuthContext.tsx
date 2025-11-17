@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   //Can define a useEffect to check authentication status on mouunt
 
-  // Initialize with mock users
+
   const [users, setUsers] = useState<User[]>([]);
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);

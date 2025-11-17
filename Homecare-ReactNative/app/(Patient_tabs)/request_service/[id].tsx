@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams  } from 'expo-router';
 import { getCompanyOptions} from '../../../options/companyQueryOptions';
 import { useQuery} from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { companyDetailStyles } from '../../../assets/styles/patient/request/requestStyles';
 const CompanyDetails = () => {
     
     const router = useRouter();
@@ -35,56 +36,35 @@ const CompanyDetails = () => {
       <SafeAreaView style={{flex:1}}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {/* header blue */}
-          <View style={{ backgroundColor: '#4454c3' , justifyContent: 'center', alignItems: 'center', height: 150}}> 
-            <Text style= {[styles.companyHeaderText, { fontWeight: 'bold', fontSize: 20 }]}>{company.company_name}</Text>
-            <Text style= {styles.companyHeaderText}>{company.address}</Text>
-            <Text style= {styles.companyHeaderText}>{company.phone_number}</Text>
-            <Text style= {styles.companyHeaderText}>{company.email}</Text>
+          <View style={companyDetailStyles.headerContainer}> 
+            <Text style= {companyDetailStyles.companyHeaderTitle}>{company.company_name}</Text>
+            <Text style= {companyDetailStyles.companyHeaderText}>{company.address}</Text>
+            <Text style= {companyDetailStyles.companyHeaderText}>{company.phone_number}</Text>
+            <Text style= {companyDetailStyles.companyHeaderText}>{company.email}</Text>
           </View>
 
-          <View style= {{borderBottomColor: 'black', borderBottomWidth: 1 , padding: 25}}>
-            <Text style={{color: '#53346A', fontFamily: 'poppins', fontWeight: 'bold' }}>ABOUT US</Text>
-            <Text style= {{color: '#53346A', fontFamily: 'poppins' }}>{company.description}</Text>
+          <View style= {companyDetailStyles.aboutUsContainer}>
+            <Text style={companyDetailStyles.categoryLabel}>ABOUT US</Text>
+            <Text style= {companyDetailStyles.aboutUsText}>{company.description}</Text>
           </View>
           
-          <View style={{padding: 25}}>
-            <Text style={{color: '#53346A', fontFamily: 'poppins', fontWeight: 'bold', marginBottom: 20 }}>SERVICES OFFERED</Text>
-            <View style={styles.grid}>
+          <View style={companyDetailStyles.servicesOfferedContainer}>
+            <Text style={companyDetailStyles.categoryLabel}>SERVICES OFFERED</Text>
+            <View style={companyDetailStyles.grid}>
               {servicesList.map(service => (
-                  <View  key={service.id} style={styles.serviceType}>
-                    <Text style={{color:'white', textAlign: 'center'}}>{service.service_name}</Text>
+                  <View  key={service.id} style={companyDetailStyles.serviceTypeItem}>
+                    <Text style={companyDetailStyles.serviceTypeText}>{service.service_name}</Text>
                   </View>
                 ))}
             </View>
           </View>
-          <View style= {{marginTop: 'auto', padding: 30}}>
-            <Pressable onPress={handlePress} style={{backgroundColor: '#2b4ba2', padding: 10, borderRadius: 20}}><Text style={{color: 'white', textAlign: 'center'}}>Request a Service</Text></Pressable>
+          <View style= {companyDetailStyles.requestButtonContainer}>
+            <Pressable onPress={handlePress} style={companyDetailStyles.requestButton}>
+              <Text style={companyDetailStyles.requestButtonText}>Request a Service</Text></Pressable>
           </View>
         </ScrollView>
       </SafeAreaView>
     );
     };
-
-const styles = StyleSheet.create({
- companyHeaderText: {
-  color: 'white' ,
-  fontSize: 14,
- },
-grid: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between',
-  gap: 5,
-},
-serviceType: {
-  backgroundColor: '#2b4ba2',
-  padding: 10,
-  color: 'white',
-  borderRadius: 20,
-  width: '48%',
-}
-});
-
-
 
 export default CompanyDetails;
