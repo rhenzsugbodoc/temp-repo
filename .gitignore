@@ -32,3 +32,9 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /tests/tests/
 /tests/results/
 
+Dockerfile.nginx
+Dockerfile.php
+compose.yaml
+docker/
+
+.vscode/
