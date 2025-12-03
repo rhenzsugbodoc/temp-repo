@@ -71,8 +71,7 @@ class Facility_model extends CI_Model {
         $this->db->join('facility_services', 'facility.facility_id = facility_services.facility_id', 'left');
         $this->db->group_start();
             $this->db->like('facility.facility_name', $search_term);
-            $this->db->or_like('facility.address', $search_term);
-            $this->db->or_like('facility.city', $search_term);
+            $this->db->or_like('facility.facility_address', $search_term);
         $this->db->group_end();
         $this->db->group_by('facility.facility_id');
         $this->db->limit($limit);
