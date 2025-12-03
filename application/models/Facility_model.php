@@ -83,7 +83,8 @@ class Facility_model extends CI_Model {
      * Get facilities by category
      */
     public function get_facilities_by_category($category_id) {
-        $this->db->select('DISTINCT facility.*');
+        $this->db->distinct();
+        $this->db->select('facility.*');
         $this->db->from('facility');
         $this->db->join('facility_services', 'facility.facility_id = facility_services.facility_id');
         $this->db->join('services', 'facility_services.service_id = services.service_id');
