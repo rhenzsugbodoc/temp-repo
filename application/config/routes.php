@@ -71,3 +71,21 @@ $route['api/caregivers/(:num)/patients']['GET'] = 'api/caregivers/patients/$1';
 $route['api/caregivers/(:num)']['GET'] = 'api/caregivers/show/$1';
 $route['api/caregivers']['GET'] = 'api/caregivers/index';
 $route['api/caregivers']['POST'] = 'api/caregivers/create';
+
+// FACILITY ROUTES (Public - No Auth Required)
+$route['api/facilities']['GET'] = 'api/facilities/index'; // Get all facilities
+$route['api/facilities/search']['GET'] = 'api/facilities/search'; // Search facilities
+$route['api/facilities/by-service/(:num)']['GET'] = 'api/facilities/by_service/$1'; // Get facilities by service
+$route['api/facilities/by-category/(:num)']['GET'] = 'api/facilities/by_category/$1'; // Get facilities by category
+$route['api/facilities/(:num)']['GET'] = 'api/facilities/show/$1'; // Get specific facility
+$route['api/facilities/(:num)/details']['GET'] = 'api/facilities/details/$1'; // Get facility complete details
+$route['api/facilities/(:num)/services']['GET'] = 'api/facilities/services/$1'; // Get facility services (all)
+$route['api/facilities/(:num)/services/grouped']['GET'] = 'api/facilities/services_grouped/$1'; // Get facility services (grouped by category)
+$route['api/facilities/(:num)/doctors']['GET'] = 'api/facilities/doctors/$1'; // Get facility doctors
+$route['api/facilities/(:num)/caregivers']['GET'] = 'api/facilities/caregivers/$1'; // Get facility caregivers
+
+// FACILITY ADMIN ROUTES (Require Admin Auth)
+$route['api/facilities']['POST'] = 'api/facilities/create'; // Create facility (Admin only)
+$route['api/facilities/(:num)']['PUT'] = 'api/facilities/update/$1'; // Update facility (Admin only)
+$route['api/facilities/(:num)/services']['POST'] = 'api/facilities/add_service/$1'; // Add service to facility (Admin only)
+$route['api/facilities/(:num)/services/(:num)']['DELETE'] = 'api/facilities/remove_service/$1/$2'; // Remove service from facility (Admin only)
