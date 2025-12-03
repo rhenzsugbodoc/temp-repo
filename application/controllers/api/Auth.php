@@ -237,7 +237,7 @@ class Auth extends MY_Controller {
         }
     }
     
-    // Refresh token IDK HOW THIS WORKS YET
+    // Refresh token 
     public function refresh_token() {
         // Validate current token
         $user_id = $this->validate_token();
@@ -253,7 +253,7 @@ class Auth extends MY_Controller {
                 'role' => $user->role
             ];
             
-            $token = generate_jwt($token_payload, 7200); // 2 hours expiry
+            $token = generate_jwt($token_payload, 432000); // 5 days expiry
             
             $this->json_response([
                 'success' => true,
@@ -261,7 +261,7 @@ class Auth extends MY_Controller {
                 'data' => [
                     'token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_in' => 7200
+                    'expires_in' => 432000
                 ]
             ], 200);
         } else {

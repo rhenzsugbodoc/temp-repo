@@ -14,16 +14,16 @@ class Service_request_model extends CI_Model {
     // Get patient's service requests
     public function get_patient_requests($patient_id, $status = null) {
         $this->db->select('service_requests.*, 
-            pc.doctor_id as preferred_caregiver_id, 
+            pc.caregiver_id as preferred_caregiver_id, 
             pu.first_name as preferred_caregiver_first_name, 
             pu.last_name as preferred_caregiver_last_name,
-            ac.doctor_id as assigned_caregiver_id,
+            ac.caregiver_id as assigned_caregiver_id,
             au.first_name as assigned_caregiver_first_name,
             au.last_name as assigned_caregiver_last_name');
         $this->db->from('service_requests');
-        $this->db->join('caregiver pc', 'service_requests.preferred_caregiver_id = pc.doctor_id', 'left');
+        $this->db->join('caregiver pc', 'service_requests.preferred_caregiver_id = pc.caregiver_id', 'left');
         $this->db->join('user pu', 'pc.user_id = pu.user_id', 'left');
-        $this->db->join('caregiver ac', 'service_requests.assigned_caregiver_id = ac.doctor_id', 'left');
+        $this->db->join('caregiver ac', 'service_requests.assigned_caregiver_id = ac.caregiver_id', 'left');
         $this->db->join('user au', 'ac.user_id = au.user_id', 'left');
         $this->db->where('service_requests.patient_id', $patient_id);
         
