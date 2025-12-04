@@ -7,11 +7,12 @@ class Patients extends MY_Controller {
     
     public function __construct() {
         parent::__construct();
-        $this->load->model('Patient_model'); //works
-        $this->load->model('Service_request_model'); //not tested
-        $this->load->model('Prescription_order_model'); //not tested
-        $this->load->model('Appointment_model'); //not tested
-        $this->load->model('Notification_model'); //not tested
+        $this->load->model('Patient_model'); 
+        $this->load->model('Service_request_model'); 
+        $this->load->model('Prescription_order_model'); 
+        $this->load->model('Appointment_model'); 
+        $this->load->model('Notification_model');
+        $this->load->model('Episode_model');
     }
     
     /**
@@ -409,10 +410,84 @@ public function service_requests() {
 }
 
 /**
- * POST /api/patients/service-requests
- * Create new service request
+ * GET /api/patients/service-requests/one-time
+ * Get patient's one-time service requests
  */
-public function create_service_request() {
+public function get_onetime_requests() {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $status = $this->input->get('status'); // Optional filter: Pending, Approved, Completed, Cancelled
+    $requests = $this->Service_request_model->get_onetime_requests($patient->patient_id, $status);
+    
+    $this->json_response([
+        'success' => true,
+        'count' => count($requests),
+        'data' => $requests
+    ], 200);
+}
+
+/**
+ * GET /api/patients/service-requests/routine
+ * Get patient's routine service requests (with episode info)
+ */
+public function get_routine_requests() {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $status = $this->input->get('status');
+    $requests = $this->Service_request_model->get_routine_requests($patient->patient_id, $status);
+    
+    $this->json_response([
+        'success' => true,
+        'count' => count($requests),
+        'data' => $requests
+    ], 200);
+}
+
+/**
+ * GET /api/patients/service-requests/:id
+ * Get single service request details
+ */
+public function get_request_details($request_id) {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $request = $this->Service_request_model->get_request_with_details($request_id, $patient->patient_id);
+    
+    if (!$request) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Service request not found or does not belong to you'
+        ], 404);
+    }
+    
+    $this->json_response([
+        'success' => true,
+        'data' => $request
+    ], 200);
+}
+
+/**
+ * POST /api/patients/service-requests/one-time
+ * Create one-time service request
+ */
+public function create_onetime_service() {
     $this->require_role(['Patient']);
     
     if ($this->input->method() !== 'post') {
@@ -431,10 +506,9 @@ public function create_service_request() {
         $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
     }
     
-    // Validation
+    // Validation for one-time service
     $this->form_validation->set_data($input);
-    $this->form_validation->set_rules('service_type', 'Service Type', 'required|in_list[One-Time,Routine]');
-    $this->form_validation->set_rules('service_category', 'Service Category', 'required');
+    $this->form_validation->set_rules('service_id', 'Service', 'required|numeric');
     $this->form_validation->set_rules('service_description', 'Service Description', 'required');
     $this->form_validation->set_rules('preferred_date', 'Preferred Date', 'required');
     $this->form_validation->set_rules('preferred_time', 'Preferred Time', 'required');
@@ -449,14 +523,14 @@ public function create_service_request() {
     
     $request_data = [
         'patient_id' => $patient->patient_id,
-        'service_type' => $input['service_type'],
+        'service_id' => $input['service_id'],
         'service_category' => $input['service_category'],
+        'service_type' => 'One-Time',
         'service_description' => $input['service_description'],
         'preferred_date' => $input['preferred_date'],
         'preferred_time' => $input['preferred_time'],
         'preferred_caregiver_id' => $input['preferred_caregiver_id'] ?? null,
-        'frequency' => $input['frequency'] ?? null,
-        'duration_weeks' => $input['duration_weeks'] ?? null,
+        'facility_id' => $input['facility_id'] ?? null,
         'notes' => $input['notes'] ?? null,
         'status' => 'Pending'
     ];
@@ -470,13 +544,13 @@ public function create_service_request() {
             'user_id' => $this->current_user_id,
             'notification_type' => 'Service',
             'title' => 'Service Request Submitted',
-            'message' => 'Your ' . $input['service_type'] . ' service request has been submitted successfully',
+            'message' => 'Your one-time service request has been submitted successfully',
             'is_read' => 0
         ]);
         
         $this->json_response([
             'success' => true,
-            'message' => 'Service request created successfully',
+            'message' => 'One-time service request created successfully',
             'data' => ['request_id' => $request_id]
         ], 201);
     } else {
@@ -488,8 +562,268 @@ public function create_service_request() {
 }
 
 /**
+ * POST /api/patients/service-requests/routine
+ * Create routine service request (Episode of Care)
+ */
+public function create_routine_service() {
+    $this->require_role(['Patient']);
+    
+    if ($this->input->method() !== 'post') {
+        $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+    }
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input) {
+        $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
+    }
+    
+    // Validation for routine service (episode of care)
+    $this->form_validation->set_data($input);
+    $this->form_validation->set_rules('service_id', 'Service', 'required|numeric');
+    $this->form_validation->set_rules('episode_name', 'Episode Name', 'required');
+    $this->form_validation->set_rules('episode_type', 'Episode Type', 'required');
+    $this->form_validation->set_rules('clinical_category', 'Clinical Category', 'required|in_list[Clinical,Non-clinical]');
+    $this->form_validation->set_rules('start_date', 'Start Date', 'required');
+    $this->form_validation->set_rules('duration_weeks', 'Duration', 'required|numeric');
+    $this->form_validation->set_rules('frequency', 'Frequency', 'required');
+    
+    if ($this->form_validation->run() === FALSE) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $this->form_validation->error_array()
+        ], 422);
+    }
+    
+    // Start database transaction
+    $this->db->trans_start();
+    
+    // 1. Create service request
+    $request_data = [
+        'patient_id' => $patient->patient_id,
+        'service_id' => $input['service_id'],
+        'service_category' => $input['service_category'],
+        'service_type' => 'Routine',
+        'service_description' => $input['service_description'] ?? 'Routine care episode',
+        'preferred_date' => $input['start_date'],
+        'preferred_time' => $input['preferred_time'] ?? '09:00:00',
+        'preferred_caregiver_id' => $input['preferred_caregiver_id'] ?? null,
+        'facility_id' => $input['facility_id'] ?? null,
+        'frequency' => $input['frequency'],
+        'duration_weeks' => $input['duration_weeks'],
+        'notes' => $input['notes'] ?? null,
+        'status' => 'Pending'
+    ];
+    
+    $request_id = $this->Service_request_model->create_request($request_data);
+    
+    if (!$request_id) {
+        $this->db->trans_rollback();
+        $this->json_response([
+            'success' => false,
+            'message' => 'Failed to create service request'
+        ], 500);
+    }
+    
+    // 2. Create episode of care
+    $end_date = date('Y-m-d', strtotime($input['start_date'] . ' + ' . $input['duration_weeks'] . ' weeks'));
+    
+    $episode_data = [
+        'patient_id' => $patient->patient_id,
+        'service_request_id' => $request_id,
+        'episode_name' => $input['episode_name'],
+        'episode_type' => $input['episode_type'],
+        'clinical_category' => $input['clinical_category'],
+        'primary_diagnosis' => $input['primary_diagnosis'] ?? null,
+        'start_date' => $input['start_date'],
+        'end_date' => $end_date,
+        'expected_duration_weeks' => $input['duration_weeks'],
+        'frequency' => $input['frequency'],
+        'assigned_caregiver_id' => $input['preferred_caregiver_id'] ?? null,
+        'status' => 'Active',
+        'notes' => $input['notes'] ?? null
+    ];
+    
+    $episode_id = $this->Episode_model->create_episode($episode_data);
+    
+    if (!$episode_id) {
+        $this->db->trans_rollback();
+        $this->json_response([
+            'success' => false,
+            'message' => 'Failed to create care episode'
+        ], 500);
+    }
+    
+    // 3. Generate intervention schedule
+    $interventions = $this->generate_intervention_schedule(
+        $episode_id,
+        $input['service_id'],
+        $input['start_date'],
+        $input['duration_weeks'],
+        $input['frequency'],
+        $input['preferred_time'] ?? '09:00:00',
+        $input['preferred_caregiver_id'] ?? null
+    );
+    
+    if (!$interventions) {
+        $this->db->trans_rollback();
+        $this->json_response([
+            'success' => false,
+            'message' => 'Failed to generate intervention schedule'
+        ], 500);
+    }
+    
+    // Complete transaction
+    $this->db->trans_complete();
+    
+    if ($this->db->trans_status() === FALSE) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Transaction failed'
+        ], 500);
+    }
+    
+    // Create notification
+    $this->Notification_model->create_notification([
+        'patient_id' => $patient->patient_id,
+        'user_id' => $this->current_user_id,
+        'notification_type' => 'Service',
+        'title' => 'Care Episode Created',
+        'message' => 'Your routine care episode "' . $input['episode_name'] . '" has been created with ' . count($interventions) . ' scheduled interventions',
+        'is_read' => 0
+    ]);
+    
+    $this->json_response([
+        'success' => true,
+        'message' => 'Routine service request and care episode created successfully',
+        'data' => [
+            'request_id' => $request_id,
+            'episode_id' => $episode_id,
+            'total_interventions' => count($interventions),
+            'start_date' => $input['start_date'],
+            'end_date' => $end_date
+        ]
+    ], 201);
+}
+
+/**
+ * Helper: Generate intervention schedule based on frequency
+ */
+private function generate_intervention_schedule($episode_id, $service_id, $start_date, $duration_weeks, $frequency, $preferred_time, $caregiver_id) {
+    // Get service details
+    $service = $this->db->get_where('services', ['service_id' => $service_id])->row();
+    
+    if (!$service) {
+        return false;
+    }
+    
+    $interventions = [];
+    $current_date = new DateTime($start_date);
+    $end_date = new DateTime($start_date);
+    $end_date->modify('+' . $duration_weeks . ' weeks');
+    
+    // Determine interval based on frequency
+    switch ($frequency) {
+        case 'Daily':
+            $interval = 1;
+            $days_per_week = 7;
+            break;
+        case 'Twice Daily':
+            $interval = 0.5; // Special handling needed
+            $days_per_week = 7;
+            break;
+        case 'Twice Weekly':
+            $interval = 3; // Monday and Thursday
+            $days_per_week = 2;
+            break;
+        case 'Three Times Weekly':
+            $interval = 2; // Monday, Wednesday, Friday
+            $days_per_week = 3;
+            break;
+        case 'Weekly':
+            $interval = 7;
+            $days_per_week = 1;
+            break;
+        case 'Bi-weekly':
+            $interval = 14;
+            $days_per_week = 0.5;
+            break;
+        case 'Monthly':
+            $interval = 30;
+            $days_per_week = 0.25;
+            break;
+        default:
+            $interval = 7; // Default to weekly
+            $days_per_week = 1;
+    }
+    
+    // Generate interventions
+    while ($current_date < $end_date) {
+        $intervention_data = [
+            'episode_id' => $episode_id,
+            'intervention_type' => $service->name,
+            'scheduled_date' => $current_date->format('Y-m-d'),
+            'scheduled_time' => $preferred_time,
+            'assigned_caregiver_id' => $caregiver_id,
+            'status' => 'Scheduled'
+        ];
+        
+        $this->db->insert('care_interventions', $intervention_data);
+        $interventions[] = $intervention_data;
+        
+        // Handle "Twice Daily" separately
+        if ($frequency === 'Twice Daily') {
+            $evening_intervention = $intervention_data;
+            $evening_intervention['scheduled_time'] = date('H:i:s', strtotime($preferred_time) + (8 * 3600)); // 8 hours later
+            $this->db->insert('care_interventions', $evening_intervention);
+            $interventions[] = $evening_intervention;
+            $current_date->modify('+1 day');
+        }
+        // Handle "Three Times Weekly" (Mon, Wed, Fri)
+        else if ($frequency === 'Three Times Weekly') {
+            $day_of_week = $current_date->format('N'); // 1 = Monday, 7 = Sunday
+            if ($day_of_week == 1) { // Monday
+                $current_date->modify('+2 days'); // Jump to Wednesday
+            } else if ($day_of_week == 3) { // Wednesday
+                $current_date->modify('+2 days'); // Jump to Friday
+            } else if ($day_of_week == 5) { // Friday
+                $current_date->modify('+3 days'); // Jump to next Monday
+            } else {
+                // If starting mid-week, adjust to next Monday
+                $current_date->modify('next Monday');
+            }
+        }
+        // Handle "Twice Weekly" (Mon, Thu)
+        else if ($frequency === 'Twice Weekly') {
+            $day_of_week = $current_date->format('N');
+            if ($day_of_week == 1) { // Monday
+                $current_date->modify('+3 days'); // Jump to Thursday
+            } else if ($day_of_week == 4) { // Thursday
+                $current_date->modify('+4 days'); // Jump to next Monday
+            } else {
+                // Adjust to next Monday
+                $current_date->modify('next Monday');
+            }
+        }
+        // Regular interval
+        else {
+            $current_date->modify('+' . $interval . ' days');
+        }
+    }
+    
+    return $interventions;
+}
+
+/**
  * PUT /api/patients/service-requests/:id/cancel
- * Cancel service request
+ * Cancel service request (One-Time or Routine)
  */
 public function cancel_service_request($request_id) {
     $this->require_role(['Patient']);
@@ -504,34 +838,304 @@ public function cancel_service_request($request_id) {
         $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
     }
     
-    if ($this->Service_request_model->cancel_request($request_id, $patient->patient_id)) {
-        $this->json_response([
-            'success' => true,
-            'message' => 'Service request cancelled successfully'
-        ], 200);
-    } else {
+    // Get request details first
+    $request = $this->Service_request_model->get_request_by_id($request_id);
+    
+    if (!$request || $request->patient_id != $patient->patient_id) {
         $this->json_response([
             'success' => false,
-            'message' => 'Failed to cancel service request or request not found'
+            'message' => 'Service request not found or does not belong to you'
+        ], 404);
+    }
+    
+    // Check if already cancelled
+    if ($request->status === 'Cancelled') {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Service request is already cancelled'
+        ], 400);
+    }
+    
+    // Check if already completed
+    if ($request->status === 'Completed') {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Cannot cancel a completed service request'
+        ], 400);
+    }
+    
+    // Start transaction
+    $this->db->trans_start();
+    
+    // Cancel the service request
+    $cancelled = $this->Service_request_model->cancel_request($request_id, $patient->patient_id);
+    
+    if (!$cancelled) {
+        $this->db->trans_rollback();
+        $this->json_response([
+            'success' => false,
+            'message' => 'Failed to cancel service request'
         ], 500);
     }
-}
-
-/**
- * GET /api/patients/available-caregivers
- * Get available caregivers for service request
- */
-public function available_caregivers() {
-    $this->require_role(['Patient']);
     
-    $caregivers = $this->Service_request_model->get_available_caregivers();
+    // If it's a routine service, also cancel the episode and future interventions
+    if ($request->service_type === 'Routine') {
+        // Find associated episode
+        $episode = $this->Episode_model->get_episode_by_request_id($request_id);
+        
+        if ($episode) {
+            // Cancel the episode
+            $this->Episode_model->cancel_episode($episode->episode_id, $patient->patient_id);
+            
+            // Cancel all scheduled/future interventions
+            $this->Episode_model->cancel_future_interventions($episode->episode_id);
+        }
+    }
+    
+    // Complete transaction
+    $this->db->trans_complete();
+    
+    if ($this->db->trans_status() === FALSE) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Transaction failed'
+        ], 500);
+    }
+    
+    // Create notification
+    $message = $request->service_type === 'Routine' 
+        ? 'Your routine service request and associated care episode have been cancelled'
+        : 'Your one-time service request has been cancelled';
+    
+    $this->Notification_model->create_notification([
+        'patient_id' => $patient->patient_id,
+        'user_id' => $this->current_user_id,
+        'notification_type' => 'Service',
+        'title' => 'Service Request Cancelled',
+        'message' => $message,
+        'is_read' => 0
+    ]);
     
     $this->json_response([
         'success' => true,
-        'count' => count($caregivers),
-        'data' => $caregivers
+        'message' => 'Service request cancelled successfully',
+        'service_type' => $request->service_type
     ], 200);
 }
+
+/**
+ * PUT /api/patients/episodes/:id/cancel
+ * Cancel care episode (also cancels associated request and future interventions)
+ */
+public function cancel_episode($episode_id) {
+    $this->require_role(['Patient']);
+    
+    if ($this->input->method() !== 'put') {
+        $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+    }
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    // Get episode details
+    $episode = $this->Episode_model->get_episode_by_id($episode_id);
+    
+    if (!$episode || $episode->patient_id != $patient->patient_id) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Episode not found or does not belong to you'
+        ], 404);
+    }
+    
+    // Check if already cancelled
+    if ($episode->status === 'Cancelled') {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Episode is already cancelled'
+        ], 400);
+    }
+    
+    // Check if already completed
+    if ($episode->status === 'Completed') {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Cannot cancel a completed episode'
+        ], 400);
+    }
+    
+    // Start transaction
+    $this->db->trans_start();
+    
+    // Cancel the episode
+    $cancelled = $this->Episode_model->cancel_episode($episode_id, $patient->patient_id);
+    
+    if (!$cancelled) {
+        $this->db->trans_rollback();
+        $this->json_response([
+            'success' => false,
+            'message' => 'Failed to cancel episode'
+        ], 500);
+    }
+    
+    // Cancel all future interventions
+    $this->Episode_model->cancel_future_interventions($episode_id);
+    
+    // Cancel associated service request
+    $this->Service_request_model->cancel_request($episode->service_request_id, $patient->patient_id);
+    
+    // Complete transaction
+    $this->db->trans_complete();
+    
+    if ($this->db->trans_status() === FALSE) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Transaction failed'
+        ], 500);
+    }
+    
+    // Create notification
+    $this->Notification_model->create_notification([
+        'patient_id' => $patient->patient_id,
+        'user_id' => $this->current_user_id,
+        'notification_type' => 'Service',
+        'title' => 'Care Episode Cancelled',
+        'message' => 'Your care episode "' . $episode->episode_name . '" has been cancelled. All future interventions have been removed.',
+        'is_read' => 0
+    ]);
+    
+    $this->json_response([
+        'success' => true,
+        'message' => 'Care episode cancelled successfully'
+    ], 200);
+}
+
+/**
+ * GET /api/patients/episodes
+ * Get patient's care episodes
+ */
+public function episodes() {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $status = $this->input->get('status');
+    $episodes = $this->Episode_model->get_patient_episodes($patient->patient_id, $status);
+    
+    $this->json_response([
+        'success' => true,
+        'count' => count($episodes),
+        'data' => $episodes
+    ], 200);
+}
+
+/**
+ * GET /api/patients/episodes/:id
+ * Get episode details with interventions
+ */
+public function episode_details($episode_id) {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    $episode = $this->Episode_model->get_episode_details($episode_id, $patient->patient_id);
+    
+    if (!$episode) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Episode not found or does not belong to you'
+        ], 404);
+    }
+    
+    $this->json_response([
+        'success' => true,
+        'data' => $episode
+    ], 200);
+}
+
+/**
+ * GET /api/patients/episodes/:id/interventions
+ * Get all interventions for an episode
+ */
+public function episode_interventions($episode_id) {
+    $this->require_role(['Patient']);
+    
+    $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    
+    if (!$patient) {
+        $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    }
+    
+    // Verify episode belongs to patient
+    $episode = $this->Episode_model->get_episode_by_id($episode_id);
+    
+    if (!$episode || $episode->patient_id != $patient->patient_id) {
+        $this->json_response([
+            'success' => false,
+            'message' => 'Episode not found or does not belong to you'
+        ], 404);
+    }
+    
+    $status = $this->input->get('status'); // Filter by status
+    $interventions = $this->Episode_model->get_episode_interventions($episode_id, $status);
+    
+    $this->json_response([
+        'success' => true,
+        'episode_name' => $episode->episode_name,
+        'count' => count($interventions),
+        'data' => $interventions
+    ], 200);
+}
+
+/**
+ * GET /api/patients/episodes/types
+ * Get available episode types for selection
+ */
+public function episode_types() {
+    $this->require_role(['Patient']);
+    
+    $types = [
+        [
+            'category' => 'Clinical',
+            'types' => [
+                'Chronic Disease Management (Diabetes)',
+                'Chronic Disease Management (Hypertension)',
+                'Chronic Disease Management (COPD)',
+                'Chronic Disease Management (CHF)',
+                'Post-Surgical Recovery (Knee Replacement Surgery)',
+                'Post-Surgical Recovery (Hip Replacement Surgery)',
+                'Post-Surgical Recovery (Cardiac Surgery)',
+                'Post-Hospital Discharge Care (Heart Attack Recovery)',
+                'Post-Hospital Discharge Care (Stroke Recovery)',
+                'Palliative and End-of-Life Care (Terminal Cancer)',
+                'Palliative and End-of-Life Care (Advanced COPD)',
+                'Rehabilitation Nursing'
+            ]
+        ],
+        [
+            'category' => 'Non-clinical',
+            'types' => [
+                'No Affiliated Episode of Care'
+            ]
+        ]
+    ];
+    
+    $this->json_response([
+        'success' => true,
+        'data' => $types
+    ], 200);
+}
+
 
 /**
  * POST /api/patients/appointments

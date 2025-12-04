@@ -11,16 +11,23 @@ $route['api/login'] = 'api/auth/login';
 $route['api/logout'] = 'api/auth/logout';
 $route['api/user'] = 'api/auth/get_user';
 
-// Patient Routes - Specific routes FIRST!
+// Patient Routes
 $route['api/patients/profile']['GET'] = 'api/patients/profile';
 $route['api/patients/profile']['PUT'] = 'api/patients/update_profile';
 $route['api/patients/dashboard']['GET'] = 'api/patients/dashboard';
 
 // Service Requests
 $route['api/patients/service-requests']['GET'] = 'api/patients/service_requests';
-$route['api/patients/service-requests']['POST'] = 'api/patients/create_service_request';
-$route['api/patients/service-requests/(:num)/cancel']['PUT'] = 'api/patients/cancel_service_request/$1';
 $route['api/patients/available-caregivers']['GET'] = 'api/patients/available_caregivers';
+$route['api/patients/service-requests/one-time']['POST'] = 'api/patients/create_onetime_service';
+$route['api/patients/service-requests/routine']['POST'] = 'api/patients/create_routine_service';
+$route['api/patients/episodes']['GET'] = 'api/patients/episodes';
+$route['api/patients/episodes/(:num)']['GET'] = 'api/patients/episode_details/$1';
+$route['api/patients/service-requests/one-time']['GET'] = 'api/patients/get_onetime_requests';
+$route['api/patients/service-requests/routine']['GET'] = 'api/patients/get_routine_requests';
+$route['api/patients/service-requests/(:num)']['GET'] = 'api/patients/get_request_details/$1';
+$route['api/patients/service-requests/(:num)/cancel']['PUT'] = 'api/patients/cancel_service_request/$1';
+$route['api/patients/episodes/(:num)/cancel']['PUT'] = 'api/patients/cancel_episode/$1';
 
 // Appointments
 $route['api/patients/appointments']['GET'] = 'api/patients/appointments';
