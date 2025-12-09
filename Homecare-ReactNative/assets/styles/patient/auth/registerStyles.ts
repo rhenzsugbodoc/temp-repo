@@ -62,7 +62,7 @@ export const registerCommonStyles = StyleSheet.create({
     backgroundColor: '#0575e6',
   },
   genderText: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
   },
 
@@ -123,15 +123,15 @@ export const register1Styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     marginHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#1e1e1e',
+    borderRadius: 10,
+    backgroundColor: '#4454C3',
     alignItems: 'center',
   },
   genderSelected: {
     backgroundColor: '#0575e6',
   },
   genderText: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
   },
 

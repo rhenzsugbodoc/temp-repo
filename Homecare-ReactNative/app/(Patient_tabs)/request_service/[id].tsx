@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView} from 'react-native';
 import { useRouter, useLocalSearchParams  } from 'expo-router';
-import { getCompanyOptions} from '../../../options/companyQueryOptions';
+import { getCompanyOptions} from '../../../src/options/companyQueryOptions';
 import { useQuery} from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { companyDetailStyles } from '../../../assets/styles/patient/request/requestStyles';
