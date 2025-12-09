@@ -5,11 +5,15 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { AuthProvider } from '@/src/context/AuthContext';
 
 import { useColorScheme } from '../hooks/use-color-scheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
+
+
+
 
 // Configure QueryClient with better defaults
 const queryClient = new QueryClient({
@@ -39,6 +43,7 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider mode="light">
       <QueryClientProvider client={queryClient}>
+        <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack initialRouteName="login" screenOptions={{ headerShown: false }}>
             <Stack.Screen name="login" />
@@ -48,6 +53,7 @@ export default function RootLayout() {
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </GluestackUIProvider>
   );

@@ -2,7 +2,6 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,11 +17,11 @@ export default function PatientTabLayout() {
         tabBarButton: HapticTab,
       }}>
     <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="home" size={size} color="#8e98db" />
+            <Ionicons name="home-outline" size={size} color="#8e98db" />
           ),
         }}
       />
