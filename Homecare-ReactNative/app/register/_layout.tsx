@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '../../hooks/use-color-scheme';
-import { RegisterProvider } from '../../context/RegisterPatientContext';
+import { RegisterProvider } from '../../src/context/RegisterPatientContext';
 SplashScreen.preventAutoHideAsync();
 
 export default function RegisterLayout() {
@@ -17,9 +17,17 @@ export default function RegisterLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <RegisterProvider>
-        <Stack/> 
+        <Stack
+          initialRouteName="register1" 
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="register1" />
+          <Stack.Screen name="register2" />
+          <Stack.Screen name="register3" />
+        </Stack>
         {/* native auto handles route pages within directory */}
-        
         <StatusBar style="auto" />
       </RegisterProvider>
     </ThemeProvider>

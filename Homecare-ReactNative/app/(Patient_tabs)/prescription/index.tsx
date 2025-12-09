@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Image, TextInput, ImageBackground, Pressable, StyleSheet, Text, Dimensions } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Animated, View, ScrollView, Image, TextInput, ImageBackground, Pressable, StyleSheet, Text, Dimensions,TouchableWithoutFeedback, ViewStyle  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+const { height, width } = Dimensions.get('window');
 
 export default function PatientDashboard() {
 
     const router= useRouter();
-
-   const companyList = [
-      { id: 1, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 2, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 3, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 4, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 5, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 6, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 7, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 8, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-      { id: 9, company_name: 'Life Care Cebu', address: 'B. Rodriguez St. Cebu City 6000 Cebu', description:"Le Lorem Ipsum Est SImplement Du Faux Texte Employe Dans La Composition Et La Mise En Page Avant Impression. Le Lorem Ipsum Est Le Faux"},
-    ];
+      type Prescription = {
+        id: number;
+        name: string;
+        price: number;
+        dosage: string;
+      };
+  const prescriptionList: Prescription[] = [
+    { id: 1, name: 'Paracetamol', price: 50, dosage: '500 mg' },
+    { id: 2, name: 'Ibuprofen', price: 75, dosage: '200 mg' },
+    { id: 3, name: 'Amoxicillin', price: 120, dosage: '500 mg' },
+    { id: 4, name: 'Cetirizine', price: 60, dosage: '10 mg' },
+    { id: 5, name: 'Aspirin', price: 40, dosage: '325 mg' },
+    { id: 6, name: 'Metformin', price: 150, dosage: '500 mg' },
+    { id: 7, name: 'Loratadine', price: 70, dosage: '10 mg' },
+    { id: 8, name: 'Omeprazole', price: 130, dosage: '20 mg' },
+    { id: 9, name: 'Azithromycin', price: 200, dosage: '250 mg' },
+    { id: 10, name: 'Diclofenac', price: 90, dosage: '50 mg' },
+  ];
 
   const [selectedValue, setSelectedValue] = useState('Assisted Living');
   const [selectedSort, setSelectedSort] = useState('Sort By: Name');
@@ -33,12 +40,35 @@ export default function PatientDashboard() {
   ];
 
   const pharmacyList = [
-    { id: 1, name: "CLARK'S PHARMACY - TALAMBAN" },
-    { id: 2, name: 'MERCURY DRUGSTORE - MANDAUE' },
-    { id: 3, name: 'ROSE PHARMACY - TALISAY' },
-    { id: 4, name: 'ROSE PHARMACY - MANDAUE' },
+    { id: 1, name: "CLARK'S PHARMACY - TALAMBAN", rating: 4.5, distance: 2.3 },
+    { id: 2, name: 'MERCURY DRUGSTORE - MANDAUE', rating: 4.2, distance: 5.7 },
+    { id: 3, name: 'ROSE PHARMACY - TALISAY', rating: 3.8, distance: 7.1 },
+    { id: 4, name: 'ROSE PHARMACY - MANDAUE', rating: 4.0, distance: 1.5 },
   ];
 
+
+
+  const [visible, setVisible] = useState(false);
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>();
+  const slideAnim = useRef(new Animated.Value(height)).current;
+
+  const openPopup = (pharmacy: any) => {
+    setSelectedPrescription(pharmacy);
+    setVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0, // Changed from height / 2 to 0
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closePopup = () => {
+    Animated.timing(slideAnim, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setVisible(false));
+  };
   return <SafeAreaView style={{
     flex: 1,
     backgroundColor: '#f5f7fa'
@@ -129,9 +159,9 @@ export default function PatientDashboard() {
             TOP PRODUCTS</Text>
 
           <ScrollView>
-            {pharmacyList.map(pharmacy => (
-              <View key={pharmacy.id} style={{ flex: 1, marginHorizontal: 1 }}>
-                <Pressable style={[styles.card, { height: 150, padding: 0, overflow: 'hidden' }]}>
+            {prescriptionList.map(prescription => (
+              <View key={prescription.id} style={{ flex: 1, marginHorizontal: 1 }}>
+                <Pressable onPress={() => openPopup(prescription)} style={[styles.card, { height: 150, padding: 0, overflow: 'hidden' }]}>
                   <ImageBackground 
                     source={require('../../../assets/images/MisterMatres.png')} 
                     style={{ flex: 1, justifyContent: 'flex-end', padding: 20, opacity: 0.9 }} 
@@ -143,7 +173,7 @@ export default function PatientDashboard() {
                       end={{ x: 0, y: 1 }}
                       style={styles.gradientStyle}
                     />
-                    <Text style={[styles.categoryText, {width: 300, textAlign: 'left'}]}>{pharmacy.name}</Text>
+                    <Text style={[styles.categoryText, {width: 300, textAlign: 'left'}]}>{prescription.name}</Text>
                   </ImageBackground>
                 </Pressable>
               </View>
@@ -151,9 +181,61 @@ export default function PatientDashboard() {
           </ScrollView>
         </View>
     </ScrollView>
-    <Pressable onPress={()=> router.push(`prescription/cart`)} style={styles.cartButton}>
+    {visible && (
+      <TouchableWithoutFeedback onPress={closePopup}>
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback>
+            <Animated.View style={[styles.popup, { transform: [{ translateY: slideAnim }] }]}>
+              <View style={styles.popupContent}>
+
+                <View style={{flexDirection: 'row', gap:10, margin: 10, paddingBottom: 15 }}>
+                    <View style={{ flex: 3 }}>
+                      <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
+                        style={{ borderRadius: 10, width: '100%', height: 110 }} />
+                    </View>
+                    <View style={{ flex: 4, gap: 2, justifyContent: 'center', paddingLeft: 10 }}>
+                      <Text style={{color: '#424e78', fontSize: 16, fontWeight: 'bold'}}>{selectedPrescription?.name}</Text>
+                      <Text style={{color: '#424e78', fontSize: 16, fontWeight: 'bold'}}>{selectedPrescription?.dosage}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ color: '#424e78', fontSize: 16, fontWeight: 'bold' }}>
+                          ₱{selectedPrescription?.price}
+                        </Text>
+                        <Text style={{ color: '#424e78', fontSize: 12, marginLeft: 6 }}>
+                          (base price)
+                        </Text>
+                      </View>
+                    </View>
+                </View>
+
+                <ScrollView style={{width: '95%'}}>
+                  {pharmacyList.map(pharmacy => (
+                    <View key={pharmacy.id} style={{ padding: 15,  borderTopColor: '#d9d9d9', borderTopWidth: 0.5, width: '100%', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#424e78' }}>{pharmacy.name}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Ionicons name="star" size={16} color="gold" style={{ marginRight: 4 }} />
+                        <Text style={{ color: '#727a9a' }}>
+                          {pharmacy.rating} stars - {pharmacy.distance} km away
+                        </Text>
+                      </View>
+                      <Text style={{color: '#68d585'}}>Open 24 hours</Text>
+                    </View>
+                  ))}
+                </ScrollView> 
+                <Pressable onPress={closePopup} style={{ padding: 10, backgroundColor: '#4F46E5', borderRadius: 10 }}>
+                  <Text style={{ color: 'white' }}>Close</Text>
+                </Pressable>
+              </View>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    )}
+
+
+    {visible===false && 
+    (<Pressable onPress={()=> router.push(`/(Patient_tabs)/prescription/cart`)} style={styles.cartButton}>
       <Ionicons name="cart" size={30} color="#53346a" />
-    </Pressable>
+    </Pressable>)}
   </SafeAreaView>;
 }
 
@@ -281,7 +363,32 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 30,
     elevation: 5,
-    zIndex: 100,
+   
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width,
+    height,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  popup: {
+    width: '100%',
+    height: height / 2,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    position: 'absolute', // Added
+    bottom: 0, // Added,
+   
+  },
+  popupContent: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 20,
   },
 
 });

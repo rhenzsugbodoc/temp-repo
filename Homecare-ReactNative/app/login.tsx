@@ -1,91 +1,228 @@
-import { View, Image, Pressable, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-//import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '@/context/AuthContext';
-import { loginStyles } from '../assets/styles/patient/auth/loginStyles';
+import { useLoginMutation } from '../src/options/authenticationQueryOptions';
+
 export default function Login() {
-    const { loginUser } = useAuth();
-    const router = useRouter();
-    const [username, setUsername]= useState('');
-    const [email, setEmail]= useState('');
-    const [password, setPassword]= useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const loginMutation = useLoginMutation();
 
-    const handleSubmit = async () => {
-        if (!username || !password) {
-        alert('Please enter username and password');
-        return;
+  const handleLogin = async () => {
+    // Basic validation
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Please enter both email and password');
+      return;
+    }
+
+    // Simple email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Validation Error', 'Please enter a valid email address');
+      return;
+    }
+
+    loginMutation.mutate(
+      { 
+        email_address: email.trim(), 
+        password: password 
+      },
+      {
+        onSuccess: (response) => {
+          console.log('Login successful:', response);
+          
+          Alert.alert(
+            'Success',
+            `Welcome back, ${response.data?.user.first_name}!`,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  // Navigate based on user role
+                  if (response.data?.user.role === 'Patient') {
+                    router.replace('/(Patient_tabs)');
+                  } else {
+                    // Add other role navigation here
+                    router.replace('/(Patient_tabs)');
+                  }
+                },
+              },
+            ]
+          );
+        },
+        onError: (error: any) => {
+          console.error('Login failed:', error);
+          
+          let errorMessage = 'Login failed. Please try again.';
+          
+          if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          Alert.alert('Login Failed', errorMessage);
         }
-        loginUser(email, password)
-        router.replace('/(Patient_tabs)'); 
-    };
-
-
-    return(
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff'}} edges={['top']} >
-      
-        <View style={loginStyles.topContent}>
-            <Text style={loginStyles.logoTitle}>Hello Again!</Text>
-            <Text style={{ fontSize: 20, fontFamily:'poppins' }}>Welcome Back</Text>
-        </View>
-
-      
-      
-        <View style={loginStyles.loginInput}>
-            <TextInput
-                placeholder="Username"
-                placeholderTextColor="#888"
-                value={username}
-                onChangeText={setUsername}
-                style={loginStyles.input}
-            />
-            <TextInput
-                placeholder="Email"
-                placeholderTextColor="#888"
-                secureTextEntry
-                value={email}
-                onChangeText={setEmail}
-                style={loginStyles.input}
-            />
-            <TextInput
-                placeholder="Password"
-                placeholderTextColor="#888"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                style={loginStyles.input}
-            />
-            <TouchableOpacity style={loginStyles.loginButton} onPress={handleSubmit}>
-            <Text style={loginStyles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
-        </View>
-
-        <View style={loginStyles.altLogin}>
-            <Text style={loginStyles.altText}>Or Sign in With</Text>
-            <View style={loginStyles.socialRow}>
-            <TouchableOpacity style={loginStyles.socialButton}>
-                <Text style={loginStyles.socialText}>f</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={loginStyles.socialButton}>
-                <Text style={loginStyles.socialText}>G</Text>
-            </TouchableOpacity>
-            </View>
-            <Text style={loginStyles.signupText}>
-            Don’t have an account?{' '}
-            <Text style={loginStyles.signupLink} onPress={() => router.push('/register/register')}>
-                Sign Up
-            </Text>
-            </Text>
-        </View>
-        
-        <View style={{marginTop:80, alignItems:'center'}}>
-          <Text style={{color: '#838383'}}>Are you a Doctor or Facility?</Text>
-          <Pressable><Text style={{color: '#b2d5f7'}}>Register your clinic now!</Text></Pressable>
-        </View>
-    </SafeAreaView>
-
+      }
     );
+  };
 
-    
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
+        </View>
+
+        <View style={styles.form}>
+          <TextInput
+            placeholder="Email Address"
+            placeholderTextColor="#888"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            style={styles.input}
+          />
+          
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor="#888"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            autoCapitalize="none"
+            style={styles.input}
+          />
+
+          <TouchableOpacity 
+            style={[styles.loginButton, loginMutation.isPending && styles.buttonDisabled]} 
+            onPress={handleLogin}
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Sign In</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.signupText}>
+            Don't have an account?{' '}
+            <Text 
+              style={styles.signupLink} 
+              onPress={() => router.push('/register/register1')}
+            >
+              Sign Up
+            </Text>
+          </Text>
+        </View>
+
+        {/* Optional: Add test connection button */}
+        {__DEV__ && (
+          <TouchableOpacity 
+            style={styles.testButton}
+            onPress={() => router.push('/test_connection')}
+          >
+            <Text style={styles.testButtonText}>Test Connection</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  header: {
+    marginBottom: 40,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  form: {
+    marginBottom: 30,
+  },
+  input: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    color: '#333',
+  },
+  loginButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  forgotPassword: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  forgotPasswordText: {
+    color: '#007AFF',
+    fontSize: 14,
+  },
+  footer: {
+    alignItems: 'center',
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  signupLink: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  testButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#34C759',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  testButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+});

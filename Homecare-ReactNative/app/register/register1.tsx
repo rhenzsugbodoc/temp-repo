@@ -4,7 +4,7 @@
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useRegister } from '../../context/RegisterPatientContext';
+import { useRegister } from '../../src/context/RegisterPatientContext';
 import { registerCommonStyles, register1Styles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {
@@ -48,15 +48,20 @@ export default function Register() {
           <TextInput
               placeholder="Last Name"
               placeholderTextColor="#888"
-              secureTextEntry
               value={user.last_name || ''}
               onChangeText={value => handleChange('last_name', value)}
               style={registerCommonStyles.formTextInput}
           />
           <TextInput
+              placeholder="Email Address"
+              placeholderTextColor="#888"
+              value={user.email_address || ''}
+              onChangeText={value => handleChange('email_address', value)}
+              style={registerCommonStyles.formTextInput}
+          />
+          <TextInput
               placeholder="Phone Number"
               placeholderTextColor="#888"
-              secureTextEntry
               value={user.phone_number || ''}
               onChangeText={value => handleChange('phone_number', value)}
               style={registerCommonStyles.formTextInput}

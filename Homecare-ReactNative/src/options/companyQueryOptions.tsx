@@ -12,7 +12,7 @@ export function getCompanyListOptions () {
 export function getCompanyOptions (id: number) {
     return queryOptions({
         queryKey: ['company', id],
-        queryFn: () => getCompanyList(id)
+        queryFn: () => getCompany(id)
     });
 };
 

@@ -25,7 +25,7 @@ export default function RequestService() {
         City: 'Cebu City',
     }
     const handleBookService = () => {
-        router.push('/request_service/confirm');
+        router.push('/prescription/tracking');
     }
     return (
     <SafeAreaView style={{

@@ -60,7 +60,8 @@ export default function PatientDashboard() {
           <View style={styles.grid}>
             {items.map((item, index) => (
               <View key={index} style={styles.item}>
-                <Pressable style={styles.iconCircle} onPress={()=> router.push(`(Patient_tabs)/dashboard/care_team`)}>
+                <Pressable style={styles.iconCircle} onPress={()=> router.push(`/(Admin_tabs)/dashboard`)}>
+                {/* <Pressable style={styles.iconCircle} onPress={()=> router.push(`/(Patient_tabs)/dashboard/care_team`)}> */}
                   <Ionicons name={item.name as any} size={30} color="#6366f1" />
                 </Pressable>
                 <Text style={styles.label}>{item.label}</Text>

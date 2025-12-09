@@ -3,18 +3,22 @@ import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../../src/context/AuthContext';
 
 export default function PatientDashboard() {
   const router = useRouter();
-  const handleLogout = () => {
-    // TODO: implement logout behavior
+  const { logoutUser, loggedInUser } = useAuth();
+
+ const handleLogout = () => {
+    logoutUser();        
+    router.replace('/login');  
   };
 
 
   const items = [
     { id: 1, name: 'heart-outline', label: 'Health Records', route: 'health_records' },
     { id: 2, name: 'time-outline', label: 'Visit History', route: 'visit_history' },
-    { id: 3, name: 'people-outline', label: 'Care Providers', route: 'care_providers' },
+    { id: 3, name: 'people-outline', label: 'Care Providers', route: 'care_team' },
     { id: 4, name: 'document-text-outline', label: 'Clinical Notes', route: 'clinical_notes' },
     { id: 5, name: 'home-outline', label: 'Services', route: 'services' },
     { id: 6, name: 'calendar-outline', label: 'Calendar', route: 'calendar' },
@@ -42,6 +46,10 @@ export default function PatientDashboard() {
 
       <Text style={{color: '#8c82c6' , fontWeight: 'bold', fontSize: 12}}>Hello Jamal!</Text>
 
+
+      <Pressable style={styles.iconCircle} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#4454c3" />
+        </Pressable>
     </View>
 
 
@@ -60,7 +68,7 @@ export default function PatientDashboard() {
           <View style={styles.grid}>
             {items.map((item, index) => (
               <View key={index} style={styles.item}>
-                <Pressable style={styles.iconCircle} onPress={()=> router.push(`/dashboard/care_team`)}>
+                <Pressable style={styles.iconCircle} onPress={()=> router.push(`/(Patient_tabs)/dashboard/${item.route}`)}>
                   <Ionicons name={item.name as any} size={30} color="#6366f1" />
                 </Pressable>
                 <Text style={styles.label}>{item.label}</Text>

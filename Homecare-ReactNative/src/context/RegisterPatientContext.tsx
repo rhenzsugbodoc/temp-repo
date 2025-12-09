@@ -1,8 +1,23 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {User} from '../context/AuthContext';
 
 
+type User = {
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  email_address?: string;
+  password?: string;
+  confirm_password?: string;
+  gender?: "Male" | "Female";
+  dob?: Date;
+  home_address?: string;
+  medical_conditions?: string[];
+  allergies?: string[];
+  emergency_contact?: string;
+  current_medications?: string[];
+};
 
 type RegisterContextType = {
   user: User;
