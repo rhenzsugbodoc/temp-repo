@@ -1,14 +1,16 @@
+// app/login.tsx
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useLoginMutation } from '../src/options/authenticationQueryOptions';
+import { useAuth } from '../src/context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const loginMutation = useLoginMutation();
+  const { loginUser } = useAuth();
 
   const handleLogin = async () => {
     // Basic validation
@@ -24,47 +26,38 @@ export default function Login() {
       return;
     }
 
-    loginMutation.mutate(
-      { 
-        email_address: email.trim(), 
-        password: password 
-      },
-      {
-        onSuccess: (response) => {
-          console.log('Login successful:', response);
-          
-          Alert.alert(
-            'Success',
-            `Welcome back, ${response.data?.user.first_name}!`,
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  // Navigate based on user role
-                  if (response.data?.user.role === 'Patient') {
-                    router.replace('/(Patient_tabs)');
-                  } else {
-                    // Add other role navigation here
-                    router.replace('/(Patient_tabs)');
-                  }
-                },
-              },
-            ]
-          );
-        },
-        onError: (error: any) => {
-          console.error('Login failed:', error);
-          
-          let errorMessage = 'Login failed. Please try again.';
-          
-          if (error.message) {
-            errorMessage = error.message;
-          }
-          
-          Alert.alert('Login Failed', errorMessage);
-        }
+    setIsLoading(true);
+
+    try {
+      await loginUser(email.trim(), password);
+      
+      // Navigation will be handled after getting user role
+      Alert.alert(
+        'Success',
+        'Login successful!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // You can route based on role here if needed
+              router.replace('/(Patient_tabs)/dashboard');
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.message) {
+        errorMessage = error.message;
       }
-    );
+      
+      Alert.alert('Login Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,6 +77,7 @@ export default function Login() {
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
+            editable={!isLoading}
             style={styles.input}
           />
           
@@ -94,15 +88,16 @@ export default function Login() {
             value={password}
             onChangeText={setPassword}
             autoCapitalize="none"
+            editable={!isLoading}
             style={styles.input}
           />
 
           <TouchableOpacity 
-            style={[styles.loginButton, loginMutation.isPending && styles.buttonDisabled]} 
+            style={[styles.loginButton, isLoading && styles.buttonDisabled]} 
             onPress={handleLogin}
-            disabled={loginMutation.isPending}
+            disabled={isLoading}
           >
-            {loginMutation.isPending ? (
+            {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <Text style={styles.loginButtonText}>Sign In</Text>
@@ -119,22 +114,12 @@ export default function Login() {
             Don't have an account?{' '}
             <Text 
               style={styles.signupLink} 
-              onPress={() => router.push('/register/register1')}
+              onPress={() => !isLoading && router.push('/register/register1')}
             >
               Sign Up
             </Text>
           </Text>
         </View>
-
-        {/* Optional: Add test connection button */}
-        {__DEV__ && (
-          <TouchableOpacity 
-            style={styles.testButton}
-            onPress={() => router.push('/test_connection')}
-          >
-            <Text style={styles.testButtonText}>Test Connection</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -213,7 +198,7 @@ const styles = StyleSheet.create({
   },
   testButton: {
     position: 'absolute',
-    top: 20,
+    bottom: 20,
     right: 20,
     backgroundColor: '#34C759',
     paddingHorizontal: 16,
