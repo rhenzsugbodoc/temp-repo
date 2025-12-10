@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -11,9 +10,6 @@ import { useColorScheme } from '../hooks/use-color-scheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
-
-
-
 
 // Configure QueryClient with better defaults
 const queryClient = new QueryClient({
@@ -49,7 +45,6 @@ export default function RootLayout() {
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
             <Stack.Screen name="(Patient_tabs)" />
-            <Stack.Screen name="test-connection" options={{ headerShown: false }} />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

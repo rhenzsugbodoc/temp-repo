@@ -120,16 +120,6 @@ export default function Login() {
             </Text>
           </Text>
         </View>
-
-        {/* Optional: Add test connection button in dev mode */}
-        {__DEV__ && (
-          <TouchableOpacity 
-            style={styles.testButton}
-            onPress={() => router.push('/test_connection')}
-          >
-            <Text style={styles.testButtonText}>🧪 Test Connection</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </SafeAreaView>
   );
