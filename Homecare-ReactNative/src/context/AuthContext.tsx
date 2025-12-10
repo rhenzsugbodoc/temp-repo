@@ -1,7 +1,10 @@
-// src/context/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import authService from '../services/authService';
+import {
+  useLoginMutation,
+  useLogoutMutation,
+  useCurrentUser,
+} from '../options/authenticationQueryOptions';
 
 interface User {
   user_id: number;
@@ -34,19 +37,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize - Check if user is already logged in
+  const loginMutation = useLoginMutation();
+  const logoutMutation = useLogoutMutation();
+  const currentUserQuery = useCurrentUser();
+
   useEffect(() => {
     initializeAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initializeAuth = async () => {
+    setIsLoading(true);
     try {
-      const token = await authService.getStoredToken();
-      const userData = await authService.getStoredUser();
-
-      if (token && userData) {
-        setLoggedInUser(userData);
+      const userData = await AsyncStorage.getItem('user_data');
+      if (userData) {
+        setLoggedInUser(JSON.parse(userData));
       }
+      // await refreshUserData();
     } catch (error) {
       console.error('Auth initialization error:', error);
     } finally {
@@ -56,10 +63,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginUser = async (email: string, password: string) => {
     try {
-      const response = await authService.login({ email_address: email, password });
-      
+      const response = await loginMutation.mutateAsync({ email_address: email, password });
       if (response.success && response.data) {
         setLoggedInUser(response.data.user);
+        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user));
       } else {
         throw new Error(response.message || 'Login failed');
       }
@@ -70,7 +77,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logoutUser = async () => {
     try {
-      await authService.logout();
+      await logoutMutation.mutateAsync();
+      await AsyncStorage.removeItem('user_data');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -80,12 +88,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUserData = async () => {
     try {
-      const response = await authService.getCurrentUser();
-      
-      if (response.success && response.data) {
-        setLoggedInUser(response.data);
-        // Update stored user data
-        await AsyncStorage.setItem('user_data', JSON.stringify(response.data));
+      const response = await currentUserQuery.refetch();
+      if (response.data && response.data.success && response.data.data) {
+        setLoggedInUser(response.data.data);
+        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.data));
       }
     } catch (error) {
       console.error('Refresh user data error:', error);
@@ -101,7 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         loggedInUser,
-        isLoading,
+        isLoading: isLoading || loginMutation.isLoading || logoutMutation.isLoading,
         isAuthenticated: !!loggedInUser,
         loginUser,
         logoutUser,

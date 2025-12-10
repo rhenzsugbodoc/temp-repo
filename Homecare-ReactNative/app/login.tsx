@@ -31,7 +31,7 @@ export default function Login() {
     try {
       await loginUser(email.trim(), password);
       
-      // Navigation will be handled after getting user role
+      
       Alert.alert(
         'Success',
         'Login successful!',
@@ -39,7 +39,7 @@ export default function Login() {
           {
             text: 'OK',
             onPress: () => {
-              // You can route based on role here if needed
+             
               router.replace('/(Patient_tabs)/dashboard');
             },
           },

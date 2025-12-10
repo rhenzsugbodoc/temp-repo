@@ -13,7 +13,7 @@ const api = axios.create({
   timeout: 10000, // 10 seconds
 });
 
-// Request interceptor - Add token to requests
+
 api.interceptors.request.use(
   async (config) => {
     try {

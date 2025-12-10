@@ -41,7 +41,6 @@ class AuthService {
     try {
       const response = await api.post('/api/register', userData);
       
-      // Store token if registration successful
       if (response.data.success && response.data.data?.token) {
         await AsyncStorage.setItem('auth_token', response.data.data.token);
         await AsyncStorage.setItem('user_data', JSON.stringify(response.data.data.user));
