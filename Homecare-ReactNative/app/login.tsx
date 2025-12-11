@@ -4,13 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '../src/context/AuthContext';
+import { useLoginMutation } from '../src/options/authenticationQueryOptions';
+import { getUserData } from '../src/options/tokenHandler';
+import { User } from '../src/context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { loginUser } = useAuth();
+  const { setLoggedInUser } = useAuth();
+  const loginMutation = useLoginMutation();
 
   const handleLogin = async () => {
     // Basic validation
@@ -26,25 +29,37 @@ export default function Login() {
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      await loginUser(email.trim(), password);
+      const response = await loginMutation.mutateAsync({ 
+        email_address: email.trim(), 
+        password 
+      });
       
-      
-      Alert.alert(
-        'Success',
-        'Login successful!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-             
-              router.replace('/(Patient_tabs)/dashboard');
+      if (response.success && response.data) {
+        // Update context with logged in user
+        setLoggedInUser(response.data.user);
+        
+        // Get user data to check role
+        const userData = await getUserData<User>();
+        const dashboardRoute = userData?.role === 'Admin' 
+          ? '/(Admin_tabs)/dashboard' 
+          : '/(Patient_tabs)/dashboard';
+        
+        Alert.alert(
+          'Success',
+          'Login successful!',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace(dashboardRoute);
+              },
             },
-          },
-        ]
-      );
+          ]
+        );
+      } else {
+        throw new Error(response.message || 'Login failed');
+      }
     } catch (error: any) {
       console.error('Login failed:', error);
       
@@ -55,8 +70,6 @@ export default function Login() {
       }
       
       Alert.alert('Login Failed', errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -77,7 +90,7 @@ export default function Login() {
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
-            editable={!isLoading}
+            editable={!loginMutation.isPending}
             style={styles.input}
           />
           
@@ -88,16 +101,16 @@ export default function Login() {
             value={password}
             onChangeText={setPassword}
             autoCapitalize="none"
-            editable={!isLoading}
+            editable={!loginMutation.isPending}
             style={styles.input}
           />
 
           <TouchableOpacity 
-            style={[styles.loginButton, isLoading && styles.buttonDisabled]} 
+            style={[styles.loginButton, loginMutation.isPending && styles.buttonDisabled]} 
             onPress={handleLogin}
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
           >
-            {isLoading ? (
+            {loginMutation.isPending ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <Text style={styles.loginButtonText}>Sign In</Text>
@@ -114,7 +127,7 @@ export default function Login() {
             Don't have an account?{' '}
             <Text 
               style={styles.signupLink} 
-              onPress={() => !isLoading && router.push('/register/register1')}
+              onPress={() => !loginMutation.isPending && router.push('/register/register1')}
             >
               Sign Up
             </Text>

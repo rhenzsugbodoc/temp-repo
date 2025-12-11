@@ -92,25 +92,25 @@ class ServiceRequestService {
       }
     
 
-  async getFacilityData(): Promise<FacilityData[]> {
-    try {
-      const response = await api.get('/api/facilities');
-      return response.data;
+    async getFacilityData(): Promise<FacilityData[]> {
+      try {
+        const response = await api.get('/api/facilities');
+        return response.data?.data || [];
 
-    } catch (error: any) {
-      console.error('Get facility list error:', error.response?.data || error.message);
-      throw error.response?.data || { success: false, message: 'Failed to load Facility List' };
+      } catch (error: any) {
+        console.error('Get facility list error:', error.response?.data || error.message);
+        throw error.response?.data || { success: false, message: 'Failed to load Facility List' };
+      }
     }
-  }
-  async getFacilityServices(facility_id: number): Promise<FacilityDetails[]> {
-    try {
-      const response = await api.get(`/api/facilities/${facility_id}/services`);
-      return response.data?.data || [];
-    } catch (error: any) {
-      console.error('Get facility services error:', error.response?.data || error.message);
-      throw error.response?.data || { success: false, message: 'Failed to load facility services' };
+    async getFacilityServices(facility_id: number): Promise<FacilityDetails[]> {
+      try {
+        const response = await api.get(`/api/facilities/${facility_id}/services`);
+        return response.data?.data || [];
+      } catch (error: any) {
+        console.error('Get facility services error:', error.response?.data || error.message);
+        throw error.response?.data || { success: false, message: 'Failed to load facility services' };
+      }
     }
-  }
   // Get facility by ID
   async getFacilityById(facility_id: number): Promise<FacilityData | null> {
     try {

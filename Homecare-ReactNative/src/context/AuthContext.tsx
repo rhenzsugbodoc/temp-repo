@@ -1,12 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  useLoginMutation,
-  useLogoutMutation,
-  useCurrentUser,
-} from '../options/authenticationQueryOptions';
+import { getUserData, saveUserData } from '../options/tokenHandler';
+import { useCurrentUser } from '../options/authenticationQueryOptions';
 
-interface User {
+export interface User {
   user_id: number;
   first_name: string;
   middle_name?: string;
@@ -14,6 +10,7 @@ interface User {
   email_address: string;
   role: string;
   phone_number?: string;
+  password?: string;
   date_of_birth?: string;
   gender?: string;
   home_address?: string;
@@ -25,10 +22,9 @@ interface AuthContextType {
   loggedInUser: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  loginUser: (email: string, password: string) => Promise<void>;
-  logoutUser: () => Promise<void>;
   refreshUserData: () => Promise<void>;
   updateUserData: (userData: Partial<User>) => void;
+  setLoggedInUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,52 +33,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loginMutation = useLoginMutation();
-  const logoutMutation = useLogoutMutation();
   const currentUserQuery = useCurrentUser();
 
   useEffect(() => {
     initializeAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initializeAuth = async () => {
     setIsLoading(true);
     try {
-      const userData = await AsyncStorage.getItem('user_data');
+      const userData = await getUserData<User>();
       if (userData) {
-        setLoggedInUser(JSON.parse(userData));
+        setLoggedInUser(userData);
       }
-      // await refreshUserData();
     } catch (error) {
       console.error('Auth initialization error:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loginUser = async (email: string, password: string) => {
-    try {
-      const response = await loginMutation.mutateAsync({ email_address: email, password });
-      if (response.success && response.data) {
-        setLoggedInUser(response.data.user);
-        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user));
-      } else {
-        throw new Error(response.message || 'Login failed');
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const logoutUser = async () => {
-    try {
-      await logoutMutation.mutateAsync();
-      await AsyncStorage.removeItem('user_data');
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setLoggedInUser(null);
     }
   };
 
@@ -91,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await currentUserQuery.refetch();
       if (response.data && response.data.success && response.data.data) {
         setLoggedInUser(response.data.data);
-        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.data));
+        await saveUserData(response.data.data);
       }
     } catch (error) {
       console.error('Refresh user data error:', error);
@@ -107,12 +74,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         loggedInUser,
-        isLoading: isLoading || loginMutation.isLoading || logoutMutation.isLoading,
+        isLoading,
         isAuthenticated: !!loggedInUser,
-        loginUser,
-        logoutUser,
         refreshUserData,
         updateUserData,
+        setLoggedInUser,
       }}
     >
       {children}

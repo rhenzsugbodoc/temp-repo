@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { getCompanyListOptions} from '../../../src/options/companyQueryOptions';
 import { useQuery} from '@tanstack/react-query';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as DocumentPicker from 'expo-document-picker';

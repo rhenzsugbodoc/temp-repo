@@ -39,18 +39,22 @@ export default function Register() {
           style={[registerCommonStyles.formTextInput, { justifyContent: 'center' }]}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={{ color: user.dob ? 'white' : '#888' }}>
-            {user.dob ? user.dob.toLocaleDateString() : 'Select Date of Birth'}
+          <Text style={{ color: user.date_of_birth ? 'white' : '#888' }}>
+            {user.date_of_birth ? user.date_of_birth : 'Select Date of Birth'}
           </Text>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
-            value={user.dob || new Date(2000, 0, 1)}
+            value={user.date_of_birth ? new Date(user.date_of_birth) : new Date(2000, 0, 1)}
             mode="date"
             display="default"
             onChange={(_, selectedDate) => {
               setShowDatePicker(false);
-              if (selectedDate) handleChange('dob', selectedDate);
+              if (selectedDate) {
+                // Format as YYYY-MM-DD for the API
+                const formattedDate = selectedDate.toISOString().split('T')[0];
+                handleChange('date_of_birth', formattedDate);
+              }
             }}
             maximumDate={new Date()}
           />

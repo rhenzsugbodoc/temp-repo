@@ -151,18 +151,21 @@ categoryLabel: {
 grid: {
   flexDirection: 'row',
   flexWrap: 'wrap',
+  marginTop: 15,
   justifyContent: 'space-between',
-  gap: 5,
+  gap: 12,
 },
 servicesOfferedContainer: {
     padding: 25
 },
 serviceTypeItem: {
   backgroundColor: '#2b4ba2',
-  padding: 10,
+  
+  padding: 5,
   color: 'white',
   borderRadius: 20,
-  width: '48%',
+  justifyContent: 'center',
+  width: '45%',
 },
 serviceTypeText: {
     color:'white', 
@@ -170,7 +173,7 @@ serviceTypeText: {
 },
 requestButtonContainer: {
     marginTop: 'auto', 
-    padding: 30
+    padding: 10
 },
 requestButton: {
     backgroundColor: '#2b4ba2', 

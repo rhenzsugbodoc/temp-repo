@@ -3,8 +3,8 @@ import { View, ScrollView, Image, Pressable, StyleSheet, Text, ActivityIndicator
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../../src/context/AuthContext';
-import dashboardService, { DashboardData } from '../../../src/services/dashboardService';
+import { useAuth } from '@/src/context/AuthContext';
+import dashboardService, { DashboardData } from '@/src/services/dashboardService';
 
 export default function PatientDashboard() {
   const router = useRouter();
@@ -83,7 +83,7 @@ export default function PatientDashboard() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Image
-          source={require('../../../assets/images/Homecare_Logo.png')}
+          source={require('@/assets/images/Homecare_Logo.png')}
           style={{ width: 50, height: 40, marginLeft: 15 }}
           resizeMode="contain"
         />

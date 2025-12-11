@@ -1,50 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, ScrollView, Image, Pressable, StyleSheet, Text, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../../src/context/AuthContext';
-import dashboardService, { DashboardData } from '../../../src/services/dashboardService';
+import { useAuth } from '@/src/context/AuthContext';
+import { usePatientDashboard, useTodaySchedule, useCareTeam } from '@/src/options/dashboardQueryOptions';
+import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
 
 export default function PatientDashboard() {
   const router = useRouter();
-  const { logoutUser, loggedInUser, refreshUserData } = useAuth();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      setIsLoadingDashboard(true);
-      const data = await dashboardService.getPatientDashboard();
-      setDashboardData(data);
-    } catch (error: any) {
-      console.error('Failed to load dashboard:', error);
-      // If dashboard API fails, we can still show basic UI with user data
-    } finally {
-      setIsLoadingDashboard(false);
-    }
-  };
+  const { loggedInUser, refreshUserData } = useAuth();
+  
+  // Use React Query hooks
+  const { data: dashboardData, isLoading: isLoadingDashboard, refetch: refetchDashboard } = usePatientDashboard();
+  const { data: todaySchedule, refetch: refetchSchedule } = useTodaySchedule();
+  const { data: careTeam, refetch: refetchCareTeam } = useCareTeam();
+  const logoutMutation = useLogoutMutation();
 
   const onRefresh = async () => {
-    setRefreshing(true);
     try {
-      await refreshUserData();
-      await loadDashboard();
+      await Promise.all([
+        refreshUserData(),
+        refetchDashboard(),
+        refetchSchedule(),
+        refetchCareTeam(),
+      ]);
     } catch (error) {
       console.error('Refresh failed:', error);
-    } finally {
-      setRefreshing(false);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      await logoutMutation.mutateAsync();
       router.replace('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -64,8 +52,9 @@ export default function PatientDashboard() {
     { id: 8, name: 'card-outline', label: 'Bills', route: 'bills' },
   ];
 
-  // Use dashboard care team data or fallback to mock data
-  const careTeamMembers = dashboardData?.care_team || [];
+  // Use React Query data with fallbacks
+  const careTeamMembers = careTeam || [];
+  const scheduleItems = todaySchedule || dashboardData?.today_schedule || [];
 
   // Show loading spinner initially
   if (isLoadingDashboard && !dashboardData) {
@@ -83,7 +72,7 @@ export default function PatientDashboard() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Image
-          source={require('../../../assets/images/Homecare_Logo.png')}
+          source={require('@/assets/images/Homecare_Logo.png')}
           style={{ width: 50, height: 40, marginLeft: 15 }}
           resizeMode="contain"
         />
@@ -100,14 +89,18 @@ export default function PatientDashboard() {
       <ScrollView
         style={{ paddingHorizontal: 15 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4454c3']} />
+          <RefreshControl 
+            refreshing={logoutMutation.isPending} 
+            onRefresh={onRefresh} 
+            colors={['#4454c3']} 
+          />
         }
       >
         <Text style={styles.categoryLabel}>Today's Schedule</Text>
 
-        {dashboardData?.today_schedule && dashboardData.today_schedule.length > 0 ? (
+        {scheduleItems && scheduleItems.length > 0 ? (
           <View style={styles.card}>
-            {dashboardData.today_schedule.map((item, index) => (
+            {scheduleItems.map((item, index) => (
               <View key={index} style={styles.scheduleItem}>
                 <View style={styles.scheduleIconContainer}>
                   <Ionicons
@@ -196,7 +189,7 @@ export default function PatientDashboard() {
           </View>
         )}
 
-        {/* Display profile: for backend connection verification */}
+        
         <Text style={styles.categoryLabel}>Your Profile</Text>
         {loggedInUser && (
           <View style={styles.card}>

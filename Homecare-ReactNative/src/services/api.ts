@@ -1,8 +1,10 @@
 // src/services/api.ts
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getToken, removeToken } from '../options/tokenHandler';
+import {useRouter} from 'expo-router';
 
-const BASE_URL = 'http://192.168.68.154:8081'; //change to local computer's ip address
+const router = useRouter();
+const BASE_URL = 'http://192.168.254.149'; //change to local computer's ip address
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -17,7 +19,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     try {
-      const token = await AsyncStorage.getItem('auth_token');
+      const token = await getToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -31,14 +33,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle errors globally
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      await AsyncStorage.removeItem('auth_token');
-      // You can redirect to login here if needed
+      await removeToken();
+      router.replace('/login');
     }
     return Promise.reject(error);
   }

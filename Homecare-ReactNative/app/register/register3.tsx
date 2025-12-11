@@ -2,13 +2,11 @@ import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useRegister } from '../../src/context/RegisterPatientContext';
-import { useRegisterMutation } from '../../src/options/authenticationQueryOptions';
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {
-  const { user, setUser } = useRegister();
+  const { user, setUser, registerUser, isRegistering } = useRegister();
   const router = useRouter();
-  const registerMutation = useRegisterMutation();
 
   const handleChange = (key: keyof typeof user, value: any) => {
     setUser(prev => ({
@@ -24,7 +22,7 @@ export default function Register() {
       return;
     }
 
-    if (!user.dob) {
+    if (!user.date_of_birth) {
       Alert.alert('Validation Error', 'Please select your date of birth');
       return;
     }
@@ -34,50 +32,42 @@ export default function Register() {
       return;
     }
 
-    // Password confirmation check (if you have confirm_password field)
-    if (user.password !== user.confirm_password) {
-      Alert.alert('Validation Error', 'Passwords do not match');
-      return;
-    }
-
     // Register user
-    registerMutation.mutate(user, {
-      onSuccess: (response) => {
-        console.log('Registration successful:', response);
-        Alert.alert(
-          'Success',
-          'Registration successful! Please log in.',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.replace('/login'),
-            },
-          ]
-        );
-      },
-      onError: (error: any) => {
-        console.error('Registration failed:', error);
-        
-        let errorMessage = 'Registration failed. Please try again.';
-        
-        if (error.message) {
-          errorMessage = error.message;
-        }
-        
-        if (error.errors) {
-          // Handle validation errors from backend
-          const errorFields = Object.values(error.errors).join('\n');
-          errorMessage = `Validation errors:\n${errorFields}`;
-        }
-        
-        Alert.alert('Registration Failed', errorMessage, [
+    try {
+      const response = await registerUser(user as any);
+      console.log('Registration successful:', response);
+      Alert.alert(
+        'Success',
+        'Registration successful! Please log in.',
+        [
           {
             text: 'OK',
-            onPress: () => router.replace('/register/register1'),
+            onPress: () => router.replace('/login'),
           },
-        ]);
+        ]
+      );
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.message) {
+        errorMessage = error.message;
       }
-    });
+      
+      if (error.errors) {
+        // Handle validation errors from backend
+        const errorFields = Object.values(error.errors).join('\n');
+        errorMessage = `Validation errors:\n${errorFields}`;
+      }
+      
+      Alert.alert('Registration Failed', errorMessage, [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/register/register1'),
+        },
+      ]);
+    }
   };
 
   return (
@@ -114,11 +104,11 @@ export default function Register() {
         />
 
         <TouchableOpacity 
-          style={[registerCommonStyles.signupButton, registerMutation.isPending && { opacity: 0.7 }]} 
+          style={[registerCommonStyles.signupButton, isRegistering && { opacity: 0.7 }]} 
           onPress={handleRegister}
-          disabled={registerMutation.isPending}
+          disabled={isRegistering}
         >
-          {registerMutation.isPending ? (
+          {isRegistering ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={registerCommonStyles.signupButtonText}>Sign Up</Text>
