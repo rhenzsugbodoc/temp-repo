@@ -4,12 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { useQuery} from '@tanstack/react-query';
+import {useFacility} from '@/src/context/FacilityContext';
 import { companyListStyles } from '../../../assets/styles/patient/request/requestStyles';
 import { useFacilityData } from '@/src/options/serviceRequestOptions';
 export default function RequestList() {
   const router = useRouter();
-
+  const [searchValue, setSearchValue] = useState('');
+  const { facilityID, setFacilityID } = useFacility();
 
     const { data: facilityData, isLoading: isFacilitiesLoading, error: facilitiesError } = useFacilityData();
 
@@ -24,7 +25,8 @@ export default function RequestList() {
   const [selectedSort, setSelectedSort] = useState('Sort By: Name');
 
   const handleCompanyPress = (facility: any) => {
-    router.push(`/request_service/${facility.facility_id}`);
+    setFacilityID(facility.facility_id);
+    router.push(`/request_service/facilityDetails`);
   };
   return <SafeAreaView style={{
     flex: 1,
@@ -48,6 +50,7 @@ export default function RequestList() {
             <TextInput
               placeholder="Search"
               style={companyListStyles.searchInput}
+              onChangeText={setSearchValue}
             />
             <Ionicons name="search" size={20} color="#999" />
           </View>
@@ -86,24 +89,30 @@ export default function RequestList() {
         </View>
 
 
-      {/* companyList */}
+      
       <View style={companyListStyles.companyContainer}>
-        {facilityData?.map(facility => (
-          facility.facility_type === selectedValue || selectedValue === 'All' ? (
-            <Pressable key={facility.facility_id} onPress={() => handleCompanyPress(facility)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-              <View style={[companyListStyles.card, {gap: 10, flexDirection: 'row'}]}>
-                <View style={{ flex: 1 }}>
-                  <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="cover" 
-                    style={{ borderRadius: 10, width: '100%', height: 150 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={companyListStyles.companyText1}>{facility.facility_name}</Text>
-                  <Text style={companyListStyles.companyText2}>{facility.facility_address}</Text>
-                  <Text style={companyListStyles.companyText3}>{facility.facility_type}</Text>
-                </View>
+        {facilityData?.filter(facility => {        
+          const typeMatch = facility.facility_type === selectedValue || selectedValue === 'All';
+          
+          const search = searchValue.trim().toLowerCase();
+          const nameMatch = facility.facility_name?.toLowerCase().includes(search);
+          const addressMatch = facility.facility_address?.toLowerCase().includes(search);
+          const searchMatch = !search || nameMatch || addressMatch;
+          return typeMatch && searchMatch;
+        }).map(facility => (
+          <Pressable key={facility.facility_id} onPress={() => handleCompanyPress(facility)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
+            <View style={[companyListStyles.card, {gap: 10, flexDirection: 'row'}]}>
+              <View style={{ flex: 1 }}>
+                <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="cover" 
+                  style={{ borderRadius: 10, width: '100%', height: 150 }} />
               </View>
-            </Pressable>
-          ) : null
+              <View style={{ flex: 1 }}>
+                <Text style={companyListStyles.companyText1}>{facility.facility_name}</Text>
+                <Text style={companyListStyles.companyText2}>{facility.facility_address}</Text>
+                <Text style={companyListStyles.companyText3}>{facility.facility_type}</Text>
+              </View>
+            </View>
+          </Pressable>
         ))}
       </View>
 

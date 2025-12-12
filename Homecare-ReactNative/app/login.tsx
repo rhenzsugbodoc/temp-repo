@@ -36,10 +36,9 @@ export default function Login() {
       });
       
       if (response.success && response.data) {
-        // Update context with logged in user
+
         setLoggedInUser(response.data.user);
         
-        // Get user data to check role
         const userData = await getUserData<User>();
         const dashboardRoute = userData?.role === 'Admin' 
           ? '/(Admin_tabs)/dashboard' 

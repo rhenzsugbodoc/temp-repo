@@ -6,7 +6,7 @@ export const usePatientDashboard = () => {
   return useQuery({
     queryKey: ['patientDashboard'],
     queryFn: () => DashboardService.getPatientDashboard(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 };
 
@@ -14,7 +14,7 @@ export const useDoctorDashboard = () => {
   return useQuery({
     queryKey: ['doctorDashboard'],
     queryFn: () => DashboardService.getDoctorDashboard(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 };
 
@@ -22,7 +22,7 @@ export const useCaregiverDashboard = () => {
   return useQuery({
     queryKey: ['caregiverDashboard'],
     queryFn: () => DashboardService.getCaregiverDashboard(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 };
 
@@ -30,7 +30,7 @@ export const useTodaySchedule = () => {
   return useQuery({
     queryKey: ['todaySchedule'],
     queryFn: () => DashboardService.getTodaySchedule(),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000, 
   });
 };
 
@@ -38,6 +38,6 @@ export const useCareTeam = () => {
   return useQuery({
     queryKey: ['careTeam'],
     queryFn: () => DashboardService.getCareTeam(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000, 
   });
 };

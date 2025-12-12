@@ -3,26 +3,29 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView} from 'react-native';
 import { useRouter, useLocalSearchParams  } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {useFacility} from '@/src/context/FacilityContext';
 import { companyDetailStyles } from '../../../assets/styles/patient/request/requestStyles';
 import { useFacilityById, useFacilityServices } from '@/src/options/serviceRequestOptions';
 const CompanyDetails = () => {
     
     const router = useRouter();
-
-    const { id } = useLocalSearchParams();
-    const facilityId = parseInt(id as string);
-    const { data: facility, isLoading: isFacilitiesLoading, error: facilitiesError } = useFacilityById(facilityId, !!id);
-    const {data: facilityServices, error: servicesError} = useFacilityServices(facilityId, !!id);
+    const {facilityID, setFacilityID, facilityServices, setFacilityServices} = useFacility();
+    const { data: facility, isLoading: isFacilitiesLoading, error: facilitiesError } = useFacilityById(facilityID ?? 0, !!facilityID);
+    const { data: services, error: servicesError} = useFacilityServices(facilityID  ?? 0, !!facilityID);
 
     useEffect(() => {
-        if (facility) {
-            console.log('Facilities loaded:', facility);
-        }
-    }, [facility]);
+      if (facility?.facility_id) {
+        setFacilityID(facility.facility_id);
+      }
+    }, [facility?.facility_id, setFacilityID]);
+
+    useEffect(() => {
+      setFacilityServices(services ?? []);
+    }, [services, setFacilityServices]);
 
 
     const handlePress = () =>{
-      router.push(`/request_service/requesting_service?companyID=${id}`);  
+      router.push(`/request_service/requesting_service`);  
     }
 
     return (

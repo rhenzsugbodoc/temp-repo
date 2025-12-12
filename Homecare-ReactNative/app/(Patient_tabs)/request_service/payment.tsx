@@ -4,9 +4,13 @@ import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextI
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery} from '@tanstack/react-query';
+import { useRequestService } from '@/src/context/RequestContext';
+
 export default function RequestService() {
     // const params = useSearchParams();
     // const companyID = params.companyID;
+    const {form , setForm} = useRequestService();
+    
     const router = useRouter();
     const serviceList = [
         { id: 1, service_name: 'Doctor\'s Home Visit', service_price: 100, date: new Date('2024-07-01') },

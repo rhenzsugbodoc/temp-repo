@@ -30,13 +30,14 @@ export interface CaregiverDetails {
   email_address: string | null;
 }
 export interface OneTimeData {
-  service_id: number;
-  service_category: string;
+  patient_id: number | null;
+  service_id: number | null,
+  service_category: 'Nursing Care' | 'Therapy' | 'Companionship' | 'Assisted Living' | '';
+  facility_id: number | null;
+  preferred_date: string | null;
+  preferred_time: string | null;
   service_description: string;
-  preferred_date: string;
-  preferred_time: string; 
-  preferred_caregiver_id?: number | null;
-  facility_id?: number | null;
+  preffered_caregiver_id?: number | null;
   notes?: string | null;
 }
 
