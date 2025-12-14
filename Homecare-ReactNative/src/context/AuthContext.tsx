@@ -11,26 +11,23 @@ export interface User {
   role: string;
   phone_number?: string;
   password?: string;
+  emergency_contact?: string,
   date_of_birth?: string;
   gender?: string;
   home_address?: string;
   profile_picture?: string;
   created_at?: string;
+  updated_at?: string;
 }
 
 interface AuthContextType {
-  loggedInUser: User | null;
   isLoading: boolean;
-  isAuthenticated: boolean;
   refreshUserData: () => Promise<void>;
-  updateUserData: (userData: Partial<User>) => void;
-  setLoggedInUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const currentUserQuery = useCurrentUser();
@@ -42,10 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const initializeAuth = async () => {
     setIsLoading(true);
     try {
+      //checks secure store if user data exists
       const userData = await getUserData<User>();
-      if (userData) {
-        setLoggedInUser(userData);
-      }
     } catch (error) {
       console.error('Auth initialization error:', error);
     } finally {
@@ -55,9 +50,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUserData = async () => {
     try {
+      //used on dashboard loads?
       const response = await currentUserQuery.refetch();
       if (response.data && response.data.success && response.data.data) {
-        setLoggedInUser(response.data.data);
+        
         await saveUserData(response.data.data);
       }
     } catch (error) {
@@ -66,19 +62,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateUserData = (userData: Partial<User>) => {
-    setLoggedInUser(prev => prev ? { ...prev, ...userData } : null);
-  };
-
   return (
     <AuthContext.Provider
       value={{
-        loggedInUser,
         isLoading,
-        isAuthenticated: !!loggedInUser,
         refreshUserData,
-        updateUserData,
-        setLoggedInUser,
+
       }}
     >
       {children}

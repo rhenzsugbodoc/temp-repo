@@ -117,7 +117,7 @@ class Facilities extends MY_Controller {
             'facility' => [
                 'facility_id' => $facility->facility_id,
                 'facility_name' => $facility->facility_name,
-                'address' => $facility->address
+                'address' => $facility->facility_address
             ],
             'count' => count($services),
             'data' => $services

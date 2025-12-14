@@ -234,7 +234,7 @@ class Patient_model extends CI_Model {
         // Count upcoming appointments
         $this->db->where('patient_id', $patient_id);
         $this->db->where('appointment_date >=', date('Y-m-d'));
-        $this->db->where_in('status', ['Scheduled', 'Confirmed']);
+        $this->db->where_in('status', ['Pending','Scheduled', 'Confirmed']);
         $summary['upcoming_appointments'] = $this->db->count_all_results('appointments');
         
         // Count active medications

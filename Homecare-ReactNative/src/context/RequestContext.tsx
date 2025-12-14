@@ -15,10 +15,10 @@ export const RequestServiceProvider = ({ children }: { children: ReactNode }) =>
   const [form, setForm] = useState<OneTimeData>({
     patient_id: null,
     service_id: null,
-    service_category: '',
+    service_category: null,
     service_description: '',
-    preferred_date: '',
-    preferred_time: '',
+    preferred_date: null,
+    preferred_time: null,
     preffered_caregiver_id: null,
     facility_id: null,
     notes: '',

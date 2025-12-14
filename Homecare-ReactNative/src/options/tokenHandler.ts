@@ -23,6 +23,11 @@ export async function getUserData<T = any>(): Promise<T | null> {
 
 export async function removeUserData() {
   await AsyncStorage.removeItem('user_data');
+  await AsyncStorage.removeItem('auth_token');
+}
+
+export async function getPatientID( ): Promise<string | null> {
+  return await AsyncStorage.getItem('patientID');
 }
 
 export async function clearAuth() {

@@ -12,7 +12,6 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const { setLoggedInUser } = useAuth();
   const loginMutation = useLoginMutation();
 
   const handleLogin = async () => {
@@ -30,15 +29,15 @@ export default function Login() {
     }
 
     try {
-      const response = await loginMutation.mutateAsync({ 
+      const response = await loginMutation.mutateAsync({  //saves token and user data in secure store
         email_address: email.trim(), 
         password 
       });
       
       if (response.success && response.data) {
 
-        setLoggedInUser(response.data.user);
-        
+       
+        //accessess secure stored user data
         const userData = await getUserData<User>();
         const dashboardRoute = userData?.role === 'Admin' 
           ? '/(Admin_tabs)/dashboard' 

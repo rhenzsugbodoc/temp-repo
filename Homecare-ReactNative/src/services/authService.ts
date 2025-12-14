@@ -83,6 +83,7 @@ class AuthService {
 
   async getCurrentUser(): Promise<any> {
     try {
+      //interceptor adds the stored token before sending request
       const response = await api.get('/api/get_user');
       return response.data;
     } catch (error: any) {

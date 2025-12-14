@@ -4,11 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/context/AuthContext';
+import {getUserData} from '@/src/options/tokenHandler';
 import dashboardService, { DashboardData } from '@/src/services/dashboardService';
 
 export default function PatientDashboard() {
   const router = useRouter();
-  const { logoutUser, loggedInUser, refreshUserData } = useAuth();
+  const { refreshUserData } = useAuth();
+  const loggedInUser = getUserData();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -89,7 +91,7 @@ export default function PatientDashboard() {
         />
 
         <Text style={styles.greetingText}>
-          Hello {loggedInUser?.first_name || 'User'}!
+          Hello BIGASS {loggedInUser?.first_name || 'User'}!
         </Text>
 
         <Pressable style={styles.iconCircle} onPress={handleLogout}>

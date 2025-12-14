@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => env('DB_HOST'),
-	'username' => env('DB_USER'),
-	'password' => env('DB_PASS'),
-	'database' => env('DB_NAME'),
+	'hostname' => 'localhost',
+	'username' => 'root',
+	'password' => '',
+	'database' => 'homecare_db',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

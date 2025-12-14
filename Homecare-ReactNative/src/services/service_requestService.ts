@@ -32,7 +32,7 @@ export interface CaregiverDetails {
 export interface OneTimeData {
   patient_id: number | null;
   service_id: number | null,
-  service_category: 'Nursing Care' | 'Therapy' | 'Companionship' | 'Assisted Living' | '';
+  service_category: number | null;
   facility_id: number | null;
   preferred_date: string | null;
   preferred_time: string | null;

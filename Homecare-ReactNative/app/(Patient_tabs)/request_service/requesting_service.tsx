@@ -19,7 +19,7 @@ export default function RequestList() {
     
     const {form , setForm} = useRequestService();
     const [scheduleType, setScheduleType] = useState<'one-time' | 'routine'>('one-time');    
-    const [selectedCategory, setSelectedCategory] = useState<OneTimeData["service_category"]>("");
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
     const [isDateVisible, setDateVisible] = useState(false);
     const [isTimeVisible, setTimeVisible] = useState(false);
@@ -51,20 +51,34 @@ export default function RequestList() {
     };
 
     const handleSubmit = async () => {
-        setForm((prev) => ({
-            ...prev,
-            patient_id: userData?.user_id,
-            facility_id: facilityID,
-            service_category: selectedCategory as any,
-        }));
-        if (scheduleType === 'one-time') {
-            await oneTimeMutation.mutateAsync(form);
-        
-        
-        } else if (scheduleType === 'routine') {
-            // await routineMutation.mutateAsync(form);   
+        try {
+            // Prepare the complete form data BEFORE mutation
+            const requestData: OneTimeData = {
+                patient_id: userData?.user_id || null,
+                service_id: form.service_id || null,
+                service_category: selectedCategory || null,
+                service_description: form.service_description || '',
+                preferred_date: form.preferred_date || null,
+                preferred_time: form.preferred_time || null,
+                preffered_caregiver_id: form.preffered_caregiver_id || null,
+                facility_id: facilityID || null,
+                notes: form.notes || '',
+            };
+
+            console.log('Submitting request data:', requestData);
+
+            if (scheduleType === 'one-time') {
+                const result = await oneTimeMutation.mutateAsync(requestData);
+                console.log('Mutation result:', result);
+            } else if (scheduleType === 'routine') {
+                // await routineMutation.mutateAsync(requestData);   
+            }
+            
+            router.push(`/request_service/payment`);
+        } catch (error) {
+            console.error('Submit error:', error);
+            // Optionally show error to user
         }
-        router.push(`/request_service/payment`);
     };
 
     const handleChange = (key: keyof typeof form, value: any) => {
@@ -74,11 +88,12 @@ export default function RequestList() {
         }))
     };
 
+    // Map to actual database category_id values
     const serviceCategories = [
-        { id: 1, label: "Assisted Living", value: "Assisted Living" },
-        { id: 2, label: "Nursing Care", value: "Nursing Care" },
-        { id: 3, label: "Companionship", value: "Companionship" },
-        { id: 4, label: "Therapy", value: "Therapy" }, 
+        { id: 5, label: "Assisted Living", value: 5 },
+        { id: 6, label: "Nursing Care", value: 6 },
+        { id: 9, label: "Companionship", value: 9 },
+        { id: 11, label: "Therapy", value: 11 }, 
     ];
 
     return (

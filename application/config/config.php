@@ -1,10 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$dotenv = Dotenv\Dotenv::createUnsafeImmutable(FCPATH); 
-$dotenv->load();
-
-$config['composer_autoload'] = FCPATH. 'vendor'. DIRECTORY_SEPARATOR . 'autoload.php';
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
@@ -27,7 +23,7 @@ $config['composer_autoload'] = FCPATH. 'vendor'. DIRECTORY_SEPARATOR . 'autoload
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://homecare.localhost:8081'; 
+$config['base_url'] = 'http://temp-repo.local/';
 /*
 |--------------------------------------------------------------------------
 | Index File

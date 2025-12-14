@@ -6,21 +6,25 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/context/AuthContext';
 import { usePatientDashboard, useTodaySchedule, useCareTeam } from '@/src/options/dashboardQueryOptions';
 import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
-
+import {getUserData} from '@/src/options/tokenHandler';
+import { User} from '@/src/context/AuthContext';
+import { useState, useEffect } from 'react';
 export default function PatientDashboard() {
   const router = useRouter();
-  const { loggedInUser, refreshUserData } = useAuth();
-  
-  // Use React Query hooks
-  const { data: dashboardData, isLoading: isLoadingDashboard, refetch: refetchDashboard } = usePatientDashboard();
+
+
+
+
+  const { data: dashboardData, isLoading: isLoadingDashboard, isFetching: isDashboardFetching, refetch: refetchDashboard} = usePatientDashboard();
   const { data: todaySchedule, refetch: refetchSchedule } = useTodaySchedule();
   const { data: careTeam, refetch: refetchCareTeam } = useCareTeam();
   const logoutMutation = useLogoutMutation();
+ 
 
   const onRefresh = async () => {
     try {
       await Promise.all([
-        refreshUserData(),
+        refetchDashboard(),
         refetchDashboard(),
         refetchSchedule(),
         refetchCareTeam(),
@@ -54,7 +58,9 @@ export default function PatientDashboard() {
 
   // Use React Query data with fallbacks
   const careTeamMembers = careTeam || [];
-  const scheduleItems = todaySchedule || dashboardData?.today_schedule || [];
+  const scheduleItems = todaySchedule || dashboardData?.upcoming_appointments || [];
+  const summaryItems = dashboardData?.summary || null;
+  const patientInfo = dashboardData?.patient || null;
 
   // Show loading spinner initially
   if (isLoadingDashboard && !dashboardData) {
@@ -78,7 +84,7 @@ export default function PatientDashboard() {
         />
 
         <Text style={styles.greetingText}>
-          Hello {loggedInUser?.first_name || 'User'}!
+          Hello {patientInfo?.first_name || 'User'}!
         </Text>
 
         <Pressable style={styles.iconCircle} onPress={handleLogout}>
@@ -90,9 +96,10 @@ export default function PatientDashboard() {
         style={{ paddingHorizontal: 15 }}
         refreshControl={
           <RefreshControl 
-            refreshing={logoutMutation.isPending} 
+            refreshing={isDashboardFetching} 
             onRefresh={onRefresh} 
-            colors={['#4454c3']} 
+            colors={['#4454c3']}              
+            tintColor="#4454c3"               
           />
         }
       >
@@ -188,35 +195,49 @@ export default function PatientDashboard() {
             <Text style={styles.emptyText}>No care team members assigned yet</Text>
           </View>
         )}
-
-        
         <Text style={styles.categoryLabel}>Your Profile</Text>
-        {loggedInUser && (
+        {patientInfo && (
           <View style={styles.card}>
             
             <View style={styles.profileInfo}>
               <Text style={styles.profileLabel}>Name:</Text>
               <Text style={styles.profileValue}>
-                {loggedInUser.first_name} {loggedInUser.middle_name || ''} {loggedInUser.last_name}
+                {patientInfo.first_name} {patientInfo.last_name}
               </Text>
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.profileLabel}>Email:</Text>
-              <Text style={styles.profileValue}>{loggedInUser.email_address}</Text>
+              <Text style={styles.profileValue}>{patientInfo.email_address}</Text>
             </View>
             <View style={styles.profileInfo}>
-              <Text style={styles.profileLabel}>Role:</Text>
-              <Text style={styles.profileValue}>{loggedInUser.role}</Text>
+              <Text style={styles.profileLabel}>Emergency Contact:</Text>
+              <Text style={styles.profileValue}>{patientInfo.emergency_contact}</Text>
             </View>
-            {loggedInUser.phone_number && (
+            {patientInfo.phone_number && (
               <View style={styles.profileInfo}>
                 <Text style={styles.profileLabel}>Phone:</Text>
-                <Text style={styles.profileValue}>{loggedInUser.phone_number}</Text>
+                <Text style={styles.profileValue}>{patientInfo.phone_number}</Text>
               </View>
             )}
           </View>
         )}
-
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>Active Care Plans {"\n"}<Text style={styles.summaryValue}>{summaryItems?.active_care_plans}</Text></Text>
+          </View>
+         <View style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>Active Medications {"\n"}<Text style={styles.summaryValue}>{summaryItems?.active_medications}</Text></Text>
+          </View>
+         <View style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>Assigned Caregivers {"\n"}<Text style={styles.summaryValue}>{summaryItems?.assigned_caregivers}</Text></Text>
+          </View>
+         <View style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>Unpaid Balance {"\n"}<Text style={styles.summaryValue}>${summaryItems?.unpaid_balance}</Text></Text>
+          </View>
+         <View style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>Upcoming Appointments {"\n"}<Text style={styles.summaryValue}>{summaryItems?.upcoming_appointments}</Text></Text>
+          </View>
+        </View>
         <View style={{ height: 30 }} />
       </ScrollView>
     </SafeAreaView>
@@ -392,5 +413,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1a1a1a',
     flex: 1,
+  },
+  summaryContainer: {
+    
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    marginHorizontal: 15,
+    
+    marginTop: 20,
+  },
+  summaryCard: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginHorizontal: 0,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
+    
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#434e79',
+    textAlign: 'center',
+  },
+  summaryValue: {
+    fontSize: 12,
+    color: '#1a1a1a',
+    fontWeight: '600',
   },
 });
