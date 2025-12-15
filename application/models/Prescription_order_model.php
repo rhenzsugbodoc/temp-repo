@@ -51,12 +51,25 @@ class Prescription_order_model extends CI_Model {
         return $this->db->update('prescription_orders', ['status' => 'Cancelled']);
     }
     
-    // Get available pharmacies
-    public function get_available_pharmacies() {
-        $this->db->select('*');
-        $this->db->from('pharmacy');
-        $this->db->order_by('pharmacy_name', 'ASC');
-        $query = $this->db->get();
-        return $query->result();
+    // Assign driver to order
+    public function assign_driver($order_id, $driver_id) {
+        $this->db->where('order_id', $order_id);
+        return $this->db->update('prescription_orders', [
+            'driver_id' => $driver_id,
+            'status' => 'Processing'
+        ]);
     }
+    
+    // Update order status
+    public function update_order_status($order_id, $status) {
+        $allowed_statuses = ['Pending', 'Verified', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled'];
+        
+        if (!in_array($status, $allowed_statuses)) {
+            return false;
+        }
+        
+        $this->db->where('order_id', $order_id);
+        return $this->db->update('prescription_orders', ['status' => $status]);
+    }
+
 }

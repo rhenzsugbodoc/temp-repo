@@ -38,7 +38,7 @@ class Auth extends MY_Controller {
         $this->form_validation->set_rules('email_address', 'Email', 'required|valid_email|trim|max_length[150]');
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
         $this->form_validation->set_rules('phone_number', 'Phone Number', 'trim|numeric');
-        $this->form_validation->set_rules('role', 'Role', 'required|in_list[Patient,Caregiver,Doctor,Nurse,Admin]');
+        $this->form_validation->set_rules('role', 'Role', 'required|in_list[Patient,Caregiver,Doctor,Nurse,Admin,Pharmacy_Owner,Driver,Superadmin]');
         
         // Check validation
         if ($this->form_validation->run() === FALSE) {
@@ -116,6 +116,14 @@ class Auth extends MY_Controller {
                 ];
                 
                 $this->Doctor_model->create_doctor($doctor_data);
+            }
+
+            // Auto-create driver profile if role is Driver
+            if ($input['role'] === 'Driver') {
+                $driver_data = [
+                    'user_id' => $user_id
+                ];
+                $this->db->insert('driver', $driver_data);
             }
             
             // Get full user data

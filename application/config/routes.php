@@ -89,3 +89,21 @@ $route['api/facilities']['POST'] = 'api/facilities/create'; // Create facility (
 $route['api/facilities/(:num)']['PUT'] = 'api/facilities/update/$1'; // Update facility (Admin only)
 $route['api/facilities/(:num)/services']['POST'] = 'api/facilities/add_service/$1'; // Add service to facility (Admin only)
 $route['api/facilities/(:num)/services/(:num)']['DELETE'] = 'api/facilities/remove_service/$1/$2'; // Remove service from facility (Admin only)
+
+// Pharmacy Routes (Public - No Auth Required for GET)
+$route['api/pharmacies']['GET'] = 'api/prescriptions/index'; // Get all pharmacies
+$route['api/pharmacies/(:num)']['GET'] = 'api/prescriptions/show/$1'; // Get specific pharmacy
+$route['api/pharmacies/(:num)/schedule']['GET'] = 'api/prescriptions/schedule/$1'; // Get pharmacy schedule
+
+// PHARMACY ADMIN ROUTES (Require Pharmacy_Owner or Admin Auth)
+$route['api/pharmacies']['POST'] = 'api/prescriptions/create'; // Create pharmacy (Pharmacy_Owner or Admin only)
+$route['api/pharmacies/(:num)']['PUT'] = 'api/prescriptions/update/$1'; // Update pharmacy (Pharmacy_Owner or Admin only)
+$route['api/pharmacies/(:num)']['DELETE'] = 'api/prescriptions/delete/$1'; // Delete pharmacy (Pharmacy_Owner or Admin only)
+$route['api/pharmacies/(:num)/schedule']['PUT'] = 'api/prescriptions/update_schedule/$1'; // Update pharmacy schedule (Pharmacy_Owner or Admin only)
+$route['api/pharmacies/(:num)/schedule']['POST'] = 'api/prescriptions/add_schedule/$1'; // Add pharmacy schedule (Pharmacy_Owner or Admin only)
+// Driver Routes (Require Driver Auth)
+$route['api/drivers/available-orders']['GET'] = 'api/drivers/available_orders'; // Get available orders
+$route['api/drivers/my-orders']['GET'] = 'api/drivers/my_orders'; // Get driver's assigned orders
+$route['api/drivers/orders/(:num)/accept']['POST'] = 'api/drivers/accept_order/$1'; // Accept an order
+$route['api/drivers/orders/(:num)/status']['PUT'] = 'api/drivers/update_delivery_status/$1'; // Update delivery status
+$route['api/drivers/status']['PUT'] = 'api/drivers/update_status'; // Update driver availability status

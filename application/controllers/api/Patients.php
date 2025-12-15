@@ -1371,7 +1371,6 @@ public function create_prescription_order() {
     // Validation
     $this->form_validation->set_data($input);
     $this->form_validation->set_rules('medications_requested', 'Medications', 'required');
-    $this->form_validation->set_rules('order_type', 'Order Type', 'required|in_list[Refill,New Prescription]');
     $this->form_validation->set_rules('delivery_address', 'Delivery Address', 'required');
     
     if ($this->form_validation->run() === FALSE) {
@@ -1388,9 +1387,11 @@ public function create_prescription_order() {
         'prescription_image' => $input['prescription_image'] ?? null,
         'medications_requested' => $input['medications_requested'],
         'doctor_name' => $input['doctor_name'] ?? null,
-        'order_type' => $input['order_type'],
         'delivery_address' => $input['delivery_address'],
+        'delivery_date' => $input['delivery_date'] ?? null,
+        'total_amount' => $input['total_amount'] ?? null,
         'notes' => $input['notes'] ?? null,
+        'pharmacy_notes' => $input['pharmacy_notes'] ?? null,
         'status' => 'Pending'
     ];
     
