@@ -125,9 +125,18 @@ export default function Login() {
             Don't have an account?{' '}
             <Text 
               style={styles.signupLink} 
-              onPress={() => !loginMutation.isPending && router.push('/register/register1')}
+              onPress={() => !loginMutation.isPending && router.push('/register/register0')}
             >
               Sign Up
+            </Text>
+          </Text>
+          <Text style={styles.signupText}>
+            Want to register your facility?{' '}
+            <Text 
+              style={styles.signupLink} 
+              onPress={() => !loginMutation.isPending && router.push('/register_facility/register0')}
+            >
+              Register Facility
             </Text>
           </Text>
         </View>

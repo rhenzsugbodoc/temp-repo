@@ -335,14 +335,16 @@ class Facilities extends MY_Controller {
         
         $facility_data = [
             'facility_name' => $input['facility_name'],
-            'address' => $input['address'],
+            'facility_address' => $input['address'],
+            'country' => $input['country'] ?? null,
             'city' => $input['city'] ?? null,
             'province' => $input['province'] ?? null,
             'postal_code' => $input['postal_code'] ?? null,
-            'phone_number' => $input['phone_number'] ?? null,
+            'facility_image' => $input['facility_image'] ?? null,
+            'facility_phone' => $input['phone_number'] ?? null,
             'email_address' => $input['email_address'] ?? null,
             'website' => $input['website'] ?? null,
-            'description' => $input['description'] ?? null,
+            'facility_description' => $input['facility_description'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];

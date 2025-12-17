@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRegister } from '../../src/context/RegisterPatientContext';
+import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {

@@ -114,9 +114,9 @@ class Prescriptions extends MY_Controller {
         
         $pharmacy_data = [
             'pharmacy_name' => $input['pharmacy_name'],
-            'address' => $input['address'],
-            'contact_number' => $input['contact_number'] ?? null,
-            'email' => $input['email'] ?? null,
+            'pharmacy_address' => $input['pharmacy_address'],
+            'pharmacy_phone' => $input['contact_number'] ?? null,
+            'pharmacy_email' => $input['email'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -332,6 +332,140 @@ class Prescriptions extends MY_Controller {
             $this->json_response([
                 'success' => false,
                 'message' => 'Failed to add pharmacy schedule'
+            ], 500);
+        }
+    }
+    
+    /**
+     * GET /api/medicines
+     * Get all available medicines (Public)
+     */
+    public function get_medicine() {
+        // No authentication required - public endpoint
+        
+        $medicines = $this->Pharmacy_model->get_medicine();
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($medicines),
+            'data' => $medicines
+        ], 200);
+    }
+    
+    /**
+     * POST /api/pharmacies/inventory
+     * Create inventory entry for pharmacy owned by logged-in user (Pharmacy_Owner only)
+     */
+    public function create_inventory() {
+        $this->require_role(['Pharmacy_Owner', 'Superadmin']);
+        
+        if ($this->input->method() !== 'post') {
+            $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
+        }
+        
+        // Validation
+        $this->form_validation->set_data($input);
+        $this->form_validation->set_rules('medicine_id', 'Medicine ID', 'required|integer');
+        $this->form_validation->set_rules('stock_quantity', 'Stock Quantity', 'required|integer');
+        $this->form_validation->set_rules('price', 'Price', 'required|numeric');
+        
+        if ($this->form_validation->run() === FALSE) {
+            $this->json_response([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $this->form_validation->error_array()
+            ], 422);
+        }
+        
+        // Create inventory using current user's ID (from JWT token)
+        $result = $this->Pharmacy_model->create_inventory($this->current_user_id, $input);
+        
+        if ($result !== false) {
+            $this->json_response([
+                'success' => true,
+                'message' => 'Inventory created successfully',
+                'data' => $result
+            ], 201);
+        } else {
+            $this->json_response([
+                'success' => false,
+                'message' => 'Failed to create inventory. Ensure you own a pharmacy and the medicine exists.'
+            ], 500);
+        }
+    }
+    
+    /**
+     * GET /api/pharmacies/inventory
+     * Get inventory for pharmacy owned by logged-in user (Pharmacy_Owner only)
+     */
+    public function get_inventory() {
+        $this->require_role(['Pharmacy_Owner', 'Superadmin']);
+        
+        $inventory = $this->Pharmacy_model->get_inventory_by_owner($this->current_user_id);
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($inventory),
+            'data' => $inventory
+        ], 200);
+    }
+    
+    /**
+     * PUT /api/pharmacies/inventory/:medicine_id
+     * Update inventory entry (stock_quantity and/or price) for pharmacy owned by logged-in user
+     */
+    public function update_inventory($medicine_id) {
+        $this->require_role(['Pharmacy_Owner', 'Superadmin']);
+        
+        if ($this->input->method() !== 'put') {
+            $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+        }
+        
+        if (!$medicine_id) {
+            $this->json_response(['success' => false, 'message' => 'Medicine ID is required'], 400);
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
+        }
+        
+        // At least one field must be provided
+        if (!isset($input['stock_quantity']) && !isset($input['price'])) {
+            $this->json_response([
+                'success' => false,
+                'message' => 'At least one field (stock_quantity or price) is required'
+            ], 400);
+        }
+        
+        // Validate fields if provided
+        if (isset($input['stock_quantity']) && !is_numeric($input['stock_quantity'])) {
+            $this->json_response(['success' => false, 'message' => 'stock_quantity must be numeric'], 400);
+        }
+        
+        if (isset($input['price']) && !is_numeric($input['price'])) {
+            $this->json_response(['success' => false, 'message' => 'price must be numeric'], 400);
+        }
+        
+        // Update inventory using current user's ID (verifies ownership) and medicine_id
+        $result = $this->Pharmacy_model->update_inventory($this->current_user_id, $medicine_id, $input);
+        
+        if ($result) {
+            $this->json_response([
+                'success' => true,
+                'message' => 'Inventory updated successfully'
+            ], 200);
+        } else {
+            $this->json_response([
+                'success' => false,
+                'message' => 'Failed to update inventory. Ensure the medicine exists in your pharmacy inventory.'
             ], 500);
         }
     }

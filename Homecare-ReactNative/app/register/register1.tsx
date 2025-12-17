@@ -4,7 +4,7 @@
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useRegister } from '../../src/context/RegisterPatientContext';
+import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles, register1Styles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {
@@ -74,14 +74,14 @@ export default function Register() {
               onChangeText={value => handleChange('password', value)}
               style={registerCommonStyles.formTextInput}
           />
-          <TextInput
+          {/* <TextInput
               placeholder="Confirm Password"
               placeholderTextColor="#888"
               secureTextEntry
               value={user.confirm_password || ''}
               onChangeText={value => handleChange('confirm_password', value)}
               style={registerCommonStyles.formTextInput}
-          />
+          /> */}
 
        
         <TouchableOpacity style={registerCommonStyles.signupButton} onPress={handleRegister}>

@@ -94,6 +94,7 @@ $route['api/facilities/(:num)/services/(:num)']['DELETE'] = 'api/facilities/remo
 $route['api/pharmacies']['GET'] = 'api/prescriptions/index'; // Get all pharmacies
 $route['api/pharmacies/(:num)']['GET'] = 'api/prescriptions/show/$1'; // Get specific pharmacy
 $route['api/pharmacies/(:num)/schedule']['GET'] = 'api/prescriptions/schedule/$1'; // Get pharmacy schedule
+$route['api/medicines']['GET'] = 'api/prescriptions/get_medicine'; // Get all medicines
 
 // PHARMACY ADMIN ROUTES (Require Pharmacy_Owner or Admin Auth)
 $route['api/pharmacies']['POST'] = 'api/prescriptions/create'; // Create pharmacy (Pharmacy_Owner or Admin only)
@@ -101,6 +102,11 @@ $route['api/pharmacies/(:num)']['PUT'] = 'api/prescriptions/update/$1'; // Updat
 $route['api/pharmacies/(:num)']['DELETE'] = 'api/prescriptions/delete/$1'; // Delete pharmacy (Pharmacy_Owner or Admin only)
 $route['api/pharmacies/(:num)/schedule']['PUT'] = 'api/prescriptions/update_schedule/$1'; // Update pharmacy schedule (Pharmacy_Owner or Admin only)
 $route['api/pharmacies/(:num)/schedule']['POST'] = 'api/prescriptions/add_schedule/$1'; // Add pharmacy schedule (Pharmacy_Owner or Admin only)
+
+// Pharmacy Inventory Routes (Require Pharmacy_Owner or Admin Auth)
+$route['api/pharmacies/inventory']['GET'] = 'api/prescriptions/get_inventory'; // Get inventory for logged-in pharmacy owner
+$route['api/pharmacies/inventory']['POST'] = 'api/prescriptions/create_inventory'; // Create inventory entry
+$route['api/pharmacies/inventory/(:num)']['PUT'] = 'api/prescriptions/update_inventory/$1'; // Update inventory entry
 // Driver Routes (Require Driver Auth)
 $route['api/drivers/available-orders']['GET'] = 'api/drivers/available_orders'; // Get available orders
 $route['api/drivers/my-orders']['GET'] = 'api/drivers/my_orders'; // Get driver's assigned orders

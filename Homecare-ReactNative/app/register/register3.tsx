@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useRegister } from '../../src/context/RegisterPatientContext';
+import { useRegister } from '../../src/context/RegisterContext
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {
@@ -36,13 +36,26 @@ export default function Register() {
     try {
       const response = await registerUser(user as any);
       console.log('Registration successful:', response);
+      
+      // Determine next route based on user role
+      let nextRoute = '/login';
+      let successMessage = 'Registration successful! Please log in.';
+      
+      if (user.role === 'Admin') {
+        nextRoute = '/register_facility/register1';
+        successMessage = 'User registered! Now register your facility.';
+      } else if (user.role === 'Pharmacy_Owner') {
+        nextRoute = '/register_pharmacy/register1';
+        successMessage = 'User registered! Now register your pharmacy.';
+      }
+      
       Alert.alert(
         'Success',
-        'Registration successful! Please log in.',
+        successMessage,
         [
           {
             text: 'OK',
-            onPress: () => router.replace('/login'),
+            onPress: () => router.replace(nextRoute),
           },
         ]
       );
