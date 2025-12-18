@@ -9,10 +9,15 @@ import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
 import {getUserData} from '@/src/options/tokenHandler';
 import { User} from '@/src/context/AuthContext';
 import { useState, useEffect } from 'react';
+import {useGetMedicines, useGetInventory, useUpdateInventoryMutation, useCreateInventoryMutation} from '@/src/options/PrescriptionQueryOptions';
 export default function PharmacyDashboard() {
   const router = useRouter();
 
+  const { data: medicinesData, isLoading: medicinesLoading, isRefetching: medicinesRefreshing } = useGetMedicines();
+  const { data: inventoryData, isLoading: inventoryLoading, isRefetching: inventoryRefreshing } = useGetInventory();
 
+  const createInventoryMutation = useCreateInventoryMutation();
+  const updateInventoryMutation = useUpdateInventoryMutation();
   const logoutMutation = useLogoutMutation();
 
   const handleLogout = async () => {
@@ -26,38 +31,78 @@ export default function PharmacyDashboard() {
     }
   };
 
-  const items = [
-    { id: 1, name: 'heart-outline', label: 'Health Records', route: 'health_records' },
-    { id: 2, name: 'time-outline', label: 'Visit History', route: 'visit_history' },
-    { id: 3, name: 'people-outline', label: 'Care Providers', route: 'care_team' },
-    { id: 4, name: 'document-text-outline', label: 'Clinical Notes', route: 'clinical_notes' },
-    { id: 5, name: 'home-outline', label: 'Services', route: 'services' },
-    { id: 6, name: 'calendar-outline', label: 'Calendar', route: 'calendar' },
-    { id: 7, name: 'folder-outline', label: 'Files', route: 'files' },
-    { id: 8, name: 'card-outline', label: 'Bills', route: 'bills' },
-  ];
+  const handleCreateInventory = async (medicineId: string) => {
+    try {
+      await createInventoryMutation.mutateAsync({
+        medicine_id: medicineId,
+        stock_quantity: 0,
+        low_inventory: 10,
+        price: 100
+      });
+    } catch (error) {
+      console.error('Failed to create inventory:', error);
+    }
+  };
 
+  const handleUpdateInventory = async (medicineId: string) => {
+    try {
+      await updateInventoryMutation.mutateAsync({
+        medicineId,
+        updateData: {
+          stock_quantity: 0,
+          low_inventory: 10,
+          price: 100
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update inventory:', error);
+    }
+  };
+
+  
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Image
-          source={require('@/assets/images/Homecare_Logo.png')}
-          style={{ width: 50, height: 40, marginLeft: 15 }}
-          resizeMode="contain"
-        />
-
-        <Text style={styles.greetingText}>
-          Hello {patientInfo?.first_name || 'User'}!
-        </Text>
-
-        <Pressable style={styles.iconCircle} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={24} color="#4454c3" />
-        </Pressable>
-      </View>
-
       <ScrollView>
-        
+        {medicinesLoading ? (
+          <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
+        ) : (
+          medicinesData?.data?.map(medicine => {
+            const existsInInventory = inventoryData?.data?.some(
+              (item) => item.medicine_id === medicine.medicine_id
+            );
+
+            return (
+              <View key={medicine.medicine_id} style={styles.card}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{medicine.name}</Text>
+                <Text style={{ marginTop: 5 }}>Description: {medicine.description}</Text>
+                <Text style={{ marginTop: 5 }}>Type: {medicine.medication_type}</Text>
+                
+                {existsInInventory ? (
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => handleUpdateInventory(medicine.medicine_id)}
+                    disabled={updateInventoryMutation.isPending}
+                  >
+                    <Text style={styles.buttonText}>
+                      {updateInventoryMutation.isPending ? 'Updating...' : 'Update Inventory Details'}
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    style={[styles.button, styles.createButton]}
+                    onPress={() => handleCreateInventory(medicine.medicine_id)}
+                    disabled={createInventoryMutation.isPending}
+                  >
+                    <Text style={styles.buttonText}>
+                      {createInventoryMutation.isPending ? 'Creating...' : 'Create Inventory Item'}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+            );
+          })
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -87,5 +132,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
     gap: 10,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  createButton: {
+    backgroundColor: '#34C759',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

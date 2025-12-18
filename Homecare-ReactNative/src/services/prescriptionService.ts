@@ -24,14 +24,14 @@ export interface InventoryItem {
 
 // Request Interfaces
 export interface CreateInventoryRequest {
-  medicine_id: number;
+  medicine_id: string;
   stock_quantity: number;
   price: number;
   low_inventory: number
 }
 
 export interface UpdateInventoryRequest {
-  stock_quantity?: number | string;
+  stock_quantity?: string;
   price?: number | string;
 }
 
@@ -78,7 +78,7 @@ class PrescriptionService {
   async getInventory(): Promise<InventoryResponse> {
     try {
       const response = await api.get('/api/pharmacies/inventory');
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
       console.error('Get inventory error:', error.response?.data || error.message);
       throw error.response?.data || { success: false, message: 'Network error' };

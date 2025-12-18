@@ -100,9 +100,9 @@ class Prescriptions extends MY_Controller {
         // Validation
         $this->form_validation->set_data($input);
         $this->form_validation->set_rules('pharmacy_name', 'Pharmacy Name', 'required|trim|max_length[200]');
-        $this->form_validation->set_rules('address', 'Address', 'required|trim');
-        $this->form_validation->set_rules('contact_number', 'Contact Number', 'trim');
-        $this->form_validation->set_rules('email', 'Email', 'valid_email|trim');
+        $this->form_validation->set_rules('pharmacy_address', 'Address', 'required|trim');
+        $this->form_validation->set_rules('pharmacy_phone', 'Contact Number', 'trim');
+        $this->form_validation->set_rules('pharmacy_email', 'Email', 'valid_email|trim');
         
         if ($this->form_validation->run() === FALSE) {
             $this->json_response([

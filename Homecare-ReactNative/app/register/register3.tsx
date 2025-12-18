@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useRegister } from '../../src/context/RegisterContext
+import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
 
 export default function Register() {

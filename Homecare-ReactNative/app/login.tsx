@@ -2,7 +2,7 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../src/context/AuthContext';
 import { useLoginMutation } from '../src/options/authenticationQueryOptions';
 import { getUserData } from '../src/options/tokenHandler';
@@ -13,6 +13,28 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const loginMutation = useLoginMutation();
+
+  useEffect(() => {
+    const checkExistingUser = async () => {
+      const userData = await getUserData<User>();
+
+      if (userData) {
+        let dashboardRoute: string;
+
+        if (userData.role === 'Admin') {
+          dashboardRoute = '/(Admin_tabs)/dashboard';
+        } else if (userData.role === 'Pharmacy_Owner') {
+          dashboardRoute = '/(Pharmacy_Owner)/index';
+        } else {
+          dashboardRoute = '/(Patient_tabs)/dashboard';
+        }
+
+        router.replace(dashboardRoute);
+      }
+    };
+
+  checkExistingUser();
+}, []);
 
   const handleLogin = async () => {
     // Basic validation
@@ -28,6 +50,7 @@ export default function Login() {
       return;
     }
 
+    
     try {
       const response = await loginMutation.mutateAsync({  //saves token and user data in secure store
         email_address: email.trim(), 
@@ -36,13 +59,19 @@ export default function Login() {
       
       if (response.success && response.data) {
 
-       
-        //accessess secure stored user data
+        let dashboardRoute= '/(Patient_tabs)/dashboard';
         const userData = await getUserData<User>();
-        const dashboardRoute = userData?.role === 'Admin' 
-          ? '/(Admin_tabs)/dashboard' 
-          : '/(Patient_tabs)/dashboard';
-        
+
+        if (userData?.role === 'Pharmacy_Owner') {
+          dashboardRoute = '/(Pharmacy_Owner)/index';
+        }
+        if (userData?.role === 'Admin'){
+          dashboardRoute = '/(Admin_tabs)/dashboard';
+        }
+        if (userData?.role === 'Patient'){
+          dashboardRoute = '/(Patient_tabs)/dashboard';
+        }
+
         Alert.alert(
           'Success',
           'Login successful!',
