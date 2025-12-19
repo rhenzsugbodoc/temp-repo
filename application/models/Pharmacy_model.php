@@ -137,9 +137,12 @@ class Pharmacy_model extends CI_Model {
             'medicine_id' => $inventory_data['medicine_id'],
             'stock_quantity' => $inventory_data['stock_quantity'],
             'price' => $inventory_data['price'],
-            // 'created_at' => date('Y-m-d H:i:s'),
-            // 'updated_at' => date('Y-m-d H:i:s')
         ];
+        
+        // Add low_inventory if provided
+        if (isset($inventory_data['low_inventory'])) {
+            $data['low_inventory'] = $inventory_data['low_inventory'];
+        }
         
         if ($this->db->insert('pharmacy_medicine_inventory', $data)) {
             return [
@@ -196,6 +199,10 @@ class Pharmacy_model extends CI_Model {
         
         if (isset($update_data['price'])) {
             $data['price'] = $update_data['price'];
+        }
+        
+        if (isset($update_data['low_inventory'])) {
+            $data['low_inventory'] = $update_data['low_inventory'];
         }
         
         if (empty($data)) {

@@ -48,7 +48,7 @@ export const useUpdateInventoryMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ medicineId, updateData }: { medicineId: string | number; updateData: UpdateInventoryRequest }) => {
+    mutationFn: ({ medicineId, updateData }: { medicineId: string; updateData: UpdateInventoryRequest }) => {
       return prescriptionService.updateInventory(medicineId, updateData);
     },
     onSuccess: () => {

@@ -374,6 +374,7 @@ class Prescriptions extends MY_Controller {
         $this->form_validation->set_rules('medicine_id', 'Medicine ID', 'required|integer');
         $this->form_validation->set_rules('stock_quantity', 'Stock Quantity', 'required|integer');
         $this->form_validation->set_rules('price', 'Price', 'required|numeric');
+        $this->form_validation->set_rules('low_inventory', 'Low Inventory', 'integer');
         
         if ($this->form_validation->run() === FALSE) {
             $this->json_response([
@@ -438,10 +439,10 @@ class Prescriptions extends MY_Controller {
         }
         
         // At least one field must be provided
-        if (!isset($input['stock_quantity']) && !isset($input['price'])) {
+        if (!isset($input['stock_quantity']) && !isset($input['price']) && !isset($input['low_inventory'])) {
             $this->json_response([
                 'success' => false,
-                'message' => 'At least one field (stock_quantity or price) is required'
+                'message' => 'At least one field (stock_quantity, price, or low_inventory) is required'
             ], 400);
         }
         
@@ -452,6 +453,10 @@ class Prescriptions extends MY_Controller {
         
         if (isset($input['price']) && !is_numeric($input['price'])) {
             $this->json_response(['success' => false, 'message' => 'price must be numeric'], 400);
+        }
+        
+        if (isset($input['low_inventory']) && !is_numeric($input['low_inventory'])) {
+            $this->json_response(['success' => false, 'message' => 'low_inventory must be numeric'], 400);
         }
         
         // Update inventory using current user's ID (verifies ownership) and medicine_id

@@ -17,6 +17,7 @@ export interface InventoryItem {
   created_at: string;
   updated_at: string;
   medicine_name: string;
+  low_inventory: string;
   medication_type: 'otc' | 'prescription';
   description: string;
   pharmacy_name: string;
@@ -24,15 +25,16 @@ export interface InventoryItem {
 
 // Request Interfaces
 export interface CreateInventoryRequest {
-  medicine_id: string;
-  stock_quantity: number;
-  price: number;
-  low_inventory: number
+  medicine_id: string ;
+  stock_quantity: string ;
+  price: string ;
+  low_inventory: string ;
 }
 
 export interface UpdateInventoryRequest {
-  stock_quantity?: string;
-  price?: number | string;
+  stock_quantity?: string ;
+  price?: string ;
+  low_inventory?: string ;
 }
 
 // Response Interfaces
@@ -48,19 +50,19 @@ export interface InventoryResponse {
   data: InventoryItem[];
 }
 
-export interface CreateInventoryResponse {
-  success: boolean;
-  message: string;
-  data: {
-    pharmacy_id: number;
-    medicine_id: number;
-  };
-}
+// export interface CreateInventoryResponse {
+//   success: boolean;
+//   message: string;
+//   data: {
+//     pharmacy_id: number | string;
+//     medicine_id: number | string;
+//   };
+// }
 
-export interface UpdateInventoryResponse {
-  success: boolean;
-  message: string;
-}
+// export interface UpdateInventoryResponse {
+//   success: boolean;
+//   message: string;
+// }
 
 class PrescriptionService {
   // Get all available medicines
@@ -78,7 +80,7 @@ class PrescriptionService {
   async getInventory(): Promise<InventoryResponse> {
     try {
       const response = await api.get('/api/pharmacies/inventory');
-      return response.data.data;
+      return response.data;
     } catch (error: any) {
       console.error('Get inventory error:', error.response?.data || error.message);
       throw error.response?.data || { success: false, message: 'Network error' };
@@ -86,7 +88,7 @@ class PrescriptionService {
   }
 
   // Create inventory entry
-  async createInventory(inventoryData: CreateInventoryRequest): Promise<CreateInventoryResponse> {
+  async createInventory(inventoryData: CreateInventoryRequest): Promise<any> {
     try {
       const response = await api.post('/api/pharmacies/inventory', inventoryData);
       return response.data;
@@ -97,7 +99,7 @@ class PrescriptionService {
   }
 
   // Update inventory entry
-  async updateInventory(medicineId: string | number, updateData: UpdateInventoryRequest): Promise<UpdateInventoryResponse> {
+  async updateInventory(medicineId: string , updateData: UpdateInventoryRequest): Promise<any> {
     try {
       const response = await api.put(`/api/pharmacies/inventory/${medicineId}`, updateData);
       return response.data;
@@ -106,6 +108,27 @@ class PrescriptionService {
       throw error.response?.data || { success: false, message: 'Network error' };
     }
   }
+
+
+  async get_available_orders(): Promise<any> {
+    try {
+      const response = await api.get('/api/drivers/available-orders');
+      return response.data
+    } catch (error: any) {
+      console.error('Get available orders error:', error.response?.data || error.message);
+      throw error.response?.data || { success: false, message: 'Network error' };
+    }
+  }
+  async get_my_orders(): Promise<any> {
+    try {
+      const response = await api.get('/api/drivers/my-orders');
+      return response.data
+    } catch (error: any) {
+      console.error('Get my orders error:', error.response?.data || error.message);
+      throw error.response?.data || { success: false, message: 'Network error' };
+    }
+  }
 }
+
 
 export default new PrescriptionService();
