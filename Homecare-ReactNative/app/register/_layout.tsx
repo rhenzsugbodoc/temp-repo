@@ -21,6 +21,7 @@ export default function RegisterLayout() {
             headerShown: false,
           }}
         >
+          <Stack.Screen name="register0" />
           <Stack.Screen name="register1" />
           <Stack.Screen name="register2" />
           <Stack.Screen name="register3" />

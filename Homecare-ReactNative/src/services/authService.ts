@@ -57,11 +57,7 @@ class AuthService {
     try {
       const response = await api.post('/api/login', credentials);
       
-      // Store token if login successful
-      if (response.data.success && response.data.data?.token) {
-        await saveToken(response.data.data.token);
-        await saveUserData(response.data.data.user);
-      }
+
       
       return response.data;
     } catch (error: any) {

@@ -40,14 +40,8 @@ export default function RootLayout() {
     <GluestackUIProvider mode="light">
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack initialRouteName="login" screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="login" />
-            <Stack.Screen name="register" />
-            <Stack.Screen name="(Patient_tabs)" />
-          </Stack>
+          <Stack initialRouteName="login" screenOptions={{ headerShown: false }}/>
           <StatusBar style="auto" />
-        </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </GluestackUIProvider>

@@ -1,7 +1,11 @@
-RewriteEngine On
-RewriteBase /
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /temp-repo/
 
-# Redirect all requests to index.php if file/folder doesn't exist
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php/$1 [L]
+    # Do not rewrite existing files or directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Send everything else to index.php
+    RewriteRule ^ index.php [L]
+</IfModule>

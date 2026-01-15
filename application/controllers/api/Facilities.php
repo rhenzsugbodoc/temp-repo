@@ -321,9 +321,9 @@ class Facilities extends MY_Controller {
         // Validation
         $this->form_validation->set_data($input);
         $this->form_validation->set_rules('facility_name', 'Facility Name', 'required|trim|max_length[200]');
-        $this->form_validation->set_rules('address', 'Address', 'required|trim');
-        $this->form_validation->set_rules('phone_number', 'Phone Number', 'trim');
-        $this->form_validation->set_rules('email_address', 'Email', 'valid_email|trim');
+        $this->form_validation->set_rules('facility_address', 'Address', 'required|trim');
+        $this->form_validation->set_rules('facility_phone', 'Phone Number', 'trim');
+        $this->form_validation->set_rules('facility_email', 'Email', 'valid_email|trim');
         
         if ($this->form_validation->run() === FALSE) {
             $this->json_response([
@@ -335,15 +335,15 @@ class Facilities extends MY_Controller {
         
         $facility_data = [
             'facility_name' => $input['facility_name'],
-            'facility_address' => $input['address'],
+            'facility_address' => $input['facility_address'],
             'country' => $input['country'] ?? null,
             'city' => $input['city'] ?? null,
             'province' => $input['province'] ?? null,
             'postal_code' => $input['postal_code'] ?? null,
             'facility_image' => $input['facility_image'] ?? null,
-            'facility_phone' => $input['phone_number'] ?? null,
-            'email_address' => $input['email_address'] ?? null,
-            'website' => $input['website'] ?? null,
+            'facility_phone' => $input['facility_phone'] ?? null,
+            'facility_email' => $input['facility_email'] ?? null,
+            'facility_website' => $input['facility_website'] ?? null,
             'facility_description' => $input['facility_description'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')

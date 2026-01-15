@@ -67,8 +67,9 @@
 switch (ENVIRONMENT)
 {
 	case 'development':
-		error_reporting(-1);
-		ini_set('display_errors', 1);
+		error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+		ini_set('display_errors', 0); // Don't display errors for API responses
+		ini_set('log_errors', 1); // Log errors instead
 	break;
 
 	case 'testing':

@@ -8,8 +8,8 @@ export interface FacilityData {
   province?: string;
   postal_code?: string;
   facility_phone?: string;
-  email_address?: string;
-  website?: string;
+  facility_email?: string;
+  facility_website?: string;
   facility_description?: string;
 }
 

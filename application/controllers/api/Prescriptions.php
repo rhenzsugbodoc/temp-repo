@@ -111,11 +111,18 @@ class Prescriptions extends MY_Controller {
                 'errors' => $this->form_validation->error_array()
             ], 422);
         }
+        if($this->current_user_id == 'Pharmacy_Owner' || $this->current_user_id == 'Superadmin'){
+            $this->json_response([
+                'success' => false,
+                'message' => 'Unauthorized - Only Pharmacy_Owner or Superadmin can create pharmacy'
+            ], 401);
+        }
         
         $pharmacy_data = [
             'pharmacy_name' => $input['pharmacy_name'],
             'pharmacy_address' => $input['pharmacy_address'],
             'pharmacy_phone' => $input['contact_number'] ?? null,
+            'owner_id' => $this->current_user_id,
             'pharmacy_email' => $input['email'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')

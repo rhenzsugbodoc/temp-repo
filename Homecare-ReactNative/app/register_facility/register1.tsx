@@ -84,15 +84,15 @@ export default function RegisterFacility() {
           <TextInput
               placeholder="Email Address"
               placeholderTextColor="#888"
-              value={facility.email_address || ''}
-              onChangeText={value => handleChange('email_address', value)}
+              value={facility.facility_email || ''}
+              onChangeText={value => handleChange('facility_email', value)}
               style={registerCommonStyles.formTextInput}
           />
           <TextInput
               placeholder="Website"
               placeholderTextColor="#888"
-              value={facility.website || ''}
-              onChangeText={value => handleChange('website', value)}
+              value={facility.facility_website || ''}
+              onChangeText={value => handleChange('facility_website', value)}
               style={registerCommonStyles.formTextInput}
           />
           <TextInput

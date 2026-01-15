@@ -14,27 +14,27 @@ export default function Login() {
   const router = useRouter();
   const loginMutation = useLoginMutation();
 
-  useEffect(() => {
-    const checkExistingUser = async () => {
-      const userData = await getUserData<User>();
+//   useEffect(() => {
+//     const checkExistingUser = async () => {
+//       const userData = await getUserData<User>();
 
-      if (userData) {
-        let dashboardRoute: string;
+//       if (userData) {
+//         let dashboardRoute: string;
 
-        if (userData.role === 'Admin') {
-          dashboardRoute = '/(Admin_tabs)/dashboard';
-        } else if (userData.role === 'Pharmacy_Owner') {
-          dashboardRoute = '/(Pharmacy_Owner)/index';
-        } else {
-          dashboardRoute = '/(Patient_tabs)/dashboard';
-        }
+//         if (userData.role === 'Admin') {
+//           dashboardRoute = '/(Admin_tabs)/dashboard';
+//         } else if (userData.role === 'Pharmacy_Owner') {
+//           dashboardRoute = '/(Pharmacy_Owner)/index';
+//         } else if (userData.role === 'Patient') {
+//           dashboardRoute = '/(Patient_tabs)/dashboard';
+//         }
 
-        router.replace(dashboardRoute);
-      }
-    };
+//         router.replace(dashboardRoute);
+//       }
+//     };
 
-  checkExistingUser();
-}, []);
+//   checkExistingUser();
+// }, []);
 
   const handleLogin = async () => {
     // Basic validation
@@ -52,25 +52,31 @@ export default function Login() {
 
     
     try {
+      console.log('Login mutation started');
       const response = await loginMutation.mutateAsync({  //saves token and user data in secure store
         email_address: email.trim(), 
         password 
       });
       
+      console.log('Login mutation response:', response);
+      
       if (response.success && response.data) {
-
-        let dashboardRoute= '/(Patient_tabs)/dashboard';
+        console.log('Login successful, getting user data');
+        
         const userData = await getUserData<User>();
+        console.log('User data retrieved:', userData);
+
+        let dashboardRoute: string = '/(Patient_tabs)/dashboard'; // Default route
 
         if (userData?.role === 'Pharmacy_Owner') {
           dashboardRoute = '/(Pharmacy_Owner)/index';
-        }
-        if (userData?.role === 'Admin'){
+        } else if (userData?.role === 'Admin'){
           dashboardRoute = '/(Admin_tabs)/dashboard';
-        }
-        if (userData?.role === 'Patient'){
+        } else if (userData?.role === 'Patient'){
           dashboardRoute = '/(Patient_tabs)/dashboard';
         }
+        
+        console.log('Navigating to:', dashboardRoute);
 
         Alert.alert(
           'Success',
@@ -154,7 +160,7 @@ export default function Login() {
             Don't have an account?{' '}
             <Text 
               style={styles.signupLink} 
-              onPress={() => !loginMutation.isPending && router.push('/register/register0')}
+              onPress={() => !loginMutation.isPending && router.push('/register')}
             >
               Sign Up
             </Text>
@@ -163,7 +169,7 @@ export default function Login() {
             Want to register your facility?{' '}
             <Text 
               style={styles.signupLink} 
-              onPress={() => !loginMutation.isPending && router.push('/register_facility/register0')}
+              onPress={() => !loginMutation.isPending && router.push('/register_facility/register1')}
             >
               Register Facility
             </Text>
