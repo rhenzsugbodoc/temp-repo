@@ -50,7 +50,7 @@ class Driver_model extends CI_Model {
     }
     
     public function update_status($driver_id, $status) {
-        $allowed_statuses = ['Available', 'Delivering', 'Offline'];
+        $allowed_statuses = ['Available', 'Assigned', 'Delivering', 'Offline'];
         if (!in_array($status, $allowed_statuses)) {
             return false;
         }

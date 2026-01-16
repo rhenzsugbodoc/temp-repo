@@ -90,6 +90,10 @@ $route['api/facilities/(:num)']['PUT'] = 'api/facilities/update/$1'; // Update f
 $route['api/facilities/(:num)/services']['POST'] = 'api/facilities/add_service/$1'; // Add service to facility (Admin only)
 $route['api/facilities/(:num)/services/(:num)']['DELETE'] = 'api/facilities/remove_service/$1/$2'; // Remove service from facility (Admin only)
 
+// FACILITY SERVICE REQUEST ROUTES (Require Facility Admin/Owner Auth)
+$route['api/facilities/service-requests/one-time']['GET'] = 'api/facilities/onetime_requests'; // Get facility one-time service requests
+$route['api/facilities/service-requests/routine']['GET'] = 'api/facilities/routine_requests'; // Get facility routine service requests
+
 // Pharmacy Routes (Public - No Auth Required for GET)
 $route['api/pharmacies']['GET'] = 'api/prescriptions/index'; // Get all pharmacies
 $route['api/pharmacies/(:num)']['GET'] = 'api/prescriptions/show/$1'; // Get specific pharmacy

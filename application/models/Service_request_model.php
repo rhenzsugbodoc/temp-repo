@@ -12,7 +12,96 @@ class Service_request_model extends CI_Model {
         }
         return false;
     }
-    
+    /**
+     * Get ONE-TIME service requests for a facility
+     * Facility ID is derived from current_user_id via facility table
+     */
+    public function get_onetime_facility_requests($status = null) {
+        $this->db->select('service_requests.*, 
+            services.name as service_name,
+            service_category.category_name,
+            patient.patient_id,
+            pu.first_name as patient_first_name, 
+            pu.last_name as patient_last_name,
+            pu.phone_number as patient_phone,
+            pc.caregiver_id as preferred_caregiver_id, 
+            pcu.first_name as preferred_caregiver_first_name, 
+            pcu.last_name as preferred_caregiver_last_name,
+            ac.caregiver_id as assigned_caregiver_id,
+            acu.first_name as assigned_caregiver_first_name,
+            acu.last_name as assigned_caregiver_last_name');
+        $this->db->from('service_requests');
+        $this->db->join('facility', 'service_requests.facility_id = facility.facility_id');
+        $this->db->join('services', 'service_requests.service_id = services.service_id', 'left');
+        $this->db->join('service_category', 'services.category_id = service_category.category_id', 'left');
+        $this->db->join('patient', 'service_requests.patient_id = patient.patient_id', 'left');
+        $this->db->join('user pu', 'patient.user_id = pu.user_id', 'left');
+        $this->db->join('caregiver pc', 'service_requests.preferred_caregiver_id = pc.caregiver_id', 'left');
+        $this->db->join('user pcu', 'pc.user_id = pcu.user_id', 'left');
+        $this->db->join('caregiver ac', 'service_requests.assigned_caregiver_id = ac.caregiver_id', 'left');
+        $this->db->join('user acu', 'ac.user_id = acu.user_id', 'left');
+        $this->db->where('facility.user_id', $this->current_user_id);
+        $this->db->where('service_requests.service_type', 'One-Time');
+        
+        if ($status) {
+            $this->db->where('service_requests.status', $status);
+        }
+        
+        $this->db->order_by('service_requests.created_at', 'DESC');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    /**
+     * Get ROUTINE service requests for a facility with episode info
+     * Facility ID is derived from current_user_id via facility table
+     */
+    public function get_routine_facility_requests($status = null) {
+        $this->db->select('service_requests.*, 
+            services.name as service_name,
+            service_category.category_name,
+            patient.patient_id,
+            pu.first_name as patient_first_name, 
+            pu.last_name as patient_last_name,
+            pu.phone_number as patient_phone,
+            care_episodes.episode_id,
+            care_episodes.episode_name,
+            care_episodes.episode_type,
+            care_episodes.start_date,
+            care_episodes.end_date,
+            care_episodes.status as episode_status,
+            pc.caregiver_id as preferred_caregiver_id, 
+            pcu.first_name as preferred_caregiver_first_name, 
+            pcu.last_name as preferred_caregiver_last_name,
+            ac.caregiver_id as assigned_caregiver_id,
+            acu.first_name as assigned_caregiver_first_name,
+            acu.last_name as assigned_caregiver_last_name,
+            COUNT(DISTINCT care_interventions.intervention_id) as total_interventions,
+            SUM(CASE WHEN care_interventions.status = "Completed" THEN 1 ELSE 0 END) as completed_interventions');
+        $this->db->from('service_requests');
+        $this->db->join('facility', 'service_requests.facility_id = facility.facility_id');
+        $this->db->join('services', 'service_requests.service_id = services.service_id', 'left');
+        $this->db->join('service_category', 'services.category_id = service_category.category_id', 'left');
+        $this->db->join('patient', 'service_requests.patient_id = patient.patient_id', 'left');
+        $this->db->join('user pu', 'patient.user_id = pu.user_id', 'left');
+        $this->db->join('care_episodes', 'service_requests.request_id = care_episodes.service_request_id', 'left');
+        $this->db->join('care_interventions', 'care_episodes.episode_id = care_interventions.episode_id', 'left');
+        $this->db->join('caregiver pc', 'service_requests.preferred_caregiver_id = pc.caregiver_id', 'left');
+        $this->db->join('user pcu', 'pc.user_id = pcu.user_id', 'left');
+        $this->db->join('caregiver ac', 'service_requests.assigned_caregiver_id = ac.caregiver_id', 'left');
+        $this->db->join('user acu', 'ac.user_id = acu.user_id', 'left');
+        $this->db->where('facility.user_id', $this->current_user_id);
+        $this->db->where('service_requests.service_type', 'Routine');
+        
+        if ($status) {
+            $this->db->where('service_requests.status', $status);
+        }
+        
+        $this->db->group_by('service_requests.request_id');
+        $this->db->order_by('service_requests.created_at', 'DESC');
+        $query = $this->db->get();
+        return $query->result();
+    }
     /**
      * Get ONE-TIME service requests only
      */

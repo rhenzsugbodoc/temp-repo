@@ -6,7 +6,9 @@ import ServiceRequestService, {
   CaregiverDetails, 
   OneTimeData, 
   RoutineServiceData, 
-  FacilityDetails 
+  FacilityDetails ,
+  FacilityOneTimeRequest,
+  FacilityRoutineRequest,
 } from '../services/service_requestService';
 
 
@@ -79,6 +81,26 @@ export const useFacilityCaregivers = (facility_id: number, enabled: boolean = tr
     queryFn: () => ServiceRequestService.getFacilityCaregivers(facility_id),
     staleTime: 10 * 60 * 1000,
     enabled: enabled && !!facility_id,
+  });
+};
+
+// ===== Facility Admin Queries =====
+
+export const useFacilityOneTimeRequests = (status?: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ['facility', 'admin', 'one-time-requests', status],
+    queryFn: () => ServiceRequestService.getFacilityOneTimeRequests(),
+    staleTime: 2 * 60 * 1000, // 2 minutes - shorter cache for admin data
+    enabled: enabled,
+  });
+};
+
+export const useFacilityRoutineRequests = (status?: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ['facility', 'admin', 'routine-requests', status],
+    queryFn: () => ServiceRequestService.getFacilityRoutineRequests(),
+    staleTime: 2 * 60 * 1000, // 2 minutes - shorter cache for admin data
+    enabled: enabled,
   });
 };
 

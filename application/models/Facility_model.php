@@ -186,14 +186,13 @@ class Facility_model extends CI_Model {
     public function get_facility_caregivers($facility_id) {
         $this->db->select('caregiver.caregiver_id,
                           caregiver.caregiver_type,
-                          user.first_name,
-                          user.last_name,
+                          caregiver.professional_display_name,
                           user.phone_number,
                           user.email_address');
         $this->db->from('caregiver');
         $this->db->join('user', 'caregiver.user_id = user.user_id');
         $this->db->where('caregiver.facility_id', $facility_id);
-        $this->db->order_by('user.last_name', 'ASC');
+        $this->db->order_by('caregiver.professional_display_name', 'ASC');
         $query = $this->db->get();
         return $query->result();
     }

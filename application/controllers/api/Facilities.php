@@ -8,6 +8,7 @@ class Facilities extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Facility_model');
+        $this->load->model('Service_request_model');
     }
     
     /**
@@ -471,5 +472,39 @@ class Facilities extends MY_Controller {
                 'message' => 'Failed to remove service from facility'
             ], 500);
         }
+    }
+
+    /**
+     * GET /api/facilities/service-requests/one-time
+     * Get one-time service requests for facility (Facility Admin/Owner only)
+     */
+    public function onetime_requests() {
+        $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+        
+        $status = $this->input->get('status');
+        $requests = $this->Service_request_model->get_onetime_facility_requests($status);
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($requests),
+            'data' => $requests
+        ], 200);
+    }
+
+    /**
+     * GET /api/facilities/service-requests/routine
+     * Get routine service requests for facility (Facility Admin/Owner only)
+     */
+    public function routine_requests() {
+        $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+        
+        $status = $this->input->get('status');
+        $requests = $this->Service_request_model->get_routine_facility_requests($status);
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($requests),
+            'data' => $requests
+        ], 200);
     }
 }

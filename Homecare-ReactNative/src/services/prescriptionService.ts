@@ -128,6 +128,36 @@ class PrescriptionService {
       throw error.response?.data || { success: false, message: 'Network error' };
     }
   }
+
+
+    async accept_order(order_id: string): Promise<any>{
+      try{
+        const response = await api.post(`api/drivers/accept_order/${order_id}`);
+        return response.data
+      }
+      catch (error: any) {
+        throw error.response?.data || {success: false, message: 'Network error'};
+      }
+    }
+    async update_delivery_status(order_id: string, status: string): Promise<any>{
+      try{
+        const response = await api.post(`api/drivers/update_delivery_status/${order_id}`, status);
+        return response.data
+      }
+      catch (error: any) {
+        throw error.response?.data || {success: false, message: 'Network error'};
+      }
+    }
+    async update_driver_status(status: string): Promise<any>{
+      try{
+        const response = await api.post(`api/drivers/update_status`, status);
+        return response.data
+      }
+      catch (error: any) {
+        throw error.response?.data || {success: false, message: 'Network error'};
+      }
+    }
+
 }
 
 

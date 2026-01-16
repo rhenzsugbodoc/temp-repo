@@ -121,6 +121,9 @@ class Drivers extends MY_Controller {
         $result = $this->Prescription_order_model->assign_driver($order_id, $driver->driver_id);
 
         if ($result) {
+            // Update driver status to Assigned
+            $this->Driver_model->update_status($driver->driver_id, 'Assigned');
+            
             return $this->output
                 ->set_status_header(200)
                 ->set_content_type('application/json')

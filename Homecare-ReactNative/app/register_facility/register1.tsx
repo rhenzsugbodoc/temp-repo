@@ -4,10 +4,11 @@ import { useRouter } from 'expo-router';
 import { useRegister } from '../../src/context/RegisterContext';
 import {FacilityData} from '../../src/services/registerService';
 import { registerCommonStyles, register1Styles } from '../../assets/styles/patient/auth/registerStyles';
+import {Picker} from '@react-native-picker/picker';
 
 export default function RegisterFacility() {
   const { facility, setFacility, registerFacility } = useRegister();
-
+  const facilityTypes = ['Hospital', 'Clinic', 'Nursing Home', 'Rehabilitation Center'];
   const router = useRouter();
   const handleChange = (key: keyof FacilityData, value: any) => {
     setFacility(prev => ({
@@ -32,6 +33,18 @@ export default function RegisterFacility() {
       </View>
 
       <ScrollView style={registerCommonStyles.form}>     
+
+          <View>
+              <Text>Facility  Type</Text>
+                  <View>
+
+                  <Picker selectedValue={facility.facility_type} onValueChange={(facilityType) => handleChange('facility_type', facilityType)}>
+                      {facilityTypes.map((type) => (
+                          <Picker.Item key={type} label={type} value={type} />
+                      ))}
+                  </Picker>
+              </View>
+          </View>
           <TextInput
               placeholder="Facility Name"
               placeholderTextColor="#888"

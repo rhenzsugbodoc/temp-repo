@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export interface FacilityData {
   facility_id?: number;
   user_id?: number | null;
-  facility_type?: 'Hospital' | 'Clinic' | 'Nursing Home' | 'Rehabilitation Center' | string | null;
   facility_address?: string | null;
   facility_name: string;
   facility_phone?: string | null;
@@ -24,11 +23,48 @@ export interface DoctorDetails {
 export interface CaregiverDetails {
   caregiver_id: number;
   caregiver_type: string;
-  first_name: string;
-  last_name: string;
+  professional_display_name: string;
   phone_number: string | null;
   email_address: string | null;
 }
+
+export interface FacilityOneTimeRequest {
+  request_id: number;
+  patient_id: number;
+  service_id: number;
+  facility_id: number;
+  service_type: string;
+  preferred_date: string | null;
+  preferred_time: string | null;
+  service_description: string | null;
+  preffered_caregiver_id: number | null;
+  assigned_caregiver_id: number | null;
+  status: 'Pending' | 'Confirmed' | 'In Progress' | 'Completed' | 'Cancelled' | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string | null;
+  service_name: string;
+  category_name: string | null;
+  patient_first_name: string;
+  patient_last_name: string;
+  patient_phone: string | null;
+  preferred_caregiver_first_name: string | null;
+  preferred_caregiver_last_name: string | null;
+  assigned_caregiver_first_name: string | null;
+  assigned_caregiver_last_name: string | null;
+}
+
+export interface FacilityRoutineRequest extends FacilityOneTimeRequest {
+  episode_id: number | null;
+  episode_name: string | null;
+  episode_type: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  episode_status: string | null;
+  total_interventions: number;
+  completed_interventions: number;
+}
+
 export interface OneTimeData {
   patient_id: number | null;
   service_id: number | null,
@@ -81,6 +117,30 @@ class ServiceRequestService {
         }
       }
 
+      async getFacilityOneTimeRequests(status?: string, enabled: boolean = true): Promise<FacilityOneTimeRequest[]> {
+        try {
+          const url = status 
+            ? `api/facilities/service-requests/one-time?status=${status}`
+            : `api/facilities/service-requests/one-time`;
+          const response = await api.get(url);
+          return response.data?.data || [];
+        } catch (error: any) {
+          console.error('Get facility one-time requests error:', error.response?.data || error.message);
+          throw error.response?.data || { success: false, message: 'Failed to load facility one-time requests' };
+        }
+      }
+      async getFacilityRoutineRequests(status?: string, enabled: boolean = true): Promise<FacilityRoutineRequest[]> {
+        try {
+          const url = status 
+            ? `api/facilities/service-requests/routine?status=${status}`
+            : `api/facilities/service-requests/routine`;
+          const response = await api.get(url);
+          return response.data?.data || [];
+        } catch (error: any) {
+          console.error('Get facility routine requests error:', error.response?.data || error.message);
+          throw error.response?.data || { success: false, message: 'Failed to load facility routine requests' };
+        }
+      }
       // Get all caregivers at a facility
       async getFacilityCaregivers(facility_id: number): Promise<CaregiverDetails[]> {
         try {

@@ -12,7 +12,7 @@ import {useFacility} from '@/src/context/FacilityContext';
 import {OneTimeData} from '@/src/services/service_requestService';
 import { useRequestService } from '@/src/context/RequestContext';
 import {getUserData} from '@/src/options/tokenHandler';
-import { useCreateOneTimeServiceRequest } from '@/src/options/serviceRequestOptions';
+import { useCreateOneTimeServiceRequest, useFacilityDoctors, useFacilityCaregivers } from '@/src/options/serviceRequestOptions';
 
 export default function RequestList() {
     const router = useRouter();
@@ -26,7 +26,11 @@ export default function RequestList() {
     const {facilityID, facilityServices} = useFacility();
     const [userData, setUserData] = useState<any>(null);
     const oneTimeMutation = useCreateOneTimeServiceRequest();
-    
+
+    const { data: facilityCaregivers } = useFacilityCaregivers(facilityID, {
+    enabled: !!facilityID,
+    });
+
     useEffect(() => {
     const fetchUser = async () => {
         const data = await getUserData();
@@ -195,7 +199,19 @@ export default function RequestList() {
                 </View> */}
 
              {/* Next Button */}
-
+            {scheduleType === 'routine' && (
+                <View>
+                    <Text>Preferred Caregiver</Text>
+                    <Picker selectedValue={form.preffered_caregiver_id} onValueChange={(caregiverID)=> setForm((prev)=>({
+                        ...prev,
+                        preffered_caregiver_id: caregiverID}))}>
+                        <Picker.Item label="No Preference" value={null} />
+                        {facilityCaregivers?.map((caregiver) => (
+                            <Picker.Item key={caregiver.caregiver_id} label={caregiver.professional_display_name} value={caregiver.caregiver_id} />
+                        ))}
+                    </Picker>
+                </View>
+            )}
             <View style={{ alignItems: 'flex-end', backgroundColor: 'white',   shadowColor: '#000',
                 shadowOffset: { width: 0, height: -2 },
                 shadowOpacity: 0.5,

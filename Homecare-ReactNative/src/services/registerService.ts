@@ -3,6 +3,7 @@ import api from './api';
 export interface FacilityData {
   facility_name?: string;
   facility_address?: string;
+  facility_type?: 'Hospital' | 'Clinic' | 'Nursing Home' | 'Rehabilitation Center' | string | null;
   country?: string;
   city?: string;
   province?: string;
