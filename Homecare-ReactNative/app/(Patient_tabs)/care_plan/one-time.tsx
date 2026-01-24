@@ -3,8 +3,9 @@ import { View, ScrollView, StyleSheet, Text, RefreshControl } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { useRequestDetails } from '@/src/options/carePlanQueryOptions';
+import { useOneTimeRequests } from '@/src/options/carePlanQueryOptions';
 import { useCarePlan } from '@/src/context/CarePlanContext';
+import { getPatientID } from '@/src/options/tokenHandler';
 
 export default function OneTimeServiceDetails() {
   const { requestID } = useCarePlan();
@@ -12,15 +13,15 @@ export default function OneTimeServiceDetails() {
 
   useEffect(() => {
     const fetchPatientID = async () => {
-      const pID = await AsyncStorage.getItem('patientID');
-      if (pID) setPatientID(parseInt(pID));
+      const id = await getPatientID();
+      setPatientID(parseInt(id || '0'));
     };
     fetchPatientID();
   }, []);
 
-  console.log('Request ID from context:', requestID);
-
-  const { data: requestDetails, isLoading, isFetching, refetch } = useRequestDetails(requestID || 0,!!(requestID));
+  const { data: oneTimeData, isLoading: isLoadingOneTimeData, isFetching: isFetchingOneTimeData, refetch: refetchOneTimeData } = useOneTimeRequests(patientID || 0, undefined, !!patientID);
+  
+  const requestDetails = oneTimeData?.find(request => parseInt(request.request_id) === requestID);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f4f7fa' }} edges={['top']}>
@@ -32,8 +33,8 @@ export default function OneTimeServiceDetails() {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={isFetching}
-            onRefresh={refetch}
+            refreshing={isFetchingOneTimeData}
+            onRefresh={refetchOneTimeData}
             colors={['#4454c3']}
             tintColor="#4454c3"
           />
@@ -114,9 +115,7 @@ export default function OneTimeServiceDetails() {
                     ? `${requestDetails.preferred_caregiver_first_name} ${requestDetails.preferred_caregiver_last_name}`
                     : 'Not specified'}
                 </Text>
-                {requestDetails.preferred_caregiver_phone && (
-                  <Text style={styles.phoneText}>{requestDetails.preferred_caregiver_phone}</Text>
-                )}
+    
               </View>
               <View style={styles.section}>
                 <Text style={styles.label}>Assigned Caregiver:</Text>
@@ -157,66 +156,8 @@ export default function OneTimeServiceDetails() {
               )}
             </View>
 
-            {/* 5. Episode Progress (if exists) */}
-            {requestDetails.episode && (
-              <View style={styles.card}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', gap: 10, marginBottom: 15 }}>
-                  <View style={styles.logoContainer}>
-                    <Ionicons name="bar-chart" size={24} color="#4454c3" />
-                  </View>
-                  <Text style={styles.cardTitle}>Episode Progress</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Episode Name:</Text>
-                  <Text style={styles.valueMedium}>{requestDetails.episode.episode_name}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Episode Type:</Text>
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{requestDetails.episode.episode_type}</Text>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Status:</Text>
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{requestDetails.episode.status}</Text>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Date Range:</Text>
-                  <Text style={styles.valueSmall}>
-                    {requestDetails.episode.start_date} - {requestDetails.episode.end_date || 'Ongoing'}
-                  </Text>
-                </View>
-                <View style={styles.progressSection}>
-                  <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>{requestDetails.episode.completed_interventions}</Text>
-                    <Text style={styles.statLabel}>Completed</Text>
-                  </View>
-                  <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>{requestDetails.episode.scheduled_interventions}</Text>
-                    <Text style={styles.statLabel}>Scheduled</Text>
-                  </View>
-                  <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>{requestDetails.episode.total_interventions}</Text>
-                    <Text style={styles.statLabel}>Total</Text>
-                  </View>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View
-                    style={[
-                      styles.progressBar,
-                      {
-                        width: `${
-                          (requestDetails.episode.completed_interventions / requestDetails.episode.total_interventions) * 100
-                        }%`,
-                      },
-                    ]}
-                  />
-                </View>
-              </View>
-            )}
-
+   
+       
             {/* 6. Notes */}
             <View style={styles.card}>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start', gap: 10, marginBottom: 15 }}>

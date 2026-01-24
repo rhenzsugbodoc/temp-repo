@@ -27,69 +27,47 @@ export interface CaregiverDetails {
   phone_number: string | null;
   email_address: string | null;
 }
-
-export interface FacilityOneTimeRequest {
-  request_id: number;
-  patient_id: number;
-  service_id: number;
-  facility_id: number;
-  service_type: string;
+export interface ServiceRequest {
+  request_id: string;
+  patient_id: string;
+  service_id: string;
+  service_type: 'One-Time' | 'Routine';
+  service_category: string;
+  service_description: string;
   preferred_date: string | null;
   preferred_time: string | null;
-  service_description: string | null;
-  preffered_caregiver_id: number | null;
-  assigned_caregiver_id: number | null;
-  status: 'Pending' | 'Confirmed' | 'In Progress' | 'Completed' | 'Cancelled' | null;
+  preferred_caregiver_id: string | null;
+  frequency: string | null;
+  duration_weeks: string | null;
+  status: 'Pending' | 'Approved' | 'In Progress' | 'Completed' | 'Cancelled';
+  assigned_caregiver_id: string | null;
   notes: string | null;
+  admin_notes: string | null;
   created_at: string;
-  updated_at: string | null;
-  service_name: string;
+  updated_at: string;
+  facility_id: string;
+  patient_first_name: string | null;
+  patient_last_name: string | null;
+  service_name: string | null;
   category_name: string | null;
-  patient_first_name: string;
-  patient_last_name: string;
-  patient_phone: string | null;
+  facility_name: string | null;
+  assigned_date?: string | null,
+  assigned_time?: string | null,
   preferred_caregiver_first_name: string | null;
   preferred_caregiver_last_name: string | null;
   assigned_caregiver_first_name: string | null;
   assigned_caregiver_last_name: string | null;
 }
-
-export interface FacilityRoutineRequest extends FacilityOneTimeRequest {
-  episode_id: number | null;
-  episode_name: string | null;
-  episode_type: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  episode_status: string | null;
-  total_interventions: number;
-  completed_interventions: number;
-}
-
-export interface OneTimeData {
+export interface SubmitRequestData {
   patient_id: number | null;
   service_id: number | null,
-  service_category: number | null;
+  // service_category: number | null; //need service_type
   facility_id: number | null;
+  service_type: string | null;
   preferred_date: string | null;
   preferred_time: string | null;
   service_description: string;
-  preffered_caregiver_id?: number | null;
-  notes?: string | null;
-}
-
-export interface RoutineServiceData {
-  service_id: number;
-  episode_name: string;
-  episode_type: string;
-  clinical_category: 'Clinical' | 'Non-clinical';
-  start_date: string; 
-  duration_weeks: number;
-  frequency: string;
-  service_category?: string;
-  service_description?: string;
-  preferred_time?: string; 
   preferred_caregiver_id?: number | null;
-  facility_id?: number | null;
   notes?: string | null;
   primary_diagnosis?: string | null;
 }
@@ -105,6 +83,14 @@ export interface FacilityDetails {
   updated_at: string | null
 }
 
+export interface EditRequestDetails {
+  request_id: string | number,
+  status?: 'Pending' | 'Confirmed' | 'In Progress' | 'Completed' | 'Cancelled',
+  assigned_date?: string | null,
+  assigned_time?: string | null,
+  admin_notes?: string | null,
+}
+
 class ServiceRequestService {
       // Get all doctors at a facility
       async getFacilityDoctors(facility_id: number): Promise<DoctorDetails[]> {
@@ -117,11 +103,11 @@ class ServiceRequestService {
         }
       }
 
-      async getFacilityOneTimeRequests(status?: string, enabled: boolean = true): Promise<FacilityOneTimeRequest[]> {
+      async getFacilityOneTimeRequests(status?: string, enabled: boolean = true): Promise<ServiceRequest[]> {
         try {
           const url = status 
-            ? `api/facilities/service-requests/one-time?status=${status}`
-            : `api/facilities/service-requests/one-time`;
+            ? `/api/facilities/service-requests/one-time?status=${status}`
+            : `/api/facilities/service-requests/one-time`;
           const response = await api.get(url);
           return response.data?.data || [];
         } catch (error: any) {
@@ -129,11 +115,11 @@ class ServiceRequestService {
           throw error.response?.data || { success: false, message: 'Failed to load facility one-time requests' };
         }
       }
-      async getFacilityRoutineRequests(status?: string, enabled: boolean = true): Promise<FacilityRoutineRequest[]> {
+      async getFacilityRoutineRequests(status?: string, enabled: boolean = true): Promise<ServiceRequest[]> {
         try {
           const url = status 
-            ? `api/facilities/service-requests/routine?status=${status}`
-            : `api/facilities/service-requests/routine`;
+            ? `/api/facilities/service-requests/routine?status=${status}`
+            : `/api/facilities/service-requests/routine`;
           const response = await api.get(url);
           return response.data?.data || [];
         } catch (error: any) {
@@ -215,9 +201,9 @@ class ServiceRequestService {
       throw error.response?.data || { success: false, message: 'Failed to load facilities by category' };
     }
   }
-  async create_routine(requestData: RoutineServiceData): Promise<any> {
+  async create_routine(requestData: SubmitRequestData): Promise<any> {
     try {
-      const response = await api.post('/api/patients/service-requests/routine', requestData);
+      const response = await api.post('/api/service-requests/create', requestData);
       
       
       return response.data;
@@ -227,9 +213,19 @@ class ServiceRequestService {
     }
   }
 
-  async create_oneTime(requestData: OneTimeData): Promise<any> {
+  async create_oneTime(requestData: SubmitRequestData): Promise<any> {
     try {
-      const response = await api.post('/api/patients/service-requests/one-time', requestData);
+      const response = await api.post('/api/service-requests/create', requestData);
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Submission error:', error.response?.data || error.message);
+      throw error.response?.data || { success: false, message: 'Network error' };
+    }
+  }
+  async edit_request(requestData: EditRequestDetails): Promise<any> {
+    try {
+      const response = await api.put('/api/service-requests/edit', requestData);
       
       return response.data;
     } catch (error: any) {

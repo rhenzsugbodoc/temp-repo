@@ -4,8 +4,8 @@ import ServiceRequestService, {
   FacilityData, 
   DoctorDetails, 
   CaregiverDetails, 
-  OneTimeData, 
-  RoutineServiceData, 
+  SubmitRequestData, 
+  EditRequestDetails,
   FacilityDetails ,
   FacilityOneTimeRequest,
   FacilityRoutineRequest,
@@ -110,7 +110,7 @@ export const useCreateRoutineServiceRequest = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (requestData: RoutineServiceData) => 
+    mutationFn: (requestData: SubmitRequestData) => 
       ServiceRequestService.create_routine(requestData),
     onSuccess: () => {
       // Invalidate relevant queries after creating a service request
@@ -124,9 +124,24 @@ export const useCreateOneTimeServiceRequest = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (requestData: OneTimeData) => 
+    mutationFn: (requestData: SubmitRequestData) => 
       ServiceRequestService.create_oneTime(requestData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patientDashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['todaySchedule'] });
+    },
+  });
+};
+
+
+export const useEditServiceRequest = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (requestData: EditRequestDetails) => 
+      ServiceRequestService.edit_request(requestData),
+    onSuccess: () => {
+      // Invalidate relevant queries after creating a service request
       queryClient.invalidateQueries({ queryKey: ['patientDashboard'] });
       queryClient.invalidateQueries({ queryKey: ['todaySchedule'] });
     },

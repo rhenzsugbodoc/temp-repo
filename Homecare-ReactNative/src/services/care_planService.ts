@@ -5,21 +5,23 @@ export interface ServiceRequest {
   request_id: string;
   patient_id: string;
   service_id: string;
-  service_category: string;
   service_type: 'One-Time' | 'Routine';
+  service_category: string;
   service_description: string;
   preferred_date: string | null;
   preferred_time: string | null;
   preferred_caregiver_id: string | null;
-  assigned_caregiver_id: string | null;
-  facility_id: string;
   frequency: string | null;
   duration_weeks: string | null;
-  notes: string;
-  admin_notes: string | null;
   status: 'Pending' | 'Approved' | 'In Progress' | 'Completed' | 'Cancelled';
+  assigned_caregiver_id: string | null;
+  notes: string | null;
+  admin_notes: string | null;
   created_at: string;
   updated_at: string;
+  facility_id: string;
+  patient_first_name: string | null;
+  patient_last_name: string | null; 
   service_name: string | null;
   category_name: string | null;
   facility_name: string | null;
@@ -27,17 +29,6 @@ export interface ServiceRequest {
   preferred_caregiver_last_name: string | null;
   assigned_caregiver_first_name: string | null;
   assigned_caregiver_last_name: string | null;
-}
-
-export interface RoutineServiceRequest extends ServiceRequest {
-  episode_id?: number;
-  episode_name?: string;
-  episode_type?: string;
-  start_date?: string;
-  end_date?: string;
-  episode_status?: string;
-  total_interventions?: number;
-  completed_interventions?: number;
 }
 
 export interface ServiceRequestDetails extends ServiceRequest {
@@ -64,17 +55,20 @@ class CarePlanService {
     try {
       const params = status ? { status } : {};
       const response = await api.get(`/api/patients/service-requests/one-time`);
+      console.log('getOneTimeRequests response:', response.data);
       return response.data?.data || [];
     } catch (error: any) {
       console.error('Get one-time requests error:', error.response?.data || error.message);
+      
       throw error.response?.data || { success: false, message: 'Failed to load one-time requests' };
     }
   }
 
-  async getRoutineRequests(patient_id: number, status?: string): Promise<RoutineServiceRequest[]> {
+  async getRoutineRequests(patient_id: number, status?: string): Promise<ServiceRequest[]> {
     try {
-      const params = status ? { status } : {};
-      const response = await api.get(`/api/patients/${patient_id}/service-requests/routine`, { params });
+      
+      const response = await api.get(`/api/patients/service-requests/routine`);
+      console.log('getRoutineRequests response:', response.data);
       return response.data?.data || [];
     } catch (error: any) {
       console.error('Get routine requests error:', error.response?.data || error.message);

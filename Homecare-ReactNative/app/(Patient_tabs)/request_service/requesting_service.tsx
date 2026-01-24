@@ -9,16 +9,16 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import {requestDetailStyles} from '@/assets/styles/patient/request/requestStyles';
 import {useFacility} from '@/src/context/FacilityContext';
-import {OneTimeData} from '@/src/services/service_requestService';
+import {SubmitRequestData} from '@/src/services/service_requestService';
 import { useRequestService } from '@/src/context/RequestContext';
 import {getUserData} from '@/src/options/tokenHandler';
-import { useCreateOneTimeServiceRequest, useFacilityDoctors, useFacilityCaregivers } from '@/src/options/serviceRequestOptions';
+import { useCreateOneTimeServiceRequest, useFacilityDoctors, useFacilityCaregivers, useCreateRoutineServiceRequest } from '@/src/options/serviceRequestOptions';
 
 export default function RequestList() {
     const router = useRouter();
     
     const {form , setForm} = useRequestService();
-    const [scheduleType, setScheduleType] = useState<'one-time' | 'routine'>('one-time');    
+    const [scheduleType, setScheduleType] = useState<'One-Time' | 'Routine'>('One-Time');    
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
     const [isDateVisible, setDateVisible] = useState(false);
@@ -26,6 +26,7 @@ export default function RequestList() {
     const {facilityID, facilityServices} = useFacility();
     const [userData, setUserData] = useState<any>(null);
     const oneTimeMutation = useCreateOneTimeServiceRequest();
+    const routineMutation = useCreateRoutineServiceRequest();
 
     const { data: facilityCaregivers } = useFacilityCaregivers(facilityID, {
     enabled: !!facilityID,
@@ -57,25 +58,27 @@ export default function RequestList() {
     const handleSubmit = async () => {
         try {
             // Prepare the complete form data BEFORE mutation
-            const requestData: OneTimeData = {
+            const requestData: SubmitRequestData = {
                 patient_id: userData?.user_id || null,
                 service_id: form.service_id || null,
-                service_category: selectedCategory || null,
+                // service_category: selectedCategory || null,
                 service_description: form.service_description || '',
                 preferred_date: form.preferred_date || null,
                 preferred_time: form.preferred_time || null,
-                preffered_caregiver_id: form.preffered_caregiver_id || null,
+                preferred_caregiver_id: form.preferred_caregiver_id || null,
+                service_type: form.service_type || scheduleType,
                 facility_id: facilityID || null,
-                notes: form.notes || '',
+                notes: form.notes || null,
             };
 
             console.log('Submitting request data:', requestData);
 
-            if (scheduleType === 'one-time') {
+            if (scheduleType === 'One-Time') {
                 const result = await oneTimeMutation.mutateAsync(requestData);
                 console.log('Mutation result:', result);
-            } else if (scheduleType === 'routine') {
-                // await routineMutation.mutateAsync(requestData);   
+            } else if (scheduleType === 'Routine') {
+                const result = await routineMutation.mutateAsync(requestData);   
+                console.log('Mutation result:', result);
             }
             
             router.push(`/request_service/payment`);
@@ -114,11 +117,11 @@ export default function RequestList() {
             <ScrollView>
                 <Text>Schedule Details</Text>
                 <View style={requestDetailStyles.scheduleTypeContainer}> 
-                <Pressable onPress={() => setScheduleType('one-time')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='one-time'?'#4454c3':'#ebe9ec'}]}>
-                    <Text style={{textAlign:'center', color: scheduleType === 'one-time' ? 'white' : 'black'}}>One-Time Service</Text>
+                <Pressable onPress={() => setScheduleType('One-Time')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='One-Time'?'#4454c3':'#ebe9ec'}]}>
+                    <Text style={{textAlign:'center', color: scheduleType === 'One-Time' ? 'white' : 'black'}}>One-Time Service</Text>
                 </Pressable>
-                <Pressable onPress={() => setScheduleType('routine')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='routine'?'#4454c3':'#ebe9ec'}]}>
-                    <Text style={{textAlign:'center', color: scheduleType === 'routine' ? 'white' : 'black'}}>Routine</Text>
+                <Pressable onPress={() => setScheduleType('Routine')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='Routine'?'#4454c3':'#ebe9ec'}]}>
+                    <Text style={{textAlign:'center', color: scheduleType === 'Routine' ? 'white' : 'black'}}>Routine</Text>
                 </Pressable>
                 </View>
                 {/* date and time picker */}
@@ -152,7 +155,7 @@ export default function RequestList() {
                 </View>
 
                 {/* <View style={{ marginVertical: 8}}> */}
-                    <View style={requestDetailStyles.serviceTypeContainer}>
+                    {/* <View style={requestDetailStyles.serviceTypeContainer}>
                         <Text>Select Category of Service</Text>
                         <View style={requestDetailStyles.serviceToggleItem}>
                             <Picker
@@ -165,7 +168,7 @@ export default function RequestList() {
                             </Picker>
                         </View>
 
-                    </View>
+                    </View> */}
 
                     <View style={requestDetailStyles.serviceTypeContainer}>
                         <Text>Select Specific Service</Text>
@@ -199,19 +202,19 @@ export default function RequestList() {
                 </View> */}
 
              {/* Next Button */}
-            {scheduleType === 'routine' && (
+           
                 <View>
                     <Text>Preferred Caregiver</Text>
-                    <Picker selectedValue={form.preffered_caregiver_id} onValueChange={(caregiverID)=> setForm((prev)=>({
+                    <Picker selectedValue={form.preferred_caregiver_id} onValueChange={(caregiverID)=> setForm((prev)=>({
                         ...prev,
-                        preffered_caregiver_id: caregiverID}))}>
+                        preferred_caregiver_id: caregiverID}))}>
                         <Picker.Item label="No Preference" value={null} />
                         {facilityCaregivers?.map((caregiver) => (
                             <Picker.Item key={caregiver.caregiver_id} label={caregiver.professional_display_name} value={caregiver.caregiver_id} />
                         ))}
                     </Picker>
                 </View>
-            )}
+           
             <View style={{ alignItems: 'flex-end', backgroundColor: 'white',   shadowColor: '#000',
                 shadowOffset: { width: 0, height: -2 },
                 shadowOpacity: 0.5,

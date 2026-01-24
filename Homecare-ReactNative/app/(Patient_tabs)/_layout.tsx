@@ -17,7 +17,7 @@ export default function PatientTabLayout() {
         tabBarButton: HapticTab,
       }}>
     <Tabs.Screen
-        name="dashboard"
+        name="dashboard/index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size = 28 }) => (
@@ -52,6 +52,29 @@ export default function PatientTabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="profile/index"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      {/* Hide nested request_service routes */}
+      <Tabs.Screen name="request_service/facilityDetails" options={{ href: null }} />
+      <Tabs.Screen name="request_service/payment" options={{ href: null }} />
+      <Tabs.Screen name="request_service/confirm" options={{ href: null }} />
+      <Tabs.Screen name="request_service/requesting_service" options={{ href: null }} />
+      <Tabs.Screen name="request_service/_layout" options={{ href: null }} />
+      {/* Hide nested care_plan routes */}
+      <Tabs.Screen name="care_plan/interventions" options={{ href: null }} />
+      <Tabs.Screen name="care_plan/one-time" options={{ href: null }} />
+      <Tabs.Screen name="care_plan/routine" options={{ href: null }} />
+      <Tabs.Screen name="care_plan/_layout" options={{ href: null }} />
+
+      <Tabs.Screen name="dashboard/calendar/index" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/calendar/calendarMonth" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/care_team/index" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/care_team/care_member" options={{ href: null }} />
+      {/* <Tabs.Screen name="dashboard/care_team" options={{ href: null }} /> */}
     </Tabs>
   );
 }

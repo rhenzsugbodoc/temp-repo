@@ -32,6 +32,17 @@ class Facility_model extends CI_Model {
     }
     
     /**
+     * Get facility by user ID
+     */
+    public function get_facility_by_user_id($user_id) {
+        $this->db->select('facility.*');
+        $this->db->from('facility');
+        $this->db->where('facility.user_id', $user_id);
+        $query = $this->db->get();
+        return $query->row();
+    }
+    
+    /**
      * Get services offered by a facility
      */
     public function get_facility_services($facility_id) {

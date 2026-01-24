@@ -2,7 +2,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import CarePlanService, {
   ServiceRequest,
-  RoutineServiceRequest,
   ServiceRequestDetails
 } from '../services/care_planService';
 

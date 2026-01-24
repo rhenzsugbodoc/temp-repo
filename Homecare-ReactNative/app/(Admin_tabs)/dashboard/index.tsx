@@ -4,13 +4,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {Picker} from '@react-native-picker/picker';
+import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
+
 export default function PatientDashboard() {
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  const handleLogout = () => {
-    // TODO: implement logout behavior
+  const logoutMutation = useLogoutMutation();
+  
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to login even if API call fails
+      router.replace('/login');
+    }
   };
-
   const locations = [
     {id: 1, branch: 'All Locations'},
     {id: 2, branch: 'Mandaue Clinic'},
@@ -55,9 +65,9 @@ export default function PatientDashboard() {
         </View>
       </View>
 
-      <View>
-        <Ionicons name="notifications-outline" size={24} color="#596389" />
-      </View>
+      <Pressable style={styles.iconCircle} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={24} color="#4454c3" />
+      </Pressable>
 
     </View>
     <ScrollView style={{paddingHorizontal: 15, }}>

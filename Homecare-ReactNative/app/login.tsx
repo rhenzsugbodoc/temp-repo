@@ -75,6 +75,9 @@ export default function Login() {
         } else if (userData?.role === 'Patient'){
           dashboardRoute = '/(Patient_tabs)/dashboard';
         }
+         else if (userData?.role === 'Driver'){
+          dashboardRoute = '/(Driver_tabs)/index';
+        }
         
         console.log('Navigating to:', dashboardRoute);
 

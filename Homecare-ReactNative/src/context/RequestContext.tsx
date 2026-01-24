@@ -1,27 +1,28 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { OneTimeData } from '@/src/services/service_requestService';   
+import { SubmitRequestData } from '@/src/services/service_requestService';   
 
 
 
 interface RequestServiceContextType {
-  form: OneTimeData;
-  setForm: React.Dispatch<React.SetStateAction<OneTimeData>>;
+  form: SubmitRequestData;
+  setForm: React.Dispatch<React.SetStateAction<SubmitRequestData>>;
   // Add other context values here if needed
 }
 
 const RequestServiceContext = createContext<RequestServiceContextType | undefined>(undefined);
 
 export const RequestServiceProvider = ({ children }: { children: ReactNode }) => {
-  const [form, setForm] = useState<OneTimeData>({
+  const [form, setForm] = useState<SubmitRequestData>({
     patient_id: null,
     service_id: null,
-    service_category: null,
+    // service_category: null,
     service_description: '',
     preferred_date: null,
     preferred_time: null,
-    preffered_caregiver_id: null,
+    preferred_caregiver_id: null,
+    service_type: null,
     facility_id: null,
-    notes: '',
+    notes: null,
   });
 
   return (

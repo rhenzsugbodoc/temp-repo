@@ -16,16 +16,27 @@ $route['api/patients/profile']['GET'] = 'api/patients/profile';
 $route['api/patients/profile']['PUT'] = 'api/patients/update_profile';
 $route['api/patients/dashboard']['GET'] = 'api/patients/dashboard';
 
-// Service Requests
+// Service Requests - New Controller
+$route['api/service-requests/create']['POST'] = 'api/service_requests/create_service_request';
+// $route['api/service-requests/routine']['POST'] = 'api/service_requests/create_routine'; removed
+$route['api/service-requests/edit']['PUT'] = 'api/service_requests/edit_service_request'; // Edit service request (Doctor/Admin)
+
+// Care Plans Routes
+$route['api/care-plans']['POST'] = 'api/care_plans/create'; //n WORKS
+$route['api/care-plans/patient/(:num)']['GET'] = 'api/care_plans/get_by_patient/$1'; //  WORKS
+$route['api/care-plans/facility']['GET'] = 'api/care_plans/get_by_facility'; //WORKS
+$route['api/care-plans/(:num)']['GET'] = 'api/care_plans/show/$1'; // Get care plan details
+$route['api/care-plans/(:num)']['PUT'] = 'api/care_plans/update/$1'; // WORKS
+$route['api/care-plans/(:num)']['DELETE'] = 'api/care_plans/delete/$1'; // WORKS
+
+// Service Requests - Patient View
 $route['api/patients/service-requests']['GET'] = 'api/patients/service_requests';
 $route['api/patients/available-caregivers']['GET'] = 'api/patients/available_caregivers';
-$route['api/patients/service-requests/one-time']['POST'] = 'api/patients/create_onetime_service';
-$route['api/patients/service-requests/routine']['POST'] = 'api/patients/create_routine_service';
-$route['api/patients/episodes']['GET'] = 'api/patients/episodes';
-$route['api/patients/episodes/(:num)']['GET'] = 'api/patients/episode_details/$1';
+// $route['api/patients/episodes']['GET'] = 'api/patients/episodes'; // REMOVED
+// $route['api/patients/episodes/(:num)']['GET'] = 'api/patients/episode_details/$1'; //REMOVED
 $route['api/patients/service-requests/one-time']['GET'] = 'api/patients/get_onetime_requests';
-$route['api/patients/service-requests/routine']['GET'] = 'api/patients/get_routine_requests';
-$route['api/patients/service-requests/(:num)']['GET'] = 'api/patients/get_request_details/$1';
+$route['api/patients/service-requests/routine']['GET'] = 'api/patients/get_routine_requests'; //MODIFIED TBT
+// $route['api/patients/service-requests/(:num)']['GET'] = 'api/patients/get_request_details/$1'; //REMOVED
 $route['api/patients/service-requests/(:num)/cancel']['PUT'] = 'api/patients/cancel_service_request/$1';
 $route['api/patients/episodes/(:num)/cancel']['PUT'] = 'api/patients/cancel_episode/$1';
 

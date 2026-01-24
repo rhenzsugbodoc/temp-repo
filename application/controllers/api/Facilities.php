@@ -479,16 +479,31 @@ class Facilities extends MY_Controller {
      * Get one-time service requests for facility (Facility Admin/Owner only)
      */
     public function onetime_requests() {
-        $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+        // log_message('debug', 'Onetime requests - Start');
+        // log_message('debug', 'Current user ID: ' . $this->current_user_id);
+        // log_message('debug', 'Current user role: ' . $this->current_user_role);
         
-        $status = $this->input->get('status');
-        $requests = $this->Service_request_model->get_onetime_facility_requests($status);
-        
-        $this->json_response([
-            'success' => true,
-            'count' => count($requests),
-            'data' => $requests
-        ], 200);
+        try {
+            $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+            
+            // log_message('debug', 'Role check passed, calling model method');
+            $requests = $this->Service_request_model->get_onetime_facility_requests($this->current_user_id);
+            
+            log_message('debug', 'Requests retrieved: ' . count($requests));
+            
+            $this->json_response([
+                'success' => true,
+                'count' => count($requests),
+                'data' => $requests
+            ], 200);
+        } catch (Exception $e) {
+            // log_message('error', 'Onetime requests error: ' . $e->getMessage());
+            // log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            $this->json_response([
+                'success' => false,
+                'message' => 'Internal server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -496,15 +511,30 @@ class Facilities extends MY_Controller {
      * Get routine service requests for facility (Facility Admin/Owner only)
      */
     public function routine_requests() {
-        $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+        // log_message('debug', 'Routine requests - Start');
+        // log_message('debug', 'Current user ID: ' . $this->current_user_id);
+        // log_message('debug', 'Current user role: ' . $this->current_user_role);
         
-        $status = $this->input->get('status');
-        $requests = $this->Service_request_model->get_routine_facility_requests($status);
-        
-        $this->json_response([
-            'success' => true,
-            'count' => count($requests),
-            'data' => $requests
-        ], 200);
+        try {
+            $this->require_role(['Facility_Admin', 'Facility_Owner', 'Admin']);
+            
+            // log_message('debug', 'Role check passed, calling model method');
+            $requests = $this->Service_request_model->get_routine_facility_requests($this->current_user_id);
+            
+            // log_message('debug', 'Requests retrieved: ' . count($requests));
+            
+            $this->json_response([
+                'success' => true,
+                'count' => count($requests),
+                'data' => $requests
+            ], 200);
+        } catch (Exception $e) {
+            // log_message('error', 'Routine requests error: ' . $e->getMessage());
+            // log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            $this->json_response([
+                'success' => false,
+                'message' => 'Internal server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
