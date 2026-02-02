@@ -34,6 +34,13 @@ export default function PatientTabLayout() {
           ),
         }}
       />
+
+
+      {/* <Tabs.Screen name="service_requests/facilityDetails" options={{ href: null }} />
+      <Tabs.Screen name="request_service/payment" options={{ href: null }} /> */}
+
+      <Tabs.Screen name="dashboard/patient_worklist" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/profile/index" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -5,27 +5,38 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { patientDetailStyles } from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
+import { useAdminPatients } from '@/src/context/Admin-PatientsContext';
+import { useCarePlansByPatient } from '@/src/options/Admin_carePlanQueryOptions';
 
 
 export default function RequestList() {
   const router = useRouter();
+  const { selectedPatient } = useAdminPatients();
   const [detailType, setDetailType] = useState<'clinical-details' | 'care-plan' | 'patient-details' | ''>('');
 
+  // Fetch care plans for the selected patient
+  const { data: carePlanList, isLoading: loadingCarePlanList, refetch: refetchCarePlanList } = useCarePlansByPatient(
+    selectedPatient?.patient_id || 0,
+    !!selectedPatient?.patient_id
+  );
+
+  
+  const getAge = (dateOfBirth: string | undefined) => {
+    if (!dateOfBirth) return '';
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return `${age} Years Old`;
+  };
 
   // useEffect(() => {
   //   // Fetch company list or any other data if needed
   // }, []);
-    const careTeamList = [
-    { id: 1, icon: 'person-outline', name: 'Dr. Maria Santos', role: 'Doctor', title: 'MD', episode: 'Chronic Disease Management (Diabetes)' },
-    { id: 2, icon: 'person-outline', name: 'Nurse John Cruz', role: 'Nurse', title: 'RN', episode: 'Chronic Disease Management (Diabetes)' },
-    { id: 3, icon: 'person-outline', name: 'Caregiver Ana Lopez', role: 'Caregiver', title: '', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-    { id: 4, icon: 'person-outline', name: 'Dr. Paolo Reyes', role: 'Doctor', title: 'MD', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-    { id: 5, icon: 'person-outline', name: 'Coordinator Liza Tan', role: 'Care Plan Coordinator', title: '', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-    { id: 6, icon: 'person-outline', name: 'Nurse Miguel Ramos', role: 'Nurse', title: 'RN', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-    { id: 7, icon: 'person-outline', name: 'Caregiver Carla Dela Cruz', role: 'Caregiver', title: '', episode: 'Chronic Disease Management (Diabetes)' },
-    { id: 8, icon: 'person-outline', name: 'Dr. Antonio Villanueva', role: 'Doctor', title: 'MD', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-    { id: 9, icon: 'person-outline', name: 'Coordinator Sofia Garcia', role: 'Care Plan Coordinator', title: '', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-    ];
+
     const standaloneDetails = [
     { id: 1, label: 'Phone Number', value: '012312' },
     { id: 2, label: 'Email Address', value: 'rrjre@gmail' },
@@ -33,21 +44,7 @@ export default function RequestList() {
     { id: 4, label: 'Assigned Caregivers', value: ['mike tyson', 'jerome'].join(', ') }
     ];
 
-    const interventionList = [
-        { id: 1, schedule: 'Wednesdays, 4:00 PM', next_appointment: 'Oct 15, 4:00 PM', intervention: 'Physical Therapy', caregiver: 'John Doe' },
-        { id: 2, schedule: 'Fridays, 10:00 AM', next_appointment: 'Oct 21, 4:00 PM', intervention: 'Occupational Therapy', caregiver: 'Jane Smith' },
-        { id: 3, schedule: 'Mondays, 2:00 PM', next_appointment: 'Oct 5, 3:00 PM',intervention: 'Blood Glucose Monitoring', caregiver: 'Mike Johnson' },
-        { id: 4, schedule: 'Tuesdays, 11:00 AM', next_appointment: 'Oct 30, 9:00 PM',intervention: 'Respiratory Therapy', caregiver: 'Emily Davis' },
-        { id: 5, schedule: 'Thursdays, 3:00 PM', next_appointment: 'Oct 12, 12:00 PM',intervention: 'Wound Care', caregiver: 'Sarah Wilson' },
-        { id: 6, schedule: 'Saturdays, 9:00 AM', next_appointment: 'Oct 17, 1:00 PM',intervention: 'Nutritional Counseling', caregiver: 'David Brown' },
-    ]
 
-    const interventionDetails = [
-    { id: 1, label: "Schedule", key: "schedule" },
-    { id: 2, label: "Next Appointment", key: "next_appointment" },
-    { id: 3, label: "Intervention", key: "intervention" },
-    { id: 4, label: "Caregiver", key: "caregiver" },
-    ];
   const [selectedValue, setSelectedValue] = useState('EOC');
   const [selectedSort, setSelectedSort] = useState('Sort By: Name');
 
@@ -62,84 +59,165 @@ export default function RequestList() {
 
 
     <View style={styles.headerContainer}>
-        {/* <Text style={styles.headerTitle}>Care Member</Text>
-        <View style={styles.headerIcons}>
-
-        </View> */}
+        <Pressable onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={20} color="white" />
+        </Pressable>
+        <View>
+          <Text style={styles.label}>{selectedPatient?.first_name} {selectedPatient?.last_name}</Text>
+          <Text style={[{fontSize: 15, color: 'white'}]}>{getAge(selectedPatient?.date_of_birth)}</Text>
+        </View>
     </View>
-    <ScrollView contentContainerStyle={{  backgroundColor: 'transparent',marginHorizontal: 25,}}>
+    <ScrollView contentContainerStyle={{  backgroundColor: 'transparent',}}>
 
-        <View style={patientDetailStyles.card}>
+        <View style={[styles.card, {borderRadius: 0}]}>
 
-            <View style={[styles.iconCircle, { width: 70, height: 70, borderRadius: 100, alignItems: 'center', justifyContent: 'center', marginTop: 20, }]}>
-                <Ionicons name={careTeamList[0].icon as any} size={40} color="#6366f1" />
-            </View>
-            <Text style={styles.label}>{careTeamList[0].name}</Text>
+
+            
             
                 <View style={patientDetailStyles.scheduleTypeContainer}> 
-                    <Pressable onPress={() => setDetailType('clinical-details')} style={[patientDetailStyles.scheduleTypeButton, {borderBottomColor: detailType==='clinical-details'?'#4454c3':'transparent', borderBottomWidth: 5, borderBottomRightRadius: 0}]}>
-                        <Text style={{textAlign:'center', color: detailType==='clinical-details'?'#4454c3':'#b1b1b1'}}>Clinical Details</Text>
+                    <Pressable onPress={() => setDetailType('clinical-details')} style={[patientDetailStyles.scheduleTypeButton, {backgroundColor: detailType==='clinical-details'?'#4454c3':'transparent', borderRadius: 20, borderBottomWidth: 0}]}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8}}>
+                          <Ionicons name="medical-outline" size={18} color={detailType==='clinical-details'?'white':'black'} />
+                          <Text style={{textAlign:'center', color: detailType==='clinical-details'?'white':'black'}}>Clinical Details</Text>
+                        </View>
                     </Pressable>
-                    <Pressable onPress={() => setDetailType('care-plan')} style={[patientDetailStyles.scheduleTypeButton, {borderBottomColor: detailType==='care-plan'?'#4454c3':'transparent', borderBottomWidth: 5, borderBottomLeftRadius: 0, borderBottomRightRadius: 0}]}>
-                        <Text style={{textAlign:'center', color: detailType==='care-plan'?'#4454c3':'#b1b1b1'}}>Care Plan</Text>
+                    <Pressable onPress={() => setDetailType('care-plan')} style={[patientDetailStyles.scheduleTypeButton, {backgroundColor: detailType==='care-plan'?'#4454c3':'transparent', borderRadius: 20, borderBottomWidth: 0}]}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8}}>
+                          <Ionicons name="clipboard-outline" size={18} color={detailType==='care-plan'?'white':'black'} />
+                          <Text style={{textAlign:'center', color: detailType==='care-plan'?'white':'black'}}>Care Plan</Text>
+                        </View>
                     </Pressable>
-                    <Pressable onPress={() => setDetailType('patient-details')} style={[patientDetailStyles.scheduleTypeButton, {borderBottomColor: detailType==='patient-details'?'#4454c3':'transparent', borderBottomWidth: 5, borderBottomLeftRadius: 0}]}>
-                        <Text style={{textAlign:'center', color: detailType==='patient-details'?'#4454c3':'#b1b1b1' }}>Patient Details</Text>
+                    <Pressable onPress={() => setDetailType('patient-details')} style={[patientDetailStyles.scheduleTypeButton, {backgroundColor: detailType==='patient-details'?'#4454c3':'transparent', borderRadius: 20, borderBottomWidth: 0}]}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8}}>
+                          <Ionicons name="person-outline" size={18} color={detailType==='patient-details'?'white':'black'} />
+                          <Text style={{textAlign:'center', color: detailType==='patient-details'?'white':'black'}}>Patient Details</Text>
+                        </View>
                     </Pressable>
                 </View>
        
         </View>
-            {detailType==='care-plan' && interventionList.map(intervention => (
-                <Pressable key={intervention.id} style={({ pressed }) => [patientDetailStyles.card, {opacity: pressed ? 0.8 : 1 }]}>
-                    <View style={[patientDetailStyles.card, {paddingHorizontal: 20, borderWidth: 1, borderColor: '#b1b1b1'}]}>
-                    {interventionDetails.map(detail => (
-                        <View key={detail.id} style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 1, borderColor: '#e0e0e0', padding: 10, borderRadius: 10 }}>
-                            <Text style={[patientDetailStyles.interventionText, { fontWeight: 'bold' }]}>{detail.label}:</Text>
-                            <Text style={patientDetailStyles.interventionText}>{intervention[detail.key]}</Text>
+            {detailType==='care-plan' && carePlanList?.map(carePlan => (
+                <View key={carePlan.care_plan_id} style={[styles.card, {marginHorizontal: 10}]}> 
+                    <View style={styles.cardRow}>
+                        <Text style={styles.cardTitle}>{carePlan.plan_name}</Text>
+                        <View style={styles.statusContainer}>
+                            <Text style={styles.statusText}>{carePlan.status}</Text>
                         </View>
-                    ))}
                     </View>
-                </Pressable>
+                    <View style={styles.cardRow}>
+                        <Text style={styles.planTypeText}>{carePlan.plan_type}</Text>
+                        <Ionicons name="chevron-forward" size={20} color="#6b86b5" />
+                    </View>
+                    <View style={[styles.cardRow, {justifyContent: 'flex-start'}]}>
+                        <Ionicons name="calendar-outline" size={16} color="#6b86b5" />
+                        <Text style={styles.startDateText}>Started: {carePlan.start_date}</Text>
+                    </View>
+                </View>
             ))}
             
             {detailType==='patient-details' && 
-            <View>
-            <View style={patientDetailStyles.card}>
-
-            </View>
-            <View style={patientDetailStyles.card}>
-                {standaloneDetails.map(detail => (
-                    <View key={detail.id} style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 1, borderColor: '#e0e0e0', padding: 10, borderRadius: 10 }}>
-                        <Text style={[patientDetailStyles.interventionText, { fontWeight: 'bold' }]}>{detail.label}:</Text>
-                        <Text style={patientDetailStyles.interventionText}>{detail.value}</Text>
+            <View style={{paddingHorizontal: 10}}>
+                <Text style={styles.sectionTitle}>Personal Information</Text>
+                
+                <View style={styles.detailCard}>
+                  <View style={styles.detailRow}>
+                    <Ionicons name="person-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Full Name</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.first_name} {selectedPatient?.last_name}</Text>
                     </View>
-                ))}
-            </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="mail-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Email Address</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.email_address}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="call-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Phone Number</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.phone_number || 'Not provided'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="calendar-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Date of Birth</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.date_of_birth || 'Not provided'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="male-female-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Gender</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.gender || 'Not provided'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="home-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Home Address</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.home_address || 'Not provided'}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <Text style={styles.sectionTitle}>Medical Information</Text>
+                
+                <View style={styles.detailCard}>
+                  <View style={styles.detailRow}>
+                    <Ionicons name="medical-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Medical Record Number</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.medical_record_number || 'Not provided'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="water-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Blood Type</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.blood_type || 'Not provided'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="warning-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Allergies</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.allergies || 'None'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="fitness-outline" size={20} color="#4F46E5" />
+                    <View style={styles.detailContent}>
+                      <Text style={styles.detailLabel}>Chronic Conditions</Text>
+                      <Text style={styles.detailValue}>{selectedPatient?.chronic_conditions || 'None'}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, marginBottom: 20 }}>
+                  <Pressable style={{ flex: 1, backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 20, borderColor: '#08a52f', padding: 10, marginHorizontal: 5, alignItems: 'center' }}>
+                    <Text style={{ color: '#08a52f' }}>Edit Patient</Text>
+                  </Pressable>
+
+                  <Pressable style={{ flex: 1, backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 20, borderColor: '#f60b0b', padding: 10, marginHorizontal: 5, alignItems: 'center' }}>
+                    <Text style={{ color: '#f60b0b' }}>Delete Patient</Text>
+                  </Pressable>
+                </View>
             </View>
             }
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10}}>
-            <Pressable style={[styles.cartButton, ]}>
-                <Ionicons name="call" size={30} color="#ffffff" />
-            </Pressable>
-            <Pressable style={[styles.cartButton, ]}>
-                <Ionicons name="chatbubble" size={30} color="#ffffff" />
-            </Pressable>
-            <Pressable onPress={()=> router.push(`/(Patient_tabs)/profile`)}style={[styles.cartButton, ]}>
-                <Ionicons name="mail" size={30} color="#ffffff" />
-            </Pressable>
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  marginTop: 20 }}>
-            
-            <View style={{ flex: 1, backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 20, borderColor: '#08a52f', padding: 10, marginHorizontal: 5, alignItems: 'center' }}>
-                <Text style={{ color: '#08a52f' }}>Edit Patient</Text>
-            </View>
-
-            <View style={{ flex: 1, backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 20, borderColor: '#f60b0b', padding: 10, marginHorizontal: 5, alignItems: 'center' }}>
-                <Text style={{ color: '#f60b0b' }}>Delete Patient</Text>
-            </View>
-
-        </View>
- 
+  
+     
     </ScrollView>
 
   </SafeAreaView>;
@@ -148,16 +226,71 @@ export default function RequestList() {
 
 const styles = StyleSheet.create({
 
+  card: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
+  },
 
-
-headerContainer: {
-    backgroundColor: '#4750c0',
+  cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingBottom: 5,
+    paddingTop: 3
+  },
+
+  cardTitle: {
+    fontSize: 16,
+    color: 'black',
+   
+  },
+
+  statusContainer: {
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 0.1,
+    borderColor: 'forestgreen',
+    backgroundColor: '#bbf7d0',
+  },
+
+  statusText: {
+    fontSize: 12,
+    color: 'forestgreen',
+    fontWeight: '600',
+  },
+
+  planTypeText: {
+    fontSize: 14,
+    color: '#6b86b5',
+  },
+
+  startDateText: {
+    fontSize: 12,
+    color: '#6b86b5',
+    marginLeft: 5,
+  },
+
+  headerContainer: {
+    backgroundColor: '#4750c0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 15,
     padding: 25,
-    paddingVertical: 30,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    paddingVertical: 10,
+
   },
 
 headerTitle: {
@@ -183,20 +316,56 @@ headerIcons: {
   },
   label: {
     fontSize: 15,
-    color: '#53346a',
+    color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
     marginTop: 6,
   },
 
-  cartButton: {
-    // position: 'absolute',
-    // bottom: 20,
-    backgroundColor: '#53346a',
-    padding: 15,
-    borderRadius: 30,
-    elevation: 3,
-   
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 20,
+    marginBottom: 12,
   },
+
+  detailCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: 16,
+  },
+
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+
+  detailContent: {
+    marginLeft: 12,
+    flex: 1,
+  },
+
+  detailLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+
+  detailValue: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+
 
 });

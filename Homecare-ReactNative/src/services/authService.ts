@@ -2,6 +2,22 @@
 import api from './api';
 import { saveToken, saveUserData, clearAuth, getToken, getUserData } from '../options/tokenHandler';
 
+export interface User {
+  user_id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  email_address: string;
+  phone_number?: string;
+  date_of_birth?: string;
+  gender?: string;
+  home_address?: string;
+  role: string;
+  emergency_contact?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface RegisterData {
   first_name: string;
   middle_name?: string;
@@ -28,7 +44,7 @@ export interface AuthResponse {
   success: boolean;
   message: string;
   data?: {
-    user: any;
+    user: User;
     token: string;
     token_type: string;
     expires_in: number;

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
+import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
 
 export default function Register() {
   const {user ,setUser} = useRegister();
@@ -35,68 +36,77 @@ export default function Register() {
 
       <View style={registerCommonStyles.form}>     
   
-        <TouchableOpacity
-          style={[registerCommonStyles.formTextInput, { justifyContent: 'center' }]}
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text style={{ color: user.date_of_birth ? 'white' : '#888' }}>
-            {user.date_of_birth ? user.date_of_birth : 'Select Date of Birth'}
-          </Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={user.date_of_birth ? new Date(user.date_of_birth) : new Date(2000, 0, 1)}
-            mode="date"
-            display="default"
-            onChange={(_, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                // Format as YYYY-MM-DD for the API
-                const formattedDate = selectedDate.toISOString().split('T')[0];
-                handleChange('date_of_birth', formattedDate);
-              }
-            }}
-            maximumDate={new Date()}
-          />
-        )}
-
-        
-        <View style={registerCommonStyles.genderRow}>
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Date of Birth</Text>
           <TouchableOpacity
-            style={[registerCommonStyles.genderButton, user.gender === 'Male' && registerCommonStyles.genderSelected]}
-            onPress={() => setUser(prev => ({
-              ...prev,
-              gender: 'Male'
-            }))}
+            style={[addPatientStyles.descriptionInput, { height: 40, justifyContent: 'center' }]}
+            onPress={() => setShowDatePicker(true)}
           >
-            <Text style={registerCommonStyles.genderText}>Male</Text>
+            <Text style={{ color: user.date_of_birth ? '#000' : '#888' }}>
+              {user.date_of_birth ? user.date_of_birth : 'Select Date of Birth'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[registerCommonStyles.genderButton, user.gender === 'Female' && registerCommonStyles.genderSelected]}
-            onPress={() => setUser(prev => ({
-              ...prev,
-              gender: 'Female'
-            }))}
-          >
-            <Text style={registerCommonStyles.genderText}>Female</Text>
-          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={user.date_of_birth ? new Date(user.date_of_birth) : new Date(2000, 0, 1)}
+              mode="date"
+              display="default"
+              onChange={(_, selectedDate) => {
+                setShowDatePicker(false);
+                if (selectedDate) {
+                  // Format as YYYY-MM-DD for the API
+                  const formattedDate = selectedDate.toISOString().split('T')[0];
+                  handleChange('date_of_birth', formattedDate);
+                }
+              }}
+              maximumDate={new Date()}
+            />
+          )}
         </View>
 
-         
-        <TextInput
-            placeholder="Home Address"
-            placeholderTextColor="#888"
-            value={user.home_address || ''}
-            onChangeText={value => handleChange('home_address', value)}
-            style={registerCommonStyles.formTextInput}
-        />
-        <TextInput
-            placeholder="Emergency Contact"
-            placeholderTextColor="#888"
-            value={user.emergency_contact || ''}
-            onChangeText={value => handleChange('emergency_contact', value)}
-            style={registerCommonStyles.formTextInput}
-        />
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Gender</Text>
+          <View style={registerCommonStyles.genderRow}>
+            <TouchableOpacity
+              style={[registerCommonStyles.genderButton, user.gender === 'Male' && registerCommonStyles.genderSelected]}
+              onPress={() => setUser(prev => ({
+                ...prev,
+                gender: 'Male'
+              }))}
+            >
+              <Text style={registerCommonStyles.genderText}>Male</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[registerCommonStyles.genderButton, user.gender === 'Female' && registerCommonStyles.genderSelected]}
+              onPress={() => setUser(prev => ({
+                ...prev,
+                gender: 'Female'
+              }))}
+            >
+              <Text style={registerCommonStyles.genderText}>Female</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Home Address</Text>
+          <TextInput
+              placeholderTextColor="#888"
+              value={user.home_address || ''}
+              onChangeText={value => handleChange('home_address', value)}
+              style={[addPatientStyles.descriptionInput, {height: 50}]}
+          />
+        </View>
+
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Emergency Contact</Text>
+          <TextInput
+              placeholderTextColor="#888"
+              value={user.emergency_contact || ''}
+              onChangeText={value => handleChange('emergency_contact', value)}
+              style={[addPatientStyles.descriptionInput, {height: 40}]}
+          />
+        </View>
        
         <TouchableOpacity style={registerCommonStyles.signupButton} onPress={handleRegister}>
           <Text style={registerCommonStyles.signupButtonText}>Next</Text>

@@ -111,15 +111,16 @@ headerTitle: {
 },
 scheduleTypeContainer: {
     flexDirection: 'row',
-    marginTop: 30,
-    justifyContent: 'space-between',
-    gap: 5, 
-    margin: 1
+   
+    justifyContent: 'center',
+    alignItems: 'center',
+   
+    
 },
 scheduleTypeButton: {
-    borderRadius: 10,
-    padding: 2,
-    justifyContent: 'flex-end',
+    borderRadius: 0,
+    padding: 12,
+    justifyContent: 'center',
     flex: 1,
 },
 scheduleTypeText: {

@@ -77,11 +77,13 @@ export default function PatientDashboard() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Image
-          source={require('@/assets/images/Homecare_Logo.png')}
-          style={{ width: 50, height: 40, marginLeft: 15 }}
-          resizeMode="contain"
-        />
+        <Pressable onPress={() => router.push('/(Patient_tabs)/profile')}>
+          <Image
+            source={require('@/assets/images/Homecare_Logo.png')}
+            style={{ width: 50, height: 40, marginLeft: 15 }}
+            resizeMode="contain"
+          />
+        </Pressable>
 
         <Text style={styles.greetingText}>
           Hello {patientInfo?.first_name || 'User'}!

@@ -4,29 +4,41 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-
+import {usePatientsByFacility} from '@/src/options/Admin_patientsQueryOptions';
+import { useAdminPatients } from '@/src/context/Admin-PatientsContext';
 
 
 export default function RequestList() {
   const router = useRouter();
-
+ const {data: patientList, isLoading: loadingPatientList, isFetching: isFetchingPatientList, refetch: isRefetchingPatientList} = usePatientsByFacility(true);
+ const { setSelectedPatient } = useAdminPatients();
 
   // useEffect(() => {
   //   // Fetch company list or any other data if needed
   // }, []);
-const careTeamList = [
-  { id: 1, icon: 'person-outline', name: 'Dr. Maria Santos', role: 'Doctor', title: 'MD', episode: 'Chronic Disease Management (Diabetes)' },
-  { id: 2, icon: 'person-outline', name: 'Nurse John Cruz', role: 'Nurse', title: 'RN', episode: 'Chronic Disease Management (Diabetes)' },
-  { id: 3, icon: 'person-outline', name: 'Caregiver Ana Lopez', role: 'Caregiver', title: '', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-  { id: 4, icon: 'person-outline', name: 'Dr. Paolo Reyes', role: 'Doctor', title: 'MD', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-  { id: 5, icon: 'person-outline', name: 'Coordinator Liza Tan', role: 'Care Plan Coordinator', title: '', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-  { id: 6, icon: 'person-outline', name: 'Nurse Miguel Ramos', role: 'Nurse', title: 'RN', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-  { id: 7, icon: 'person-outline', name: 'Caregiver Carla Dela Cruz', role: 'Caregiver', title: '', episode: 'Chronic Disease Management (Diabetes)' },
-  { id: 8, icon: 'person-outline', name: 'Dr. Antonio Villanueva', role: 'Doctor', title: 'MD', episode: 'Palliative End of Life Care (Terminal Cancer)' },
-  { id: 9, icon: 'person-outline', name: 'Coordinator Sofia Garcia', role: 'Care Plan Coordinator', title: '', episode: 'Post-Surgical Therapy (Knee Replacement)' },
-];
+
   const [selectedValue, setSelectedValue] = useState('EOC');
   const [selectedSort, setSelectedSort] = useState('Sort By: Name');
+  const getAge = (dateOfBirth: string | undefined) => {
+    if (!dateOfBirth) return '';
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return `${age}`;
+  };
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    return ` ${month} ${day}, ${year}`;
+  };
 
   return <SafeAreaView style={{
     flex: 1,
@@ -40,8 +52,10 @@ const careTeamList = [
         <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>Patients</Text>
           <View style={styles.headerIcons}>
-            {/* <Ionicons name="time-outline" size={22} color="white" />
-            <Ionicons name="location-outline" size={22} color="white" /> */}
+            <Pressable onPress={() => router.push(`/(Admin_tabs)/dashboard/patient_worklist/add_patient`)} style={({ pressed }) => [{  opacity: pressed ? 0.8 : 1 }]}>
+              <Ionicons name="person-add-outline" size={22} color="white" />
+            </Pressable>
+
           </View>
         </View>
 
@@ -55,50 +69,29 @@ const careTeamList = [
           </View>
         </View>
 
-      {/* pickerContainer  && pickerBox*/}
-        <View style={{flexDirection: 'row', gap: 10, marginVertical: 12, paddingHorizontal: 40}}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedValue}
-                onValueChange={(itemValue) => setSelectedValue(itemValue)}
-                style={{ flex: 1, color: '#b7aac0' }}
-                
-              >
-                <Picker.Item label="Assisted Living" value="assisted_living" />
-                <Picker.Item label="Nursing Care" value="nursing_care" />
-                <Picker.Item label="Companionship" value="companionship" />
-                <Picker.Item label="Therapy" value="nursing_care" />
-              </Picker>
-            </View>
-
-            {/* Second Picker */}
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedSort}
-                onValueChange={(itemValue) => setSelectedSort(itemValue)}
-                style={{ flex: 1, color: '#b7aac0' }}
-              >
-                <Picker.Item label="Sort By: Name" value="name" />
-                <Picker.Item label="Sort By: Popularity" value="popularity" />
-              </Picker>
-            </View>
-          
-        </View>
-
-      <Pressable style={styles.iconCircle} onPress={()=> router.push(`/(Admin_tabs)/dashboard/patient_worklist/patient_details`)}><Text>RAH</Text></Pressable>
+     
 
       {/* care team list */}
-      <View style={[styles.grid, {marginHorizontal: 30}]}>
-        {careTeamList.map(member => (
-            <View key={member.id} style={[styles.gridItem, styles.card]}>
-            <Pressable onPress={() => router.push(`/(Admin_tabs)/dashboard/patient_worklist`)} style={({ pressed }) => [{  opacity: pressed ? 0.8 : 1 }]}>
-                <View style={{alignItems: 'center', gap: 5}}>
-                  <View style={[styles.iconCircle, { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }]}>
-                      <Ionicons name={member.icon as any} size={30} color="#6366f1" />
+      <View style={[styles.grid, {margin: 20}]}>
+        {patientList?.map(member => (
+            <View key={member.patient_id} style={[styles.card]}>
+            <Pressable onPress={() => {
+              setSelectedPatient(member);
+              router.push(`/(Admin_tabs)/dashboard/patient_worklist/patient_details`);
+            }} style={({ pressed }) => [{  opacity: pressed ? 0.8 : 1 }]}>
+                <View style={{alignItems: 'center',  flexDirection: 'row', justifyContent: 'space-between', gap: 15, width: '100%'}}>
+                  <View style={{flexDirection: 'row', gap: 15, alignItems: 'center'}}>
+                  <View style={[styles.iconCircle, { width: 40, height: 40, borderRadius: 25, alignItems: 'center', justifyContent: 'center' }]}>
+                      <Ionicons name='person-outline' size={20} color="#6366f1" />
                   </View>
-                  <Text style={styles.label}>{member.name}</Text>
-                  <Text style={styles.label}>{member.role}</Text>
-                  <Text style={styles.label}>{member.episode}</Text>
+                  <View style={{alignItems: 'flex-start'}}>
+                    <Text style={styles.cardTitle}>{member.first_name} {member.last_name}</Text>
+                    
+                    <Text style={styles.label}>{getAge(member.date_of_birth)} years old • {member.gender}</Text>
+                    <Text style={styles.label}>{formatDate(member.date_of_birth)}</Text>
+                  </View>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#6b86b5" />
                 </View>
             </Pressable>
             </View>
@@ -114,9 +107,9 @@ const careTeamList = [
 const styles = StyleSheet.create({
 
   card: {
-    
+    flexGrow: 1,
     backgroundColor: '#ffffff',
-    borderRadius: 1,
+    borderRadius: 8,
     padding: 15,
     // marginHorizontal: 5,
     // marginVertical: 5,
@@ -125,7 +118,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
 
     headerContainer: {
@@ -201,14 +194,19 @@ const styles = StyleSheet.create({
   },
   iconCircle: {
     borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#53346a',
+
     padding: 10,
     backgroundColor: '#eef2ff',
   },
+  cardTitle:{
+    fontSize: 16,
+    color: 'black',
+    textAlign: 'center',
+    marginTop: 6,
+  },
   label: {
     fontSize: 12,
-    color: '#53346a',
+    color: '#6b7280',
     textAlign: 'center',
     marginTop: 6,
   },

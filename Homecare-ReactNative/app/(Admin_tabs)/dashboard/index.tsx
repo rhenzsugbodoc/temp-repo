@@ -30,8 +30,8 @@ export default function PatientDashboard() {
   ]
   const items = [
     { id: 1, name: 'heart-outline', label: 'Health Records', route: 'health_records' },
-    { id: 2, name: 'time-outline', label: 'Visit History', route: 'visit_history' },
-    { id: 3, name: 'people-outline', label: 'Care Providers', route: 'care_providers' },
+    { id: 2, name: 'time-outline', label: 'Patient Worklist', route: '/(Admin_tabs)/dashboard/patient_worklist' },
+    { id: 3, name: 'people-outline', label: 'Staff', route: '/(Admin_tabs)/dashboard/staff_list' },
     { id: 4, name: 'document-text-outline', label: 'Clinical Notes', route: 'clinical_notes' },
     { id: 5, name: 'home-outline', label: 'Services', route: 'services' },
     { id: 6, name: 'calendar-outline', label: 'Calendar', route: 'calendar' },
@@ -52,10 +52,13 @@ export default function PatientDashboard() {
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal:15, marginVertical: 20}}>
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/images/MisterMatres.png')}
-        style={{ width: 55, height: 55, marginLeft: 15, borderRadius: 30 }} 
-        resizeMode="cover"
-        />
+        <Pressable onPress={() => router.push('/(Admin_tabs)/dashboard/profile')}>
+          <Image
+            source={require('@/assets/images/Homecare_Logo.png')}
+            style={{ width: 50, height: 40, marginLeft: 15 }}
+            resizeMode="contain"
+          />
+        </Pressable>
         <View>
           <Text style={{color: '#596389' , fontWeight: 'bold', fontSize: 14}}>Doctor Admin</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -89,7 +92,7 @@ export default function PatientDashboard() {
           <View style={styles.grid}>
             {items.map((item, index) => (
               <View key={index} style={styles.item}>
-                <Pressable style={styles.iconCircle} onPress={()=> router.push(`/(Admin_tabs)/dashboard/patient_worklist`)}>
+                <Pressable style={styles.iconCircle} onPress={()=> router.push(item.route as any)}>
                   <Ionicons name={item.name as any} size={30} color="#8e98db" />
                 </Pressable>
                 <Text style={styles.routeLabel}>{item.label}</Text>

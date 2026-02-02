@@ -5,7 +5,8 @@ import { useRegister } from '../../src/context/RegisterContext';
 import {FacilityData} from '../../src/services/registerService';
 import { registerCommonStyles, register1Styles } from '../../assets/styles/patient/auth/registerStyles';
 import {Picker} from '@react-native-picker/picker';
-
+import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
+import {countries} from '@/assets/lists/country_list'
 export default function RegisterFacility() {
   const { facility, setFacility, registerFacility } = useRegister();
   const facilityTypes = ['Hospital', 'Clinic', 'Nursing Home', 'Rehabilitation Center'];
@@ -34,89 +35,119 @@ export default function RegisterFacility() {
 
       <ScrollView style={registerCommonStyles.form}>     
 
-          <View>
-              <Text>Facility  Type</Text>
-                  <View>
-
-                  <Picker selectedValue={facility.facility_type} onValueChange={(facilityType) => handleChange('facility_type', facilityType)}>
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Facility Type</Text>
+              <View style={addPatientStyles.serviceToggleItem}>
+                  <Picker style={{height: 50}} selectedValue={facility.facility_type} onValueChange={(facilityType) => handleChange('facility_type', facilityType)}>
                       {facilityTypes.map((type) => (
                           <Picker.Item key={type} label={type} value={type} />
                       ))}
                   </Picker>
               </View>
           </View>
-          <TextInput
-              placeholder="Facility Name"
-              placeholderTextColor="#888"
-              value={facility.facility_name || ''}
-              onChangeText={value => handleChange('facility_name', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Facility Address"
-              placeholderTextColor="#888"
-              value={facility.facility_address || ''}
-              onChangeText={value => handleChange('facility_address', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Country"
-              placeholderTextColor="#888"
-              value={facility.country || ''}
-              onChangeText={value => handleChange('country', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="City"
-              placeholderTextColor="#888"
-              value={facility.city || ''}
-              onChangeText={value => handleChange('city', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Province"
-              placeholderTextColor="#888"
-              value={facility.province || ''}
-              onChangeText={value => handleChange('province', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Postal Code"
-              placeholderTextColor="#888"
-              value={facility.postal_code || ''}
-              onChangeText={value => handleChange('postal_code', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Facility Phone"
-              placeholderTextColor="#888"
-              value={facility.facility_phone || ''}
-              onChangeText={value => handleChange('facility_phone', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Email Address"
-              placeholderTextColor="#888"
-              value={facility.facility_email || ''}
-              onChangeText={value => handleChange('facility_email', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Website"
-              placeholderTextColor="#888"
-              value={facility.facility_website || ''}
-              onChangeText={value => handleChange('facility_website', value)}
-              style={registerCommonStyles.formTextInput}
-          />
-          <TextInput
-              placeholder="Facility Description"
-              placeholderTextColor="#888"
-              multiline
-              numberOfLines={4}
-              value={facility.facility_description || ''}
-              onChangeText={value => handleChange('facility_description', value)}
-              style={[registerCommonStyles.formTextInput, { height: 100, textAlignVertical: 'top' }]}
-          />
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Facility Name</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.facility_name || ''}
+                  onChangeText={value => handleChange('facility_name', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Facility Address</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.facility_address || ''}
+                  onChangeText={value => handleChange('facility_address', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 50}]}
+              />
+          </View>
+          
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Country</Text>
+              <View style={addPatientStyles.serviceToggleItem}>
+                  <Picker style={{height: 50}} selectedValue={facility.country} onValueChange={(itemValue) => handleChange('country', itemValue)}>
+                      {countries.map((country, index) => (
+                      <Picker.Item key={index} label={country} value={country} />
+                      ))}
+                  </Picker>
+              </View>
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>City</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.city || ''}
+                  onChangeText={value => handleChange('city', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Province</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.province || ''}
+                  onChangeText={value => handleChange('province', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Postal Code</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.postal_code || ''}
+                  onChangeText={value => handleChange('postal_code', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Facility Phone</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.facility_phone || ''}
+                  onChangeText={value => handleChange('facility_phone', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Email Address</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.facility_email || ''}
+                  onChangeText={value => handleChange('facility_email', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Website</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  value={facility.facility_website || ''}
+                  onChangeText={value => handleChange('facility_website', value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40}]}
+              />
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+              <Text style={addPatientStyles.fieldLabel}>Facility Description</Text>
+              <TextInput
+                  placeholderTextColor="#888"
+                  multiline
+                  numberOfLines={4}
+                  value={facility.facility_description || ''}
+                  onChangeText={value => handleChange('facility_description', value)}
+                  style={[addPatientStyles.descriptionInput, { height: 50, textAlignVertical: 'top' }]}
+              />
+          </View>
 
        
         <TouchableOpacity style={registerCommonStyles.signupButton} onPress={handleRegister}>

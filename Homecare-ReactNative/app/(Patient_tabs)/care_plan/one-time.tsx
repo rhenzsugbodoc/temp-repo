@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet, Text, RefreshControl } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { useOneTimeRequests } from '@/src/options/carePlanQueryOptions';
+import { useOneTimeRequests, useRoutineRequests } from '@/src/options/carePlanQueryOptions';
 import { useCarePlan } from '@/src/context/CarePlanContext';
 import { getPatientID } from '@/src/options/tokenHandler';
 
@@ -20,8 +20,10 @@ export default function OneTimeServiceDetails() {
   }, []);
 
   const { data: oneTimeData, isLoading: isLoadingOneTimeData, isFetching: isFetchingOneTimeData, refetch: refetchOneTimeData } = useOneTimeRequests(patientID || 0, undefined, !!patientID);
+  const {data: routineData, isLoading: isLoadingRoutineData, isFetching: isFetchingRoutineData, refetch: refetchRoutineData} = useRoutineRequests(patientID || 0, undefined, !!patientID);
   
-  const requestDetails = oneTimeData?.find(request => parseInt(request.request_id) === requestID);
+  const requestDetails = oneTimeData?.find(request => parseInt(request.request_id) === requestID) || 
+                         routineData?.find(request => parseInt(request.request_id) === requestID);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f4f7fa' }} edges={['top']}>

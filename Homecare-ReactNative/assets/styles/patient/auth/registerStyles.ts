@@ -30,9 +30,9 @@ export const registerCommonStyles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     marginBottom: 16,
     color: '#c2c2c2',
     fontSize: 16,
@@ -48,18 +48,19 @@ export const registerCommonStyles = StyleSheet.create({
   genderRow: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     marginVertical: 16,
   },
   genderButton: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 8,
     marginHorizontal: 8,
     borderRadius: 8,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#4b5cbe',
     alignItems: 'center',
   },
   genderSelected: {
-    backgroundColor: '#0575e6',
+    backgroundColor: '#9bc3da',
   },
   genderText: {
     color: 'white',
@@ -67,14 +68,14 @@ export const registerCommonStyles = StyleSheet.create({
   },
 
   signupButton: {
-    backgroundColor: '#0575e6',
-    borderRadius: 25,
+    backgroundColor: '#4b5cbe',
+    borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
   },
   signupButtonText: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
   },

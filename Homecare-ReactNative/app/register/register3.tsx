@@ -1,8 +1,10 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles } from '../../assets/styles/patient/auth/registerStyles';
+import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
 
 export default function Register() {
   const { user, setUser, registerUser, isRegistering } = useRegister();
@@ -14,6 +16,12 @@ export default function Register() {
       [key]: value,
     }));
   };
+  
+  useEffect(() => {
+    if (user.role && user.role !== 'Patient') {
+      handleRegister();
+    }
+  }, []);
   
   const handleRegister = async () => {
     // Validation
@@ -91,30 +99,38 @@ export default function Register() {
       </View>
 
       <View style={registerCommonStyles.form}>     
-        <TextInput
-          placeholder="Medical Conditions (comma-separated)"
-          placeholderTextColor="#888"
-          value={user.medical_conditions ? user.medical_conditions.join(', ') : ''}
-          onChangeText={value => handleChange('medical_conditions', value.split(',').map(s => s.trim()).filter(Boolean))}
-          style={registerCommonStyles.formTextInput}
-          multiline
-        />
-        <TextInput
-          placeholder="Allergies (comma-separated)"
-          placeholderTextColor="#888"
-          value={user.allergies ? user.allergies.join(', ') : ''}
-          onChangeText={value => handleChange('allergies', value.split(',').map(s => s.trim()).filter(Boolean))}
-          style={registerCommonStyles.formTextInput}
-          multiline
-        />
-        <TextInput
-          placeholder="Current Medications (comma-separated)"
-          placeholderTextColor="#888"
-          value={user.current_medications ? user.current_medications.join(', ') : ''}
-          onChangeText={value => handleChange('current_medications', value.split(',').map(s => s.trim()).filter(Boolean))}
-          style={registerCommonStyles.formTextInput}
-          multiline
-        />
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Medical Conditions (comma-separated)</Text>
+          <TextInput
+            placeholderTextColor="#888"
+            value={user.medical_conditions ? user.medical_conditions.join(', ') : ''}
+            onChangeText={value => handleChange('medical_conditions', value.split(',').map(s => s.trim()).filter(Boolean))}
+            style={[addPatientStyles.descriptionInput, {height: 60}]}
+            multiline
+          />
+        </View>
+
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Allergies (comma-separated)</Text>
+          <TextInput
+            placeholderTextColor="#888"
+            value={user.allergies ? user.allergies.join(', ') : ''}
+            onChangeText={value => handleChange('allergies', value.split(',').map(s => s.trim()).filter(Boolean))}
+            style={[addPatientStyles.descriptionInput, {height: 60}]}
+            multiline
+          />
+        </View>
+
+        <View style={addPatientStyles.descriptionContainer}>
+          <Text style={addPatientStyles.fieldLabel}>Current Medications (comma-separated)</Text>
+          <TextInput
+            placeholderTextColor="#888"
+            value={user.current_medications ? user.current_medications.join(', ') : ''}
+            onChangeText={value => handleChange('current_medications', value.split(',').map(s => s.trim()).filter(Boolean))}
+            style={[addPatientStyles.descriptionInput, {height: 60}]}
+            multiline
+          />
+        </View>
 
         <TouchableOpacity 
           style={[registerCommonStyles.signupButton, isRegistering && { opacity: 0.7 }]} 

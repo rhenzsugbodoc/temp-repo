@@ -189,10 +189,14 @@ requestButtonText: {
 export const requestDetailStyles = StyleSheet.create({
 headerContainer: {
     height: 60,
+    backgroundColor: '#22449e',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
 },
 headerTitle: {
-    color: '#8c82c6', 
-    fontSize: 20
+    color: '#ffffff', 
+    fontSize: 20,
+    fontWeight: 'bold'
 },
 scheduleTypeContainer: {
     flexDirection: 'row', 

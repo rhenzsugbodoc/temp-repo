@@ -1,5 +1,5 @@
 // app/login.tsx
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -69,7 +69,7 @@ export default function Login() {
         let dashboardRoute: string = '/(Patient_tabs)/dashboard'; // Default route
 
         if (userData?.role === 'Pharmacy_Owner') {
-          dashboardRoute = '/(Pharmacy_Owner)/index';
+          dashboardRoute = '/(Pharmacy_Owner)';
         } else if (userData?.role === 'Admin'){
           dashboardRoute = '/(Admin_tabs)/dashboard';
         } else if (userData?.role === 'Patient'){
@@ -113,6 +113,8 @@ export default function Login() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.content}>
         <View style={styles.header}>
+          <Image source={require('@/assets/images/Homecare_Logo.png')} style={styles.logo} />                     
+                                
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
@@ -197,6 +199,12 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     alignItems: 'center',
   },
+  logo: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -221,7 +229,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   loginButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#4b5cbe',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import { View, Animated, ScrollView, Pressable, StyleSheet, Text, ActivityIndicator, TextInput, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGetMedicines, useGetInventory, useUpdateInventoryMutation, useCreateInventoryMutation } from '@/src/options/PrescriptionQueryOptions';
-
+import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
+import { useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
 const { height } = Dimensions.get('window');
 
 export default function PharmacyDashboard() {
@@ -13,6 +15,19 @@ export default function PharmacyDashboard() {
   const createInventoryMutation = useCreateInventoryMutation();
   const updateInventoryMutation = useUpdateInventoryMutation();
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const logoutMutation = useLogoutMutation();
+  const router = useRouter();
+  
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to login even if API call fails
+      router.replace('/login');
+    }
+  };
 
   const [selectedMedicineId, setSelectedMedicineId] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -99,6 +114,11 @@ export default function PharmacyDashboard() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView>
+      <View style={{justifyContent: 'flex-end', alignItems: 'flex-end', padding: 10}}>
+        <Pressable style={styles.iconCircle} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#4454c3" />
+        </Pressable>
+      </View>
         {medicinesLoading ? (
           <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
         ) : (
@@ -350,5 +370,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  iconCircle: {
+    padding: 5,
+    borderRadius: 25,
   },
 });
