@@ -107,10 +107,10 @@ export default function RequestList() {
         <SafeAreaView style={{
         flex: 1,
         backgroundColor: '#ffffff',
-        padding: 10,
+    
         }} edges={['top']}>
 
-            <View style={requestDetailStyles.headerContainer}>
+            <View style={[requestDetailStyles.headerContainer, {marginBottom: 20, }]}>
                 <Text style={requestDetailStyles.headerTitle}>Requests</Text>
             </View>
 
@@ -215,17 +215,13 @@ export default function RequestList() {
                     </Picker>
                 </View>
            
-            <View style={{ alignItems: 'flex-end', backgroundColor: 'white',   shadowColor: '#000',
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 4,
-                elevation: 20}}>
+               <View style={{ alignItems: 'stretch', backgroundColor: 'white', marginTop: 30 }}>
                 <Pressable onPress={handleSubmit} style={requestDetailStyles.submitButton}>
                     <Text style={{ color: 'white' }}>Next</Text>
                 </Pressable>
             </View>
             </ScrollView>
-   
+
         </SafeAreaView>
     );
 }

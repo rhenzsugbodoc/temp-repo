@@ -40,9 +40,23 @@ export default function Register() {
       return;
     }
 
+    // Prepare user data - convert arrays to strings
+    const userData = {
+      ...user,
+      medical_conditions: Array.isArray(user.medical_conditions) 
+        ? user.medical_conditions.join(', ') 
+        : user.medical_conditions || '',
+      allergies: Array.isArray(user.allergies) 
+        ? user.allergies.join(', ') 
+        : user.allergies || '',
+      current_medications: Array.isArray(user.current_medications) 
+        ? user.current_medications.join(', ') 
+        : user.current_medications || '',
+    };
+
     // Register user
     try {
-      const response = await registerUser(user as any);
+      const response = await registerUser(userData as any);
       console.log('Registration successful:', response);
       
       // Determine next route based on user role

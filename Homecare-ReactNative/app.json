@@ -50,6 +50,13 @@
       "image": "./assets/images/splash-screen.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0b3cf019-0f35-4cb2-84e1-228834dd23eb"
+      }
+    },
+    "owner": "shabimbawa"
   }
 }

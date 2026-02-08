@@ -2,17 +2,84 @@ import React, { useState } from 'react';
 import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useCarePlan as useAdminCarePlan } from '@/src/context/Admin-CarePlanContext';
-import { useAssignmentsByCarePlan } from '@/src/options/caregiverAssignmentQueryOptions';
 
 
 export default function Interventions () {
-    const { carePlanID } = useAdminCarePlan();
-    const { data: assignmentData, isLoading, isFetching, refetch } = useAssignmentsByCarePlan(carePlanID || 0, !!carePlanID);
+    const assignmentData = [
+        {
+            assignment_id: '1',
+            caregiver_first_name: 'Sarah',
+            caregiver_last_name: 'Johnson',
+            assignment_type: 'Primary',
+            status: 'Active',
+            shift_schedule: 'Monday-Friday: 8AM-4PM',
+            start_date: '2026-01-15',
+            end_date: '2026-06-15',
+            specialization: 'Registered Nurse',
+            caregiver_phone: '+1 (555) 123-4567',
+            responsibilities: 'Medication management, vital signs monitoring, wound care, patient education'
+        },
+        {
+            assignment_id: '2',
+            caregiver_first_name: 'Michael',
+            caregiver_last_name: 'Chen',
+            assignment_type: 'Secondary',
+            status: 'Active',
+            shift_schedule: 'Weekends: 9AM-5PM',
+            start_date: '2026-01-20',
+            end_date: null,
+            specialization: 'Physical Therapist',
+            caregiver_phone: '+1 (555) 234-5678',
+            responsibilities: 'Physical therapy exercises, mobility assistance, strength training'
+        },
+        {
+            assignment_id: '3',
+            caregiver_first_name: 'Emily',
+            caregiver_last_name: 'Rodriguez',
+            assignment_type: 'Emergency',
+            status: 'Active',
+            shift_schedule: 'On-call 24/7',
+            start_date: '2026-02-01',
+            end_date: '2026-05-01',
+            specialization: 'Emergency Care Specialist',
+            caregiver_phone: '+1 (555) 345-6789',
+            responsibilities: 'Emergency response, critical care support, emergency medication administration'
+        },
+        {
+            assignment_id: '4',
+            caregiver_first_name: 'David',
+            caregiver_last_name: 'Thompson',
+            assignment_type: 'Temporary',
+            status: 'Inactive',
+            shift_schedule: 'Tuesday/Thursday: 2PM-8PM',
+            start_date: '2026-01-10',
+            end_date: '2026-01-31',
+            specialization: 'Occupational Therapist',
+            caregiver_phone: '+1 (555) 456-7890',
+            responsibilities: 'Daily living activities, cognitive exercises, adaptive equipment training'
+        },
+        {
+            assignment_id: '5',
+            caregiver_first_name: 'Jessica',
+            caregiver_last_name: 'Williams',
+            assignment_type: 'Primary',
+            status: 'Active',
+            shift_schedule: 'Monday/Wednesday/Friday: 6AM-2PM',
+            start_date: '2026-02-05',
+            end_date: null,
+            specialization: 'Home Health Aide',
+            caregiver_phone: '+1 (555) 567-8901',
+            responsibilities: 'Personal care assistance, meal preparation, light housekeeping, companionship'
+        }
+    ];
 
-    console.log('=== Interventions Debug ===');
-    console.log('carePlanID:', carePlanID);
-    console.log('assignmentData:', assignmentData);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => setRefreshing(false), 1000);
+    };
+
     return (
         <SafeAreaView style={{
             flex: 1,
@@ -27,8 +94,8 @@ export default function Interventions () {
             <ScrollView
                 refreshControl={
                     <RefreshControl
-                        refreshing={isFetching}
-                        onRefresh={refetch}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
                         colors={['#4454c3']}
                         tintColor="#4454c3"
                     />

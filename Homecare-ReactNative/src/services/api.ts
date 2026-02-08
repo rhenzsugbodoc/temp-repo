@@ -4,7 +4,7 @@ import { getToken, removeToken } from '../options/tokenHandler';
 import {useRouter} from 'expo-router';
 
 const router = useRouter();
-const BASE_URL = 'http://192.168.254.149/temp-repo/'; //direct IP for mobile devices
+const BASE_URL = 'http://54.221.189.210/'; //direct IP for mobile devices
 
 const api = axios.create({
   baseURL: BASE_URL,

@@ -11,6 +11,8 @@ export default function RequestLayout() {
         <Stack.Screen name="payment" options={{ headerShown: false, title: "Payment",  headerStyle: { backgroundColor: "blue" } }} />
         <Stack.Screen name="confirm" options={{ headerShown: false, title: "Confirm",  headerStyle: { backgroundColor: "blue" } }} />
         <Stack.Screen name="requesting_service" options={{ headerShown: false, title: "Requestiong_service",  headerStyle: { backgroundColor: "blue" } }} />
+        <Stack.Screen name="facilityDetails" options={{ headerShown: false, title: "Facility Details",  headerStyle: { backgroundColor: "blue" } }} />
+
       </Stack>
     </RequestServiceProvider>
 
