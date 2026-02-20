@@ -106,24 +106,44 @@ export default function LocationTracking() {
         </MapView>
 
         <View style={styles.card}>
-          <Text>Driver Information</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}>
-            <View style={{ flex: 1 }}>
-              <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="contain" 
-                style={{ borderRadius: 10, width: '100%', height: 150 }} />
+      
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.status}>Driver is on the way</Text>
+            <Text style={styles.address}>3131 Karikitan St, Manggahan</Text>
+          </View>
+          <Text style={styles.eta}>6 min</Text>
+        </View>
+
+        {/* Driver Row */}
+        <View style={styles.driverRow}>
+          <Image
+            source={require('../../../assets/images/driver.png')}
+            style={styles.avatar}
+          />
+
+          <View style={styles.driverInfo}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>Rhenz Largo</Text>
+              <Text style={styles.rating}>• 4.8 ⭐</Text>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#53346a' }}>Clement Djen</Text>
-              <Text style={{ fontSize: 14, color: '#53346a' }}>Delivery Driver</Text>
-            </View>
-            <Pressable>
-              <Ionicons name="call-outline" size={24} color="#53346a" style={{ marginRight: 16 }} />
+            <Text style={styles.vehicle}>
+              Honda WW160P • D518RG • Mototaxi - NCR to Rizal
+            </Text>
+          </View>
+
+          {/* Actions */}
+          <View style={styles.actions}>
+            <Pressable style={styles.iconBtn}>
+              <Ionicons name="chatbubble-ellipses-outline" size={20} color="#555" />
             </Pressable>
-            <Pressable>
-              <Ionicons name="chatbubble-ellipses-outline" size={24} color="#53346a" />
+            <Pressable style={styles.iconBtn}>
+              <Ionicons name="call-outline" size={20} color="#555" />
             </Pressable>
           </View>
         </View>
+      </View>
     
     </SafeAreaView>
 
@@ -131,16 +151,99 @@ export default function LocationTracking() {
 } 
 
 const styles = StyleSheet.create({
-    card: {
-    backgroundColor: '#ffffff',
-    marginBottom: 10,
+  card: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderRadius: 14,
     padding: 20,
-    paddingHorizontal: 25,
+    paddingBottom: 30,
+    margin: 15,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
     
+  },
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+
+  status: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222',
+  },
+
+  address: {
+    fontSize: 13,
+    color: '#777',
+    marginTop: 2,
+  },
+
+  eta: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#222',
+  },
+
+  driverRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 12,
+  },
+
+  driverInfo: {
+    flex: 1,
+  },
+
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  name: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#222',
+  },
+
+  rating: {
+    fontSize: 14,
+    color: '#444',
+    marginLeft: 6,
+  },
+  
+  vehicle: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+  },
+
+  actions: {
+    flexDirection: 'row',
+    marginLeft: 8,
+  },
+
+  iconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
   },
 })

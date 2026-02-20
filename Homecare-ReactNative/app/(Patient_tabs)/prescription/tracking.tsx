@@ -51,9 +51,9 @@ export default function Tracking() {
                 const isCompleted = completedStatuses.includes(status); 
                 const isLast = index === statusList.length - 1;
                 return (
-                  <View key={status} style={styles.row}>
+                  <View key={status} style={[styles.row, { marginLeft: 12 }]}>
                     <View style={styles.iconColumn}>    
-                      <View style={[styles.circle, { backgroundColor: isCompleted ? '#4F46E5' : '#b1b1b1' },]}>
+                      <View style={[styles.circle, { backgroundColor: isCompleted ? '#4454c3' : '#b1b1b1' },]}>
                         <Ionicons name="checkmark" size={20} color='#ffffff'  />
                       </View>
                       {!isLast && (
