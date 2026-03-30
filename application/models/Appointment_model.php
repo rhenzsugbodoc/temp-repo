@@ -23,6 +23,7 @@ class Appointment_model extends CI_Model {
             doctor.*, 
             user.first_name as doctor_first_name, 
             user.last_name as doctor_last_name,
+            user.user_image_blob as doctor_image_blob,
             facility.facility_name, 
             facility.facility_address');
         $this->db->from('appointments');
@@ -31,7 +32,13 @@ class Appointment_model extends CI_Model {
         $this->db->join('facility', 'appointments.facility_id = facility.facility_id', 'left');
         $this->db->where('appointments.appointment_id', $appointment_id);
         $query = $this->db->get();
-        return $query->row();
+        $appointment = $query->row();
+        
+        if ($appointment && $appointment->doctor_image_blob) {
+            $appointment->doctor_image_blob = base64_encode($appointment->doctor_image_blob);
+        }
+        
+        return $appointment;
     }
     
     // Cancel appointment
@@ -56,12 +63,20 @@ class Appointment_model extends CI_Model {
     
     // Get available doctors
     public function get_available_doctors() {
-        $this->db->select('doctor.*, user.first_name, user.last_name, user.phone_number');
+        $this->db->select('doctor.*, user.first_name, user.last_name, user.phone_number, user.user_image_blob');
         $this->db->from('doctor');
         $this->db->join('user', 'doctor.user_id = user.user_id');
         $this->db->order_by('user.first_name', 'ASC');
         $query = $this->db->get();
-        return $query->result();
+        $doctors = $query->result();
+        
+        foreach ($doctors as $doctor) {
+            if ($doctor->user_image_blob) {
+                $doctor->user_image_blob = base64_encode($doctor->user_image_blob);
+            }
+        }
+        
+        return $doctors;
     }
     
     // Get available time slots

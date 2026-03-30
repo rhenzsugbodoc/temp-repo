@@ -5,8 +5,6 @@ export default function RequestLayout() {
     <CarePlanProvider>
     <Stack>
       <Stack.Screen name="index" options={{  headerShown: false, title: "My Plans" , headerStyle: { backgroundColor: "#4454c3"},  }} />
-      <Stack.Screen name="create_careplan" options={{  headerShown: false, title: "Create Plans" , headerStyle: { backgroundColor: "#4454c3"},  }} />
-      <Stack.Screen name="assign_caregiver" options={{  headerShown: false, title: "Create Plans" , headerStyle: { backgroundColor: "#4454c3"},  }} />
 
     </Stack>
     </CarePlanProvider>

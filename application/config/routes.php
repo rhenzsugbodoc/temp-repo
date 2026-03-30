@@ -10,6 +10,8 @@ $route['api/register'] = 'api/auth/register';
 $route['api/login'] = 'api/auth/login';
 $route['api/logout'] = 'api/auth/logout';
 $route['api/user'] = 'api/auth/get_user';
+$route['api/user/edit']['PUT'] = 'api/auth/edit_user';
+$route['api/user/(:num)']['DELETE'] = 'api/auth/delete_user/$1';
 
 // Patient Routes
 $route['api/patients/profile']['GET'] = 'api/patients/profile';
@@ -23,11 +25,18 @@ $route['api/service-requests/edit']['PUT'] = 'api/service_requests/edit_service_
 
 // Care Plans Routes
 $route['api/care-plans']['POST'] = 'api/care_plans/create'; //n WORKS
+$route['api/care-plans/my-care-plans']['GET'] = 'api/care_plans/get_by_current_user'; // Get care plans for current user
 $route['api/care-plans/patient/(:num)']['GET'] = 'api/care_plans/get_by_patient/$1'; //  WORKS
 $route['api/care-plans/facility']['GET'] = 'api/care_plans/get_by_facility'; //WORKS
 $route['api/care-plans/(:num)']['GET'] = 'api/care_plans/show/$1'; // Get care plan details
 $route['api/care-plans/(:num)']['PUT'] = 'api/care_plans/update/$1'; // WORKS
 $route['api/care-plans/(:num)']['DELETE'] = 'api/care_plans/delete/$1'; // WORKS
+
+// Caregiver Assignment Routes
+$route['api/caregiver-assignments']['POST'] = 'api/caregiver_assignment/create'; // Create assignment (Admin only)
+$route['api/caregiver-assignments/care-plan/(:num)']['GET'] = 'api/caregiver_assignment/get_by_care_plan/$1'; // Get assignments by care plan
+$route['api/caregiver-assignments/patient/(:num)']['GET'] = 'api/caregiver_assignment/get_by_patient/$1'; // Get assignments by patient
+$route['api/caregiver-assignments']['PUT'] = 'api/caregiver_assignment/update'; // Edit assignment (Admin only)
 
 // Service Requests - Patient View
 $route['api/patients/service-requests']['GET'] = 'api/patients/service_requests';
@@ -55,6 +64,10 @@ $route['api/patients/prescription-orders/(:num)/cancel']['PUT'] = 'api/patients/
 $route['api/patients/available-pharmacies']['GET'] = 'api/patients/available_pharmacies';
 
 // Notifications
+$route['api/notifications']['GET'] = 'api/notifications/get_notifications';
+$route['api/notifications/(:num)/mark-read']['PUT'] = 'api/notifications/mark_as_read/$1';
+$route['api/notifications/mark-all-read']['PUT'] = 'api/notifications/mark_all_as_read';
+$route['api/notifications/(:num)']['DELETE'] = 'api/notifications/delete/$1';
 $route['api/patients/notifications']['GET'] = 'api/patients/notifications';
 $route['api/patients/notifications/(:num)/read']['PUT'] = 'api/patients/mark_notification_read/$1';
 $route['api/patients/notifications/read-all']['PUT'] = 'api/patients/mark_all_notifications_read';
@@ -85,6 +98,7 @@ $route['api/caregivers']['POST'] = 'api/caregivers/create';
 
 // Facility Routes (Public - No Auth Required)
 $route['api/facilities']['GET'] = 'api/facilities/index'; // Get all facilities
+$route['api/facilities/available-services']['GET'] = 'api/facilities/all_services'; // Get all available services
 $route['api/facilities/search']['GET'] = 'api/facilities/search'; // Search facilities
 $route['api/facilities/by-service/(:num)']['GET'] = 'api/facilities/by_service/$1'; // Get facilities by service
 $route['api/facilities/by-category/(:num)']['GET'] = 'api/facilities/by_category/$1'; // Get facilities by category
@@ -98,12 +112,14 @@ $route['api/facilities/(:num)/caregivers']['GET'] = 'api/facilities/caregivers/$
 // FACILITY ADMIN ROUTES (Require Admin Auth) --> no admin model yet
 $route['api/facilities']['POST'] = 'api/facilities/create'; // Create facility (Admin only)
 $route['api/facilities/(:num)']['PUT'] = 'api/facilities/update/$1'; // Update facility (Admin only)
-$route['api/facilities/(:num)/services']['POST'] = 'api/facilities/add_service/$1'; // Add service to facility (Admin only)
+$route['api/facilities/services/(:num)']['POST'] = 'api/facilities/add_service/$1'; // Add service to facility (Admin only) - :num is service_id, facility derived from user
 $route['api/facilities/(:num)/services/(:num)']['DELETE'] = 'api/facilities/remove_service/$1/$2'; // Remove service from facility (Admin only)
 
 // FACILITY SERVICE REQUEST ROUTES (Require Facility Admin/Owner Auth)
+$route['api/facilities/my-facility']['GET'] = 'api/facilities/get_my_facility'; // Get current user's facility
 $route['api/facilities/service-requests/one-time']['GET'] = 'api/facilities/onetime_requests'; // Get facility one-time service requests
 $route['api/facilities/service-requests/routine']['GET'] = 'api/facilities/routine_requests'; // Get facility routine service requests
+$route['api/facilities/patients']['GET'] = 'api/facilities/get_patients'; // Get facility patients (Admin, Doctor, Caregiver)
 
 // Pharmacy Routes (Public - No Auth Required for GET)
 $route['api/pharmacies']['GET'] = 'api/prescriptions/index'; // Get all pharmacies

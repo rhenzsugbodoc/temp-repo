@@ -259,11 +259,19 @@ class Service_request_model extends CI_Model {
      * Get available caregivers
      */
     public function get_available_caregivers() {
-        $this->db->select('caregiver.*, user.first_name, user.last_name, user.phone_number, user.email_address');
+        $this->db->select('caregiver.*, user.first_name, user.last_name, user.phone_number, user.email_address, user.user_image_blob');
         $this->db->from('caregiver');
         $this->db->join('user', 'caregiver.user_id = user.user_id');
         $this->db->order_by('user.first_name', 'ASC');
         $query = $this->db->get();
-        return $query->result();
+        $caregivers = $query->result();
+        
+        foreach ($caregivers as $caregiver) {
+            if ($caregiver->user_image_blob) {
+                $caregiver->user_image_blob = base64_encode($caregiver->user_image_blob);
+            }
+        }
+        
+        return $caregivers;
     }
 }

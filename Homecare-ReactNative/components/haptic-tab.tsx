@@ -13,6 +13,10 @@ export function HapticTab(props: BottomTabBarButtonProps) {
         }
         props.onPressIn?.(ev);
       }}
+      android_ripple={{
+        color: 'rgba(142, 152, 219, 0.3)', // Matches your tab icon color with transparency
+        borderless: false,
+      }}
     />
   );
 }

@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+//THIS CONTROLELR ONLY HANDLES CREATE AND EDIT OF SERVICE REQUESTS
 require_once APPPATH . 'core/MY_Controller.php';
 
 class Service_requests extends MY_Controller {
@@ -11,6 +11,7 @@ class Service_requests extends MY_Controller {
         $this->load->model('Service_request_model'); 
         $this->load->model('Notification_model');
         $this->load->model('Episode_model');
+        $this->load->model('Facility_model');
     }
     
     /**
@@ -67,15 +68,28 @@ class Service_requests extends MY_Controller {
         $request_id = $this->Service_request_model->create_request($request_data);
         
         if ($request_id) {
-            // Create notification
+            // Create notification for patient
             $this->Notification_model->create_notification([
-                'patient_id' => $patient->patient_id,
                 'user_id' => $this->current_user_id,
                 'notification_type' => 'Service',
                 'title' => 'Service Request Submitted',
                 'message' => 'Your one-time service request has been submitted successfully',
                 'is_read' => 0
             ]);
+            
+            // Create notification for facility admin if facility is specified
+            if (!empty($input['facility_id'])) {
+                $facility = $this->Facility_model->get_facility_by_id($input['facility_id']);
+                if ($facility && $facility->user_id) {
+                    $this->Notification_model->create_notification([
+                        'user_id' => $facility->user_id,
+                        'notification_type' => 'Service',
+                        'title' => 'New Service Request',
+                        'message' => 'A new service request has been submitted by ' . $patient->first_name . ' ' . $patient->last_name,
+                        'is_read' => 0
+                    ]);
+                }
+            }
             
             $this->json_response([
                 'success' => true,
@@ -159,6 +173,29 @@ class Service_requests extends MY_Controller {
         $update_data['updated_at'] = date('Y-m-d H:i:s');
         
         if ($this->Service_request_model->update_request($request_id, $update_data)) {
+            // Get patient info for notifications
+            $patient = $this->Patient_model->get_patient_by_id($request->patient_id);
+            
+            if ($patient && $patient->user_id) {
+                // Create notification for patient
+                $this->Notification_model->create_notification([
+                    'user_id' => $patient->user_id,
+                    'notification_type' => 'Service',
+                    'title' => 'Service Request Updated',
+                    'message' => 'Your service request has been updated by facility staff',
+                    'is_read' => 0
+                ]);
+            }
+            
+            // Create notification for admin who made the update
+            $this->Notification_model->create_notification([
+                'user_id' => $this->current_user_id,
+                'notification_type' => 'Service',
+                'title' => 'Service Request Updated',
+                'message' => 'You updated the service request for ' . ($patient ? $patient->first_name . ' ' . $patient->last_name : 'patient'),
+                'is_read' => 0
+            ]);
+            
             $this->json_response([
                 'success' => true,
                 'message' => 'Service request updated successfully',

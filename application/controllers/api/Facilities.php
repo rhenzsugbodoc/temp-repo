@@ -228,6 +228,36 @@ class Facilities extends MY_Controller {
     }
     
     /**
+     * GET /api/facilities/available-services
+     * Get all available services that facilities can offer (Public)
+     */
+    public function all_services() {
+        // No authentication required - public endpoint
+        
+        $grouped = $this->input->get('grouped');
+        
+        if ($grouped === 'true' || $grouped === '1') {
+            // Return services grouped by category
+            $services = $this->Facility_model->get_all_available_services_grouped();
+            
+            $this->json_response([
+                'success' => true,
+                'categories_count' => count($services),
+                'data' => $services
+            ], 200);
+        } else {
+            // Return flat list of all services
+            $services = $this->Facility_model->get_all_available_services();
+            
+            $this->json_response([
+                'success' => true,
+                'count' => count($services),
+                'data' => $services
+            ], 200);
+        }
+    }
+    
+    /**
      * GET /api/facilities/search
      * Search facilities by name or location
      */
@@ -325,6 +355,7 @@ class Facilities extends MY_Controller {
         $this->form_validation->set_rules('facility_address', 'Address', 'required|trim');
         $this->form_validation->set_rules('facility_phone', 'Phone Number', 'trim');
         $this->form_validation->set_rules('facility_email', 'Email', 'valid_email|trim');
+        $this->form_validation->set_rules('facility_type', 'Facility Type', 'trim');
         
         if ($this->form_validation->run() === FALSE) {
             $this->json_response([
@@ -334,14 +365,32 @@ class Facilities extends MY_Controller {
             ], 422);
         }
         
+        // Handle image blob - decode from base64 if provided
+        $facility_image_blob = null;
+        if (!empty($input['facility_image_blob'])) {
+            log_message('debug', 'Facility image blob received, length: ' . strlen($input['facility_image_blob']));
+            $decoded = base64_decode($input['facility_image_blob'], true);
+            if ($decoded !== false) {
+                $facility_image_blob = $decoded;
+                log_message('debug', 'Facility image blob decoded successfully, size: ' . strlen($facility_image_blob) . ' bytes');
+            } else {
+                log_message('error', 'Failed to decode facility_image_blob from base64');
+            }
+        } else {
+            log_message('debug', 'No facility_image_blob provided in input');
+        }
+        
         $facility_data = [
+            'user_id' => $this->user_id ?? null,
             'facility_name' => $input['facility_name'],
             'facility_address' => $input['facility_address'],
+            'facility_type' => $input['facility_type'] ?? null,
             'country' => $input['country'] ?? null,
             'city' => $input['city'] ?? null,
             'province' => $input['province'] ?? null,
             'postal_code' => $input['postal_code'] ?? null,
             'facility_image' => $input['facility_image'] ?? null,
+            'facility_image_blob' => $facility_image_blob,
             'facility_phone' => $input['facility_phone'] ?? null,
             'facility_email' => $input['facility_email'] ?? null,
             'facility_website' => $input['facility_website'] ?? null,
@@ -390,12 +439,24 @@ class Facilities extends MY_Controller {
         }
         
         $update_data = [];
-        $allowed_fields = ['facility_name', 'address', 'city', 'province', 'postal_code', 
-                          'phone_number', 'email_address', 'website', 'description'];
+        $allowed_fields = ['facility_name', 'facility_address', 'facility_type', 'country', 'city', 'province', 'postal_code', 
+                          'facility_phone', 'facility_email', 'facility_website', 'facility_description', 'facility_image'];
         
         foreach ($allowed_fields as $field) {
             if (isset($input[$field])) {
                 $update_data[$field] = $input[$field];
+            }
+        }
+        
+        // Handle image blob - decode from base64 if provided
+        if (!empty($input['facility_image_blob'])) {
+            log_message('debug', 'Facility image blob received for update, length: ' . strlen($input['facility_image_blob']));
+            $decoded = base64_decode($input['facility_image_blob'], true);
+            if ($decoded !== false) {
+                $update_data['facility_image_blob'] = $decoded;
+                log_message('debug', 'Facility image blob decoded successfully, size: ' . strlen($decoded) . ' bytes');
+            } else {
+                log_message('error', 'Failed to decode facility_image_blob from base64');
             }
         }
         
@@ -419,23 +480,29 @@ class Facilities extends MY_Controller {
     }
     
     /**
-     * POST /api/facilities/:id/services
+     * POST /api/facilities/services/:id
      * Add service to facility (Admin only)
+     * :id is the service_id, facility_id is derived from current_user_id
      */
-    public function add_service($facility_id) {
+    public function add_service($service_id) {
         $this->require_role(['Admin', 'Superadmin']);
         
         if ($this->input->method() !== 'post') {
             $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
         }
         
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        if (!$input || !isset($input['service_id'])) {
+        if (!$service_id) {
             $this->json_response(['success' => false, 'message' => 'service_id is required'], 400);
         }
         
-        $result = $this->Facility_model->add_service_to_facility($facility_id, $input['service_id']);
+        // Get facility_id from current user
+        $facility = $this->Facility_model->get_facility_by_user_id($this->current_user_id);
+        
+        if (!$facility) {
+            $this->json_response(['success' => false, 'message' => 'No facility found for current user'], 404);
+        }
+        
+        $result = $this->Facility_model->add_service_to_facility($facility->facility_id, $service_id);
         
         if ($result) {
             $this->json_response([
@@ -536,5 +603,45 @@ class Facilities extends MY_Controller {
                 'message' => 'Internal server error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * GET /api/facilities/patients
+     * Get all patients with care plans or service requests
+     * Accessible by: Admin, Doctor, Caregiver
+     */
+    public function get_patients() {
+        $this->require_role(['Admin', 'Doctor', 'Caregiver']);
+        
+        $patients = $this->Facility_model->get_facility_patients($this->current_user_id);
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($patients),
+            'data' => $patients
+        ], 200);
+    }
+
+    /**
+     * GET /api/facilities/my-facility
+     * Get facility for current logged-in user
+     * Accessible by: Facility_Admin, Facility_Owner, Admin
+     */
+    public function get_my_facility() {
+        $this->require_role(['Admin']);
+        
+        $facility = $this->Facility_model->get_facility_by_user_id($this->current_user_id);
+        
+        if (!$facility) {
+            $this->json_response([
+                'success' => false,
+                'message' => 'No facility found for this user'
+            ], 404);
+        }
+        
+        $this->json_response([
+            'success' => true,
+            'data' => $facility
+        ], 200);
     }
 }

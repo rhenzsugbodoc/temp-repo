@@ -62,10 +62,10 @@ serviceToggleItem: {
 },
 descriptionContainer: {
     padding: 10, 
-    gap: 8
+    gap: 3
 },
 descriptionInput: {
-    borderRadius: 10, 
+    borderRadius: 5, 
     borderWidth: 1, 
     borderColor: '#ccc'
 },
@@ -85,7 +85,9 @@ submitButton: {
     justifyContent: 'flex-end',   
 },
 fieldLabel: {
-    color: '#5a6489'
+    color: '#424e79',
+    fontSize: 16,
+    fontWeight: '600'
 }
 });
 

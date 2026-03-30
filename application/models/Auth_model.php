@@ -38,6 +38,7 @@ class Auth_model extends CI_Model {
             if (password_verify($password, $user->password)) {
                 // Don't return password
                 unset($user->password);
+                // Note: user_image_blob will be encoded in the controller
                 return $user;
             }
         }
@@ -46,12 +47,17 @@ class Auth_model extends CI_Model {
     
     // Get user by ID
     public function get_user_by_id($user_id) {
-        $this->db->select('user_id, first_name, middle_name, last_name, email_address, phone_number, date_of_birth, gender, home_address, role, created_at');
+        $this->db->select('user_id, first_name, middle_name, last_name, email_address, phone_number, emergency_contact, date_of_birth, gender, home_address, role, user_image_blob, created_at');
         $this->db->where('user_id', $user_id);
         $query = $this->db->get('user');
         
         if ($query->num_rows() === 1) {
-            return $query->row();
+            $user = $query->row();
+            // Encode image blob to base64 if present
+            if ($user->user_image_blob) {
+                $user->user_image_blob = base64_encode($user->user_image_blob);
+            }
+            return $user;
         }
         return false;
     }
@@ -60,5 +66,20 @@ class Auth_model extends CI_Model {
     public function update_last_login($user_id) {
         $this->db->where('user_id', $user_id);
         $this->db->update('user', ['updated_at' => date('Y-m-d H:i:s')]);
+    }
+
+    // Update user
+    public function update_user($user_id, $data) {
+        // Add updated timestamp
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        
+        $this->db->where('user_id', $user_id);
+        return $this->db->update('user', $data);
+    }
+
+    // Delete user
+    public function delete_user($user_id) {
+        $this->db->where('user_id', $user_id);
+        return $this->db->delete('user');
     }
 }

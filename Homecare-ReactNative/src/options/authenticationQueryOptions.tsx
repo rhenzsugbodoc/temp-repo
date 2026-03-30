@@ -1,6 +1,6 @@
 // src/options/authenticationQueryOptions.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import authService, { RegisterData, LoginData } from '../services/authService';
+import authService, { RegisterData, LoginData, EditUserData } from '../services/authService';
 import { saveToken, saveUserData, clearAuth } from './tokenHandler';
 
 export const useRegisterMutation = () => {
@@ -62,14 +62,48 @@ export const useLogoutMutation = () => {
 export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => authService.getCurrentUser(),
-    enabled: false, // Only fetch when explicitly called
-    retry: false,
+    queryFn: async () => {
+      const response = await authService.getCurrentUser();
+      return response.data; // Extract the user data from the response
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
   });
 };
 
 export const useRefreshTokenMutation = () => {
   return useMutation({
     mutationFn: () => authService.refreshToken(),
+  });
+};
+
+export const useEditUserMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (userData: EditUserData) => {
+      const response = await authService.editUser(userData);
+      
+      // Update stored user data
+      if (response.success && response.data) {
+        await saveUserData(response.data);
+      }
+      
+      return response;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    },
+  });
+};
+
+export const useDeleteUserMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (userId: string) => authService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.clear(); // Clear all queries after user deletion
+    },
   });
 };

@@ -12,6 +12,7 @@ export interface FacilityData {
   facility_email?: string;
   facility_website?: string;
   facility_description?: string;
+  facility_image_blob?: string | null;
 }
 
 export interface PharmacyData {
@@ -29,9 +30,14 @@ class RegisterService {
   async register_facility(facilityData: FacilityData): Promise<any> {
     try {
       const response = await api.post('/api/facilities/create', facilityData);
+      
+      console.log('\nAPI Response:', response.data);
       return response.data;
     } catch (error: any) {
-      console.error('Facility registration error:', error.response?.data || error.message);
+      console.error('\n✗ Facility registration error:', error.response?.data || error.message);
+      if (error.response) {
+        console.error('Error response:', error.response);
+      }
       throw error.response?.data || { success: false, message: 'Network error' };
     }
   }

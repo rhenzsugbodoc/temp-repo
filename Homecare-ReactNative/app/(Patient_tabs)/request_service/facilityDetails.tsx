@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView} from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Image, ImageBackground} from 'react-native';
 import { useRouter, useLocalSearchParams  } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useFacility} from '@/src/context/FacilityContext';
@@ -32,16 +32,35 @@ const CompanyDetails = () => {
       <SafeAreaView style={{flex:1}}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {/* header blue */}
-          <View style={companyDetailStyles.headerContainer}> 
-            <Text style= {companyDetailStyles.companyHeaderTitle}>{facility?.facility_name}</Text>
-            <Text style= {companyDetailStyles.companyHeaderText}>{facility?.facility_address}</Text>
-            <Text style= {companyDetailStyles.companyHeaderText}>{facility?.facility_phone}</Text>
-            <Text style= {companyDetailStyles.companyHeaderText}>{facility?.facility_type}</Text>
-          </View>
+<View style={[
+  companyDetailStyles.headerContainer,
+  facility?.facility_image_blob && { backgroundColor: 'transparent' }
+]}>
+  {facility?.facility_image_blob && (
+    <ImageBackground
+      source={{ uri: `data:image/jpeg;base64,${facility.facility_image_blob}` }}
+      style={StyleSheet.absoluteFillObject}
+      resizeMode="cover"
+      imageStyle={{ borderRadius: companyDetailStyles.headerContainer.borderRadius || 0 }}
+    >
+      <View style={{ 
+        ...StyleSheet.absoluteFillObject, 
+        backgroundColor: 'rgba(0, 0, 0, 0.5)' // Optional overlay for text readability
+      }} />
+    </ImageBackground>
+  )}
+  
+  <View style={{ zIndex: 1 }}>
+    <Text style={companyDetailStyles.companyHeaderTitle}>{facility?.facility_name}</Text>
+    <Text style={companyDetailStyles.companyHeaderText}>{facility?.facility_address}</Text>
+    <Text style={companyDetailStyles.companyHeaderText}>{facility?.facility_phone}</Text>
+    <Text style={companyDetailStyles.companyHeaderText}>{facility?.facility_type}</Text>
+  </View>
+</View>
 
           <View style= {companyDetailStyles.aboutUsContainer}>
             <Text style={companyDetailStyles.categoryLabel}>ABOUT US</Text>
-            <Text style= {companyDetailStyles.aboutUsText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas semper, dolor eget tincidunt consequat, augue risus pulvinar eros, ut egestas metus leo dignissim magna. Sed id accumsan ipsum, eleifend finibus erat. Sed tristique molestie mi. Integer hendrerit nulla sed mauris lacinia consectetur a vitae sem. Vivamus aliquet eros fermentum nunc hendrerit, </Text>
+            <Text style= {companyDetailStyles.aboutUsText}>{facility?.facility_description}RAH </Text>
             {/* <Text style= {companyDetailStyles.aboutUsText}>{company.description}</Text> */}
           </View>
           

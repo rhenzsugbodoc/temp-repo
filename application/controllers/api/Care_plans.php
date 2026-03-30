@@ -10,6 +10,7 @@ class Care_plans extends MY_Controller {
         $this->load->model('Care_Plan_model');
         $this->load->model('Patient_model');
         $this->load->model('Facility_model');
+        $this->load->model('Notification_model');
     }
     
     /**
@@ -63,6 +64,29 @@ class Care_plans extends MY_Controller {
         $care_plan_id = $this->Care_Plan_model->create_care_plan($care_plan_data);
         
         if ($care_plan_id) {
+            // Get patient info for notifications
+            $patient = $this->Patient_model->get_patient_by_id($input['patient_id']);
+            
+            if ($patient && $patient->user_id) {
+                // Create notification for patient
+                $this->Notification_model->create_notification([
+                    'user_id' => $patient->user_id,
+                    'notification_type' => 'General',
+                    'title' => 'New Care Plan Created',
+                    'message' => 'A new care plan has been created for you: ' . $input['plan_name'],
+                    'is_read' => 0
+                ]);
+            }
+            
+            // Create notification for doctor/admin who created it
+            $this->Notification_model->create_notification([
+                'user_id' => $this->current_user_id,
+                'notification_type' => 'General',
+                'title' => 'Care Plan Created',
+                'message' => 'You created a care plan for ' . ($patient ? $patient->first_name . ' ' . $patient->last_name : 'patient'),
+                'is_read' => 0
+            ]);
+            
             $this->json_response([
                 'success' => true,
                 'message' => 'Care plan created successfully',
@@ -96,6 +120,46 @@ class Care_plans extends MY_Controller {
         }
         
         $care_plans = $this->Care_Plan_model->get_care_plans_by_patient($patient_id);
+        
+        $this->json_response([
+            'success' => true,
+            'count' => count($care_plans),
+            'data' => $care_plans
+        ], 200);
+    }
+    
+    /**
+     * GET /api/care-plans/my-care-plans
+     * Get all care plans for the current user
+     * Accessible by: Any authenticated user
+     */
+    public function get_by_current_user() {
+        log_message('info', '=== get_by_current_user called ===');
+        log_message('info', 'Request method: ' . $this->input->method());
+        log_message('info', 'Authorization header: ' . $this->input->get_request_header('Authorization', TRUE));
+        
+        // Authenticate user
+        $this->require_role(['Patient', 'Doctor', 'Admin']);
+        
+        log_message('info', 'User authenticated - user_id: ' . $this->current_user_id . ', role: ' . $this->current_user_role);
+        
+        // Get patient record for current user
+        $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+        
+        if (!$patient) {
+            log_message('error', 'Patient profile not found for user_id: ' . $this->current_user_id);
+            $this->json_response([
+                'success' => false,
+                'message' => 'Patient profile not found for current user'
+            ], 404);
+        }
+        
+        log_message('info', 'Patient found - patient_id: ' . $patient->patient_id);
+        
+        // Get care plans
+        $care_plans = $this->Care_Plan_model->get_care_plans_by_patient($patient->patient_id);
+        
+        log_message('info', 'Retrieved ' . count($care_plans) . ' care plan(s) for patient_id: ' . $patient->patient_id);
         
         $this->json_response([
             'success' => true,

@@ -5,32 +5,49 @@ class Patient_model extends CI_Model {
     
     // Get all patients with pagination
     public function get_all_patients($limit = 100, $offset = 0) {
-        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address');
+        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address, user.user_image_blob');
         $this->db->from('patient');
         $this->db->join('user', 'patient.user_id = user.user_id');
         $this->db->limit($limit, $offset);
         $query = $this->db->get();
-        return $query->result();
+        
+        $results = $query->result();
+        foreach ($results as $patient) {
+            if ($patient->user_image_blob) {
+                $patient->user_image_blob = base64_encode($patient->user_image_blob);
+            }
+        }
+        return $results;
     }
     
     // Get patient by ID
     public function get_patient_by_id($patient_id) {
-        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address, user.emergency_contact');
+        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address, user.emergency_contact, user.user_image_blob');
         $this->db->from('patient');
         $this->db->join('user', 'patient.user_id = user.user_id');
         $this->db->where('patient.patient_id', $patient_id);
         $query = $this->db->get();
-        return $query->row();
+        
+        $patient = $query->row();
+        if ($patient && $patient->user_image_blob) {
+            $patient->user_image_blob = base64_encode($patient->user_image_blob);
+        }
+        return $patient;
     }
     
     // Get patient by user ID
     public function get_patient_by_user_id($user_id) {
-        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address, user.emergency_contact');
+        $this->db->select('patient.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.date_of_birth, user.gender, user.home_address, user.emergency_contact, user.user_image_blob');
         $this->db->from('patient');
         $this->db->join('user', 'patient.user_id = user.user_id');
         $this->db->where('patient.user_id', $user_id);
         $query = $this->db->get();
-        return $query->row();
+        
+        $patient = $query->row();
+        if ($patient && $patient->user_image_blob) {
+            $patient->user_image_blob = base64_encode($patient->user_image_blob);
+        }
+        return $patient;
     }
     
     // Create patient profile
@@ -55,7 +72,7 @@ class Patient_model extends CI_Model {
     
     // Get patient's appointments
     public function get_patient_appointments($patient_id, $status = null) {
-        $this->db->select('appointments.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name, facility.facility_name');
+        $this->db->select('appointments.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name, user.user_image_blob as doctor_image_blob, facility.facility_name');
         $this->db->from('appointments');
         $this->db->join('doctor', 'appointments.doctor_id = doctor.doctor_id', 'left');
         $this->db->join('user', 'doctor.user_id = user.user_id', 'left');
@@ -69,12 +86,20 @@ class Patient_model extends CI_Model {
         $this->db->order_by('appointments.appointment_date', 'DESC');
         $this->db->order_by('appointments.appointment_time', 'DESC');
         $query = $this->db->get();
-        return $query->result();
+        $appointments = $query->result();
+        
+        foreach ($appointments as $appointment) {
+            if ($appointment->doctor_image_blob) {
+                $appointment->doctor_image_blob = base64_encode($appointment->doctor_image_blob);
+            }
+        }
+        
+        return $appointments;
     }
     
     // Get patient's medications
     public function get_patient_medications($patient_id, $active_only = true) {
-        $this->db->select('medications.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name');
+        $this->db->select('medications.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name, user.user_image_blob as doctor_image_blob');
         $this->db->from('medications');
         $this->db->join('doctor', 'medications.doctor_id = doctor.doctor_id', 'left');
         $this->db->join('user', 'doctor.user_id = user.user_id', 'left');
@@ -86,12 +111,20 @@ class Patient_model extends CI_Model {
         
         $this->db->order_by('medications.start_date', 'DESC');
         $query = $this->db->get();
-        return $query->result();
+        $medications = $query->result();
+        
+        foreach ($medications as $medication) {
+            if ($medication->doctor_image_blob) {
+                $medication->doctor_image_blob = base64_encode($medication->doctor_image_blob);
+            }
+        }
+        
+        return $medications;
     }
     
     // Get patient's medication logs
     public function get_medication_logs($patient_id, $medication_id = null, $limit = 50) {
-        $this->db->select('medication_logs.*, medications.medication_name, medications.dosage, caregiver.caregiver_id, user.first_name as caregiver_first_name, user.last_name as caregiver_last_name');
+        $this->db->select('medication_logs.*, medications.medication_name, medications.dosage, caregiver.caregiver_id, user.first_name as caregiver_first_name, user.last_name as caregiver_last_name, user.user_image_blob as caregiver_image_blob');
         $this->db->from('medication_logs');
         $this->db->join('medications', 'medication_logs.medication_id = medications.medication_id');
         $this->db->join('caregiver', 'medication_logs.caregiver_id = caregiver.caregiver_id', 'left');
@@ -105,12 +138,20 @@ class Patient_model extends CI_Model {
         $this->db->order_by('medication_logs.scheduled_time', 'DESC');
         $this->db->limit($limit);
         $query = $this->db->get();
-        return $query->result();
+        $logs = $query->result();
+        
+        foreach ($logs as $log) {
+            if ($log->caregiver_image_blob) {
+                $log->caregiver_image_blob = base64_encode($log->caregiver_image_blob);
+            }
+        }
+        
+        return $logs;
     }
     
     // Get patient's vital signs
     public function get_vital_signs($patient_id, $limit = 30) {
-        $this->db->select('vital_signs.*, caregiver.caregiver_id, user.first_name as caregiver_first_name, user.last_name as caregiver_last_name');
+        $this->db->select('vital_signs.*, caregiver.caregiver_id, user.first_name as caregiver_first_name, user.last_name as caregiver_last_name, user.user_image_blob as caregiver_image_blob');
         $this->db->from('vital_signs');
         $this->db->join('caregiver', 'vital_signs.caregiver_id = caregiver.caregiver_id', 'left');
         $this->db->join('user', 'caregiver.user_id = user.user_id', 'left');
@@ -118,12 +159,20 @@ class Patient_model extends CI_Model {
         $this->db->order_by('vital_signs.recorded_at', 'DESC');
         $this->db->limit($limit);
         $query = $this->db->get();
-        return $query->result();
+        $vital_signs = $query->result();
+        
+        foreach ($vital_signs as $vital) {
+            if ($vital->caregiver_image_blob) {
+                $vital->caregiver_image_blob = base64_encode($vital->caregiver_image_blob);
+            }
+        }
+        
+        return $vital_signs;
     }
     
     // Get patient's care plans
     public function get_care_plans($patient_id, $status = null) {
-        $this->db->select('care_plans.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name');
+        $this->db->select('care_plans.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name, user.user_image_blob as doctor_image_blob');
         $this->db->from('care_plans');
         $this->db->join('doctor', 'care_plans.doctor_id = doctor.doctor_id', 'left');
         $this->db->join('user', 'doctor.user_id = user.user_id', 'left');
@@ -135,7 +184,15 @@ class Patient_model extends CI_Model {
         
         $this->db->order_by('care_plans.start_date', 'DESC');
         $query = $this->db->get();
-        return $query->result();
+        $care_plans = $query->result();
+        
+        foreach ($care_plans as $plan) {
+            if ($plan->doctor_image_blob) {
+                $plan->doctor_image_blob = base64_encode($plan->doctor_image_blob);
+            }
+        }
+        
+        return $care_plans;
     }
     
     // Get care plan activities
@@ -151,7 +208,7 @@ class Patient_model extends CI_Model {
     
     // Get patient's medical records
     public function get_medical_records($patient_id, $record_type = null) {
-        $this->db->select('medical_records.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name');
+        $this->db->select('medical_records.*, doctor.*, user.first_name as doctor_first_name, user.last_name as doctor_last_name, user.user_image_blob as doctor_image_blob');
         $this->db->from('medical_records');
         $this->db->join('doctor', 'medical_records.doctor_id = doctor.doctor_id', 'left');
         $this->db->join('user', 'doctor.user_id = user.user_id', 'left');
@@ -163,12 +220,20 @@ class Patient_model extends CI_Model {
         
         $this->db->order_by('medical_records.record_date', 'DESC');
         $query = $this->db->get();
-        return $query->result();
+        $records = $query->result();
+        
+        foreach ($records as $record) {
+            if ($record->doctor_image_blob) {
+                $record->doctor_image_blob = base64_encode($record->doctor_image_blob);
+            }
+        }
+        
+        return $records;
     }
     
     // Get patient's assigned caregivers
     public function get_assigned_caregivers($patient_id, $active_only = true) {
-        $this->db->select('caregiver_assignments.*, caregiver.*, user.first_name, user.last_name, user.phone_number, user.email_address');
+        $this->db->select('caregiver_assignments.*, caregiver.*, user.first_name, user.last_name, user.phone_number, user.email_address, user.user_image_blob');
         $this->db->from('caregiver_assignments');
         $this->db->join('caregiver', 'caregiver_assignments.caregiver_id = caregiver.caregiver_id');
         $this->db->join('user', 'caregiver.user_id = user.user_id');
@@ -180,7 +245,15 @@ class Patient_model extends CI_Model {
         
         $this->db->order_by('caregiver_assignments.assignment_type', 'ASC');
         $query = $this->db->get();
-        return $query->result();
+        $caregivers = $query->result();
+        
+        foreach ($caregivers as $caregiver) {
+            if ($caregiver->user_image_blob) {
+                $caregiver->user_image_blob = base64_encode($caregiver->user_image_blob);
+            }
+        }
+        
+        return $caregivers;
     }
     
     // Get patient's billing records

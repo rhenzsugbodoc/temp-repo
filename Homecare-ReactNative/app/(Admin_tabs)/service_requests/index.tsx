@@ -12,7 +12,7 @@ import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWo
 
 const { height, width } = Dimensions.get('window');
 
-export default function RequestList() {
+export default function AdminRequestList() {
   const router = useRouter();
   const {data: oneTimeRequests, isLoading: loadingOneTime, isFetching: isFetchingOneTime, refetch: refetchOneTime} = useFacilityOneTimeRequests();
   const {data: routineRequests, isLoading: loadingRoutine, isFetching: isFetchingRoutine, refetch: refetchRoutine} = useFacilityRoutineRequests();

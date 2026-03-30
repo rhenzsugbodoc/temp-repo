@@ -4,30 +4,47 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Doctor_model extends CI_Model {
     
     public function get_all_doctor($limit = 100, $offset = 0) {
-        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number');
+        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.user_image_blob');
         $this->db->from('doctor');
         $this->db->join('user', 'doctor.user_id = user.user_id');
         $this->db->limit($limit, $offset);
         $query = $this->db->get();
-        return $query->result();
+        
+        $results = $query->result();
+        foreach ($results as $doctor) {
+            if ($doctor->user_image_blob) {
+                $doctor->user_image_blob = base64_encode($doctor->user_image_blob);
+            }
+        }
+        return $results;
     }
     
-    public function get_caregiver_by_id($caregiver_id) {
-        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number');
+    public function get_doctor_by_id($doctor_id) {
+        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.user_image_blob');
         $this->db->from('doctor');
         $this->db->join('user', 'doctor.user_id = user.user_id');
         $this->db->where('doctor.doctor_id', $doctor_id);
         $query = $this->db->get();
-        return $query->row();
+        
+        $doctor = $query->row();
+        if ($doctor && $doctor->user_image_blob) {
+            $doctor->user_image_blob = base64_encode($doctor->user_image_blob);
+        }
+        return $doctor;
     }
     
     public function get_doctor_by_user_id($user_id) {
-        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number');
+        $this->db->select('doctor.*, user.first_name, user.last_name, user.email_address, user.phone_number, user.user_image_blob');
         $this->db->from('doctor');
         $this->db->join('user', 'doctor.user_id = user.user_id');
         $this->db->where('doctor.user_id', $user_id);
         $query = $this->db->get();
-        return $query->row();
+        
+        $doctor = $query->row();
+        if ($doctor && $doctor->user_image_blob) {
+            $doctor->user_image_blob = base64_encode($doctor->user_image_blob);
+        }
+        return $doctor;
     }
     
     public function create_doctor($data) {

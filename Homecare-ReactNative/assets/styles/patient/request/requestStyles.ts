@@ -5,7 +5,7 @@ export const companyListStyles = StyleSheet.create({
 card: {
     backgroundColor: '#ffffff',
     borderRadius: 15,
-    padding: 15,
+    
     marginHorizontal: 5,
     marginVertical: 5,
     shadowColor: '#000',
@@ -17,7 +17,7 @@ card: {
 },
 
 headerContainer: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4454c3',
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 25,
@@ -87,8 +87,9 @@ pickerItem: {
     color: '#b7aac0'
 },
 companyContainer: {
-    gap: 5,
-    marginHorizontal: 20 
+    gap: 15,
+    marginHorizontal: 20,
+    justifyContent: 'center'
 },
 companyImage: { 
     borderRadius: 10,
@@ -119,10 +120,10 @@ companyText3: {
 export const companyDetailStyles = StyleSheet.create({
 // create stylings for
 headerContainer: {
-    backgroundColor: '#4454c3',
+    backgroundColor: '#2b4aa2',
     justifyContent: 'center', 
     alignItems: 'center', 
-    height: 150
+    height: 200
 },
 companyHeaderTitle: {
     color: 'white' ,

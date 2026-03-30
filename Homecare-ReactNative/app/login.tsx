@@ -1,5 +1,5 @@
 // app/login.tsx
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -13,7 +13,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const loginMutation = useLoginMutation();
-
+  const { width: screenWidth } = useWindowDimensions();
+  const maxWidth = screenWidth * 0.7;
 //   useEffect(() => {
 //     const checkExistingUser = async () => {
 //       const userData = await getUserData<User>();
@@ -119,7 +120,7 @@ export default function Login() {
           <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
 
-        <View style={styles.form}>
+        <View style={[styles.form, { maxWidth }]}>
           <TextInput
             placeholder="Email Address"
             placeholderTextColor="#888"
@@ -185,6 +186,8 @@ export default function Login() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -217,6 +220,11 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 30,
+    alignItems: 'center',
+    width: '100%',
+    alignSelf: 'center',
+    
+   
   },
   input: {
     backgroundColor: '#f5f5f5',
@@ -227,6 +235,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0',
     color: '#333',
+    width: '100%',
+ 
+    
+    
   },
   loginButton: {
     backgroundColor: '#4b5cbe',
@@ -234,6 +246,8 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginTop: 8,
+    width: '100%',
+    
   },
   buttonDisabled: {
     opacity: 0.7,

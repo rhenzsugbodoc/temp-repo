@@ -1,15 +1,44 @@
 
 
 
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, FlatList, Animated, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useRegister } from '../../src/context/RegisterContext';
 import { registerCommonStyles, register1Styles } from '../../assets/styles/patient/auth/registerStyles';
 import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
+import { useEffect, useRef } from 'react';
 
 export default function Register() {
   const {user ,setUser} = useRegister();
+  const { width: screenWidth } = useWindowDimensions();
+  const formWidth = screenWidth * 0.7;
+
+  const formFields = [
+    { id: '1', key: 'first_name', label: 'First Name', secure: false },
+    { id: '2', key: 'middle_name', label: 'Middle Name', secure: false },
+    { id: '3', key: 'last_name', label: 'Last Name', secure: false },
+    { id: '4', key: 'password', label: 'Password', secure: true },
+    { id: '5', key: 'phone_number', label: 'Phone Number', secure: false },
+    { id: '6', key: 'email_address', label: 'Email Address', secure: false },
+   
+  ];
+
+  const animatedValues = useRef(
+    formFields.map(() => new Animated.Value(0))
+  ).current;
+
+  useEffect(() => {
+    const animations = animatedValues.map((anim, index) =>
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 400,
+        delay: index * (300 / formFields.length), // Stagger over 1 second
+        useNativeDriver: true,
+      })
+    );
+    Animated.stagger(100, animations).start();
+  }, []);
 
 
   const router = useRouter();
@@ -31,69 +60,43 @@ export default function Register() {
 
       </View>
 
-      <View style={registerCommonStyles.form}>     
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>First Name</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              value={user.first_name || ''}
-              onChangeText={value => handleChange('first_name', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
+      <View style={[registerCommonStyles.form, { width: formWidth, alignSelf: 'center' }]}>     
+        <FlatList
+          data={formFields}
+          scrollEnabled={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => {
+            const opacity = animatedValues[index];
+            const translateY = animatedValues[index].interpolate({
+              inputRange: [0, 1],
+              outputRange: [20, 0],
+            });
 
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>Middle Name</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              value={user.middle_name || ''}
-              onChangeText={value => handleChange('middle_name', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
+            return (
+              <Animated.View 
+                style={[
+                  addPatientStyles.descriptionContainer,
+                  {
+                    opacity,
+                    transform: [{ translateY }],
+                    
+                  }
+                ]}
+              >
+                <Text style={addPatientStyles.fieldLabel}>{item.label}</Text>
+                <TextInput
+                  placeholderTextColor="#888"
+                  value={user[item.key as keyof typeof user] as string || ''}
+                  onChangeText={value => handleChange(item.key as keyof typeof user, value)}
+                  style={[addPatientStyles.descriptionInput, {height: 40, width: screenWidth, alignSelf: 'center'}]}
+                  secureTextEntry={item.secure}
+                />
+              </Animated.View>
+            );
+          }}
+        />
 
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>Last Name</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              value={user.last_name || ''}
-              onChangeText={value => handleChange('last_name', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
-
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>Email Address</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              value={user.email_address || ''}
-              onChangeText={value => handleChange('email_address', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
-
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>Phone Number</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              value={user.phone_number || ''}
-              onChangeText={value => handleChange('phone_number', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
-
-        <View style={addPatientStyles.descriptionContainer}>
-          <Text style={addPatientStyles.fieldLabel}>Password</Text>
-          <TextInput
-              placeholderTextColor="#888"
-              secureTextEntry
-              value={user.password || ''}
-              onChangeText={value => handleChange('password', value)}
-              style={[addPatientStyles.descriptionInput, {height: 40}]}
-          />
-        </View>
-
-        <TouchableOpacity style={registerCommonStyles.signupButton} onPress={handleRegister}>
+        <TouchableOpacity style={[registerCommonStyles.signupButton, {marginHorizontal: 0, width: formWidth, alignSelf: 'center'}]} onPress={handleRegister}>
           <Text style={registerCommonStyles.signupButtonText}>Next</Text>
         </TouchableOpacity>
       </View>

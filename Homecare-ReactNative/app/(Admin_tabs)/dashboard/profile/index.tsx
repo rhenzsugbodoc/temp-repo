@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput } from 'react-native';
+import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -21,6 +21,16 @@ export default function RequestList() {
     fetchUserData();
   }, []);
 
+  const profileOptions = [
+    { id: '1', title: 'Facility Settings', icon: 'business-outline', route: '/(Admin_tabs)/dashboard/profile/facility_settings' },
+    { id: '2', title: 'Profile', icon: 'person-outline', route: '/(Admin_tabs)/dashboard/profile/profile_page' },
+    { id: '3', title: 'Settings and Privacy', icon: 'settings-outline', route: '/(Admin_tabs)/dashboard/profile/index' },
+  ];
+
+  const handleOptionPress = (route: string) => {
+    router.push(route as any);
+  };
+
   return <SafeAreaView style={{
     flex: 1,
     backgroundColor: '#f4f7fa',
@@ -32,104 +42,35 @@ export default function RequestList() {
     <ScrollView >
         <View style={styles.headerContainer}>
             <View style={{flex: 1}}>
-                <Text style={styles.headerTitle}>Profile Information</Text>
-                <Text style={[styles.headerTitle, { fontSize: 16 }]}>Patient ID: {user?.user_id}</Text>
-                {/* <View style={{marginTop: 10,borderRadius: 25, backgroundColor: 'white', height: 35, width: 90, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{fontSize: 10}}>Senior citizen</Text>
-                </View> */}
+                <Text style={styles.headerTitle}>Menu</Text>
             </View>
-          
-
         </View>
 
         <View style={styles.contentContainer}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+
           
-          <View style={styles.detailCard}>
-            <View style={styles.detailRow}>
-              <Ionicons name="person-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Full Name</Text>
-                <Text style={styles.detailValue}>{user?.first_name} {user?.middle_name ? user.middle_name + ' ' : ''}{user?.last_name}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="mail-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Email Address</Text>
-                <Text style={styles.detailValue}>{user?.email_address}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="call-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Phone Number</Text>
-                <Text style={styles.detailValue}>{user?.phone_number || 'Not provided'}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="calendar-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Date of Birth</Text>
-                <Text style={styles.detailValue}>{user?.date_of_birth || 'Not provided'}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="male-female-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Gender</Text>
-                <Text style={styles.detailValue}>{user?.gender || 'Not provided'}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="home-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Home Address</Text>
-                <Text style={styles.detailValue}>{user?.home_address || 'Not provided'}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="call-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Emergency Contact</Text>
-                <Text style={styles.detailValue}>{user?.emergency_contact || 'Not provided'}</Text>
-              </View>
-            </View>
-          </View>
-
-          <Text style={styles.sectionTitle}>Account Information</Text>
-          
-          <View style={styles.detailCard}>
-            <View style={styles.detailRow}>
-              <Ionicons name="shield-checkmark-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Role</Text>
-                <Text style={styles.detailValue}>{user?.role}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="time-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Member Since</Text>
-                <Text style={styles.detailValue}>{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Ionicons name="sync-outline" size={20} color="#4F46E5" />
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Last Updated</Text>
-                <Text style={styles.detailValue}>{user?.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'N/A'}</Text>
-              </View>
-            </View>
-          </View>
+          <FlatList
+            data={profileOptions}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable 
+                onPress={() => handleOptionPress(item.route)}
+                style={({ pressed }) => [
+                  styles.optionCard,
+                  { opacity: pressed ? 0.7 : 1 }
+                ]}
+              >
+                <View style={styles.optionRow}>
+                  <View style={styles.iconContainer}>
+                    <Ionicons name={item.icon as any} size={24} color="#4F46E5" />
+                  </View>
+                  <Text style={styles.optionTitle}>{item.title}</Text>
+                  <Ionicons name="chevron-forward-outline" size={20} color="#999" />
+                </View>
+              </Pressable>
+            )}
+          />
         </View>
 
 
@@ -153,7 +94,7 @@ const styles = StyleSheet.create({
   },
 
   headerContainer: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4454c3',
     alignItems: 'center',
     flex:1,
     flexDirection: 'row',
@@ -161,8 +102,8 @@ const styles = StyleSheet.create({
     padding: 25,
     height:90,
     paddingVertical: 30,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    // borderBottomLeftRadius: 25,
+    // borderBottomRightRadius: 25,
   },
 
   headerTitle: {
@@ -176,6 +117,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
+  profileImageContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#4454c3',
+  },
+
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -184,106 +138,42 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  detailCard: {
+  optionCard: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
-    padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
-    marginBottom: 16,
   },
 
-  detailRow: {
+  optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-   
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    padding: 16,
   },
 
-  detailContent: {
-    marginLeft: 12,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+
+  optionTitle: {
     flex: 1,
-  },
-
-  detailLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-
-  detailValue: {
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#333',
-    fontWeight: '500',
   },
 
   headerIcons: {
     flexDirection: 'row',
     gap: 15,
-  },
-
-  searchWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: -20,
-  },
-
-  searchContainer: {
-    width: '85%',
-    backgroundColor: 'white',
-    height: 40,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 4,
-
-  },
-
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    height: 45,
-  },
-  pickerContainer: {
-    backgroundColor: '#ffffff',
-    flex: 1,
-    height: 35,
-    justifyContent: 'center',
-    borderWidth: 0.1,
-    borderRadius: 25,
-    borderColor: '#ccc',
-    overflow: 'hidden',
-  },
-
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  gridItem: {
-    width: '45%', 
-    alignItems: 'center',
-    marginVertical: 10,
-   
-  },
-  iconCircle: {
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#53346a',
-    padding: 10,
-    backgroundColor: '#eef2ff',
-  },
-  label: {
-    fontSize: 12,
-    color: '#53346a',
-    textAlign: 'center',
-    marginTop: 6,
   },
 });

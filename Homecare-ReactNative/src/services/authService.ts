@@ -16,6 +16,8 @@ export interface User {
   emergency_contact?: string;
   created_at: string;
   updated_at: string;
+  user_image_blob?: string | null;
+
 }
 
 export interface RegisterData {
@@ -33,6 +35,21 @@ export interface RegisterData {
   allergies?: string;
   current_medications?: string;
   emergency_contact?: string;
+  user_image_blob?: string | null;
+
+}
+
+export interface EditUserData {
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  email_address?: string;
+  phone_number?: string;
+  date_of_birth?: string;
+  gender?: string;
+  home_address?: string;
+  emergency_contact?: string;
+  user_image_blob?: string | null;
 }
 
 export interface LoginData {
@@ -96,7 +113,7 @@ class AuthService {
   async getCurrentUser(): Promise<any> {
     try {
       //interceptor adds the stored token before sending request
-      const response = await api.get('/api/get_user');
+      const response = await api.get('/api/user');
       return response.data;
     } catch (error: any) {
       console.error('Get user error:', error.response?.data || error.message);
@@ -125,6 +142,36 @@ class AuthService {
 
   async getStoredUser(): Promise<any | null> {
     return await getUserData();
+  }
+
+  async editUser(userData: EditUserData): Promise<AuthResponse> {
+    try {
+      const response = await api.put('/api/user/edit', userData);
+      
+      if (response.data.success && response.data.data) {
+        await saveUserData(response.data.data);
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Edit user error:', error.response?.data || error.message);
+      throw error.response?.data || { success: false, message: 'Network error' };
+    }
+  }
+
+  async deleteUser(userId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.delete(`/api/user/${userId}`);
+      
+      if (response.data.success) {
+        await clearAuth();
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Delete user error:', error.response?.data || error.message);
+      throw error.response?.data || { success: false, message: 'Network error' };
+    }
   }
 }
 

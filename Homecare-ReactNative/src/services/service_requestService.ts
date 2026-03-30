@@ -5,11 +5,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export interface FacilityData {
   facility_id?: number;
   user_id?: number | null;
+  facility_type?: 'Hospital' | 'Clinic' | 'Nursing Home' | 'Rehabilitation Center' | string | null;
   facility_address?: string | null;
   facility_name: string;
   facility_phone?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
+  country?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postal_code?: string | null;
+  facility_image?: string | null;
+  facility_image_blob?: string | null;
+  facility_email?: string | null;
+  facility_website?: string | null;
+  facility_description?: string | null;
   total_services?: number | null;
 }
 export interface DoctorDetails {

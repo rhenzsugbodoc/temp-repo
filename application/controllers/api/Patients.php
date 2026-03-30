@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+//THIS CONTROLLER IS A MESS
 require_once APPPATH . 'core/MY_Controller.php';
 
 class Patients extends MY_Controller {
@@ -193,62 +193,62 @@ class Patients extends MY_Controller {
         ], 200);
     }
     
-    /**
-     * GET /api/patients/care-plans
-     * Get patient's care plans
-     */
-    public function care_plans() {
-        $this->require_role(['Patient']);
+    // /**
+    //  * GET /api/patients/care-plans
+    //  * Get patient's care plans
+    //  */
+    // public function care_plans() {
+    //     $this->require_role(['Patient']);
         
-        $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    //     $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
         
-        if (!$patient) {
-            $this->json_response([
-                'success' => false,
-                'message' => 'Patient profile not found'
-            ], 404);
-        }
+    //     if (!$patient) {
+    //         $this->json_response([
+    //             'success' => false,
+    //             'message' => 'Patient profile not found'
+    //         ], 404);
+    //     }
         
-        $status = $this->input->get('status');
-        $care_plans = $this->Patient_model->get_care_plans($patient->patient_id, $status);
+    //     $status = $this->input->get('status');
+    //     $care_plans = $this->Patient_model->get_care_plans($patient->patient_id, $status);
         
-        // Get activities for each care plan
-        foreach ($care_plans as $plan) {
-            $plan->activities = $this->Patient_model->get_care_plan_activities($plan->care_plan_id);
-        }
+    //     // Get activities for each care plan
+    //     foreach ($care_plans as $plan) {
+    //         $plan->activities = $this->Patient_model->get_care_plan_activities($plan->care_plan_id);
+    //     }
         
-        $this->json_response([
-            'success' => true,
-            'count' => count($care_plans),
-            'data' => $care_plans
-        ], 200);
-    }
+    //     $this->json_response([
+    //         'success' => true,
+    //         'count' => count($care_plans),
+    //         'data' => $care_plans
+    //     ], 200);
+    // }
     
-    /**
-     * GET /api/patients/medical-records
-     * Get patient's medical records
-     */
-    public function medical_records() {
-        $this->require_role(['Patient']);
+    // /**
+    //  * GET /api/patients/medical-records
+    //  * Get patient's medical records
+    //  */
+    // public function medical_records() {
+    //     $this->require_role(['Patient']);
         
-        $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    //     $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
         
-        if (!$patient) {
-            $this->json_response([
-                'success' => false,
-                'message' => 'Patient profile not found'
-            ], 404);
-        }
+    //     if (!$patient) {
+    //         $this->json_response([
+    //             'success' => false,
+    //             'message' => 'Patient profile not found'
+    //         ], 404);
+    //     }
         
-        $record_type = $this->input->get('type');
-        $records = $this->Patient_model->get_medical_records($patient->patient_id, $record_type);
+    //     $record_type = $this->input->get('type');
+    //     $records = $this->Patient_model->get_medical_records($patient->patient_id, $record_type);
         
-        $this->json_response([
-            'success' => true,
-            'count' => count($records),
-            'data' => $records
-        ], 200);
-    }
+    //     $this->json_response([
+    //         'success' => true,
+    //         'count' => count($records),
+    //         'data' => $records
+    //     ], 200);
+    // }
     
     /**
      * GET /api/patients/caregivers
@@ -276,84 +276,84 @@ class Patients extends MY_Controller {
         ], 200);
     }
     
-    /**
-     * GET /api/patients/billing
-     * Get patient's billing records
-     */
-    public function billing() {
-        $this->require_role(['Patient']);
+    // /**
+    //  * GET /api/patients/billing
+    //  * Get patient's billing records
+    //  */
+    // public function billing() {
+    //     $this->require_role(['Patient']);
         
-        $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    //     $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
         
-        if (!$patient) {
-            $this->json_response([
-                'success' => false,
-                'message' => 'Patient profile not found'
-            ], 404);
-        }
+    //     if (!$patient) {
+    //         $this->json_response([
+    //             'success' => false,
+    //             'message' => 'Patient profile not found'
+    //         ], 404);
+    //     }
         
-        $payment_status = $this->input->get('status');
-        $billing_records = $this->Patient_model->get_billing_records($patient->patient_id, $payment_status);
+    //     $payment_status = $this->input->get('status');
+    //     $billing_records = $this->Patient_model->get_billing_records($patient->patient_id, $payment_status);
         
-        $this->json_response([
-            'success' => true,
-            'count' => count($billing_records),
-            'data' => $billing_records
-        ], 200);
-    }
+    //     $this->json_response([
+    //         'success' => true,
+    //         'count' => count($billing_records),
+    //         'data' => $billing_records
+    //     ], 200);
+    // }
     
-    /**
-     * PUT /api/patients/profile
-     * Update patient's own profile
-     */
-    public function update_profile() {
-        $this->require_role(['Patient']);
+    // /**
+    //  * PUT /api/patients/profile
+    //  * Update patient's own profile
+    //  */
+    // public function update_profile() {
+    //     $this->require_role(['Patient']);
         
-        if ($this->input->method() !== 'put') {
-            $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
-        }
+    //     if ($this->input->method() !== 'put') {
+    //         $this->json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+    //     }
         
-        $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
+    //     $patient = $this->Patient_model->get_patient_by_user_id($this->current_user_id);
         
-        if (!$patient) {
-            $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
-        }
+    //     if (!$patient) {
+    //         $this->json_response(['success' => false, 'message' => 'Patient profile not found'], 404);
+    //     }
         
-        $input = json_decode(file_get_contents('php://input'), true);
+    //     $input = json_decode(file_get_contents('php://input'), true);
         
-        if (!$input) {
-            $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
-        }
+    //     if (!$input) {
+    //         $this->json_response(['success' => false, 'message' => 'Invalid JSON input'], 400);
+    //     }
         
-        // Patients can only update certain fields
-        $update_data = [];
-        $allowed_fields = ['medical_conditions', 'allergies', 'current_medications'];
+    //     // Patients can only update certain fields
+    //     $update_data = [];
+    //     $allowed_fields = ['medical_conditions', 'allergies', 'current_medications'];
         
-        foreach ($allowed_fields as $field) {
-            if (isset($input[$field])) {
-                $update_data[$field] = $input[$field];
-            }
-        }
+    //     foreach ($allowed_fields as $field) {
+    //         if (isset($input[$field])) {
+    //             $update_data[$field] = $input[$field];
+    //         }
+    //     }
         
-        if (empty($update_data)) {
-            $this->json_response([
-                'success' => false,
-                'message' => 'No valid fields to update'
-            ], 400);
-        }
+    //     if (empty($update_data)) {
+    //         $this->json_response([
+    //             'success' => false,
+    //             'message' => 'No valid fields to update'
+    //         ], 400);
+    //     }
         
-        if ($this->Patient_model->update_patient($patient->patient_id, $update_data)) {
-            $this->json_response([
-                'success' => true,
-                'message' => 'Profile updated successfully'
-            ], 200);
-        } else {
-            $this->json_response([
-                'success' => false,
-                'message' => 'Failed to update profile'
-            ], 500);
-        }
-    }
+    //     if ($this->Patient_model->update_patient($patient->patient_id, $update_data)) {
+    //         $this->json_response([
+    //             'success' => true,
+    //             'message' => 'Profile updated successfully'
+    //         ], 200);
+    //     } else {
+    //         $this->json_response([
+    //             'success' => false,
+    //             'message' => 'Failed to update profile'
+    //         ], 500);
+    //     }
+    // }
     
     /**
      * GET /api/patients/:id (For doctors/caregivers/admin)

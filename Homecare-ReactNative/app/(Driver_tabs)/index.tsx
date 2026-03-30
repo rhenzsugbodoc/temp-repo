@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+ import React, { useState, useRef } from 'react';
 import { View, Animated, ScrollView, Pressable, StyleSheet, Text, ActivityIndicator, TextInput, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGetMedicines, useGetInventory, useUpdateInventoryMutation, useCreateInventoryMutation } from '@/src/options/PrescriptionQueryOptions';

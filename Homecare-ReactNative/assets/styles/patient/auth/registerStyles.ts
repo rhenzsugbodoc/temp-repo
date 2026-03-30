@@ -4,7 +4,7 @@ export const registerCommonStyles = StyleSheet.create({
   topContent: {
     alignItems: 'flex-start',
     marginTop: 40,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
   },
   logoImage: {
     width: 80,
@@ -16,15 +16,17 @@ export const registerCommonStyles = StyleSheet.create({
     color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
+    textAlign: 'left',
   },
   headerText2: {
-    color: '#717171', 
+    color: '#404068', 
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'left',
   },
   form: {
     marginTop: 40,
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
   },
   formTextInput: {
     backgroundColor: '#ffffff',
@@ -53,24 +55,27 @@ export const registerCommonStyles = StyleSheet.create({
   },
   genderButton: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
     marginHorizontal: 8,
     borderRadius: 8,
-    backgroundColor: '#4b5cbe',
+    
+    backgroundColor: '#8793d4',
     alignItems: 'center',
   },
   genderSelected: {
-    backgroundColor: '#9bc3da',
+    backgroundColor: '#4b5cbe',
   },
   genderText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 
   signupButton: {
     backgroundColor: '#4b5cbe',
     borderRadius: 10,
     paddingVertical: 14,
+    marginHorizontal: 20,
     alignItems: 'center',
     marginTop: 8,
   },

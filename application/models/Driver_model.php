@@ -11,11 +11,16 @@ class Driver_model extends CI_Model {
 
     // Get driver by driver_id
     public function get_driver_by_id($driver_id) {
-        $this->db->select('driver.*, user.first_name, user.last_name, user.phone_number, user.email_address');
+        $this->db->select('driver.*, user.first_name, user.last_name, user.phone_number, user.email_address, user.user_image_blob');
         $this->db->from('driver');
         $this->db->join('user', 'driver.user_id = user.user_id');
         $this->db->where('driver.driver_id', $driver_id);
-        return $this->db->get()->row();
+        
+        $driver = $this->db->get()->row();
+        if ($driver && $driver->user_image_blob) {
+            $driver->user_image_blob = base64_encode($driver->user_image_blob);
+        }
+        return $driver;
     }
 
     // Get available orders (no driver assigned, status = Verified or Pending)

@@ -12,7 +12,7 @@ export const useOneTimeRequests = (patient_id: number, status?: string, enabled:
     queryKey: ['service-requests', 'one-time', patient_id, status],
     queryFn: () => CarePlanService.getOneTimeRequests(patient_id, status),
     staleTime: 5 * 60 * 1000,
-    enabled: enabled && !!patient_id,
+    enabled,
   });
 };
 
@@ -21,7 +21,7 @@ export const useRoutineRequests = (patient_id: number, status?: string, enabled:
     queryKey: ['service-requests', 'routine', patient_id, status],
     queryFn: () => CarePlanService.getRoutineRequests(patient_id, status),
     staleTime: 5 * 60 * 1000,
-    enabled: enabled && !!patient_id,
+    enabled,
   });
 };
 

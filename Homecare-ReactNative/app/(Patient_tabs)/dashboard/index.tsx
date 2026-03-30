@@ -1,16 +1,18 @@
 import React from 'react';
-import { View, ScrollView, Image, Pressable, StyleSheet, Text, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, ScrollView, Image, Pressable, StyleSheet, Text, ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/context/AuthContext';
 import { usePatientDashboard, useTodaySchedule, useCareTeam } from '@/src/options/dashboardQueryOptions';
-import { useLogoutMutation } from '@/src/options/authenticationQueryOptions';
+import { useLogoutMutation, useCurrentUser } from '@/src/options/authenticationQueryOptions';
 import {getUserData} from '@/src/options/tokenHandler';
 import { User} from '@/src/context/AuthContext';
 import { useState, useEffect } from 'react';
 export default function PatientDashboard() {
   const router = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
+  const contentWidth = screenWidth * 0.8;
 
 
 
@@ -18,6 +20,7 @@ export default function PatientDashboard() {
   const { data: dashboardData, isLoading: isLoadingDashboard, isFetching: isDashboardFetching, refetch: refetchDashboard} = usePatientDashboard();
   const { data: todaySchedule, refetch: refetchSchedule } = useTodaySchedule();
   const { data: careTeam, refetch: refetchCareTeam } = useCareTeam();
+  const { data: user } = useCurrentUser();
   const logoutMutation = useLogoutMutation();
  
 
@@ -76,13 +79,19 @@ export default function PatientDashboard() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      <View style={[styles.header, { margin: screenWidth * 0.05 }]}>
         <Pressable onPress={() => router.push('/(Patient_tabs)/profile')}>
-          <Image
-            source={require('@/assets/images/Homecare_Logo.png')}
-            style={{ width: 50, height: 40, marginLeft: 15 }}
-            resizeMode="contain"
-          />
+          {user?.user_image_blob ? (
+            <Image
+              source={{ uri: `data:image/jpeg;base64,${user.user_image_blob}` }}
+              style={{ width: 50, height: 50, borderRadius: 25, marginLeft: 15, borderWidth: 1, borderColor: '#4454c3' }}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: '#eef2ff', marginLeft: 15, justifyContent: 'center', alignItems: 'center' }}>
+              <Ionicons name="person-outline" size={30} color="#4454c3" />
+            </View>
+          )}
         </Pressable>
 
         <Text style={styles.greetingText}>
@@ -95,7 +104,7 @@ export default function PatientDashboard() {
       </View>
 
       <ScrollView
-        style={{ paddingHorizontal: 15 }}
+        contentContainerStyle={{ alignItems: 'center' }}
         refreshControl={
           <RefreshControl 
             refreshing={isDashboardFetching} 
@@ -105,6 +114,7 @@ export default function PatientDashboard() {
           />
         }
       >
+        <View style={{ width: contentWidth }}>
         <Text style={styles.categoryLabel}>Today's Schedule</Text>
 
         {scheduleItems && scheduleItems.length > 0 ? (
@@ -197,50 +207,8 @@ export default function PatientDashboard() {
             <Text style={styles.emptyText}>No care team members assigned yet</Text>
           </View>
         )}
-        <Text style={styles.categoryLabel}>Your Profile</Text>
-        {patientInfo && (
-          <View style={styles.card}>
-            
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileLabel}>Name:</Text>
-              <Text style={styles.profileValue}>
-                {patientInfo.first_name} {patientInfo.last_name}
-              </Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileLabel}>Email:</Text>
-              <Text style={styles.profileValue}>{patientInfo.email_address}</Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileLabel}>Emergency Contact:</Text>
-              <Text style={styles.profileValue}>{patientInfo.emergency_contact}</Text>
-            </View>
-            {patientInfo.phone_number && (
-              <View style={styles.profileInfo}>
-                <Text style={styles.profileLabel}>Phone:</Text>
-                <Text style={styles.profileValue}>{patientInfo.phone_number}</Text>
-              </View>
-            )}
-          </View>
-        )}
-        <View style={styles.summaryContainer}>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Active Care Plans {"\n"}<Text style={styles.summaryValue}>{summaryItems?.active_care_plans}</Text></Text>
-          </View>
-         <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Active Medications {"\n"}<Text style={styles.summaryValue}>{summaryItems?.active_medications}</Text></Text>
-          </View>
-         <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Assigned Caregivers {"\n"}<Text style={styles.summaryValue}>{summaryItems?.assigned_caregivers}</Text></Text>
-          </View>
-         <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Unpaid Balance {"\n"}<Text style={styles.summaryValue}>${summaryItems?.unpaid_balance}</Text></Text>
-          </View>
-         <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Upcoming Appointments {"\n"}<Text style={styles.summaryValue}>{summaryItems?.upcoming_appointments}</Text></Text>
-          </View>
         </View>
-        <View style={{ height: 30 }} />
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -265,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
-    marginHorizontal: 15,
+    marginHorizontal: 0,
     marginVertical: 5,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -281,7 +249,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   greetingText: {
-    color: '#8c82c6',
+    color: '#4454c3',
     fontWeight: 'bold',
     fontSize: 16,
     flex: 1,

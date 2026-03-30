@@ -19,6 +19,10 @@ export default function RegisterLayout() {
           initialRouteName="register0" 
           screenOptions={{
             headerShown: false,
+            animation: 'slide_from_right',
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
+            
           }}
         >
           <Stack.Screen name="register0" />

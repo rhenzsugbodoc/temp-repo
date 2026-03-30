@@ -41,6 +41,15 @@ export default function PatientTabLayout() {
 
       <Tabs.Screen name="dashboard/patient_worklist" options={{ href: null }} />
       <Tabs.Screen name="dashboard/profile/index" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/profile/facility_settings" options={{ href: null }} /> 
+      <Tabs.Screen name="dashboard/profile/profile_page" options={{ href: null }} />
+      <Tabs.Screen name="dashboard/services/index" options={{ href: null }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
+
+      <Tabs.Screen name="dashboard/staff_list" options={{ href: null }} />
+      <Tabs.Screen name="(Notifications)" options={{ href: null }} />
+      {/* <Tabs.Screen name="dashboard/profile/index" options={{ href: null }} /> */}
+
     </Tabs>
   );
 }

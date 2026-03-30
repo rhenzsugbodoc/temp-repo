@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { PatientList } from '../services/Admin_patientsService';
+import { PatientList } from '../services/Admin_facilityService';
 
 interface AdminPatientsContextType {
   selectedPatient: PatientList | null;
