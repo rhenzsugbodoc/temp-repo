@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput, RefreshControl, FlatList, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput, RefreshControl, FlatList, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -14,11 +14,26 @@ import { useCarePlansByCurrentUser } from '@/src/options/Admin_carePlanQueryOpti
 
 export default function PatientRequestList() {
     const router = useRouter();
+  const { width, height } = useWindowDimensions();
     const { setRequestID } = useCarePlan();
     const { setCarePlanID } = useAdminCarePlan();
     const [patientID, setPatientID] = useState<number | null>(null);
     const [selectedType, setSelectedType] = useState<'One-Time' | 'Routine' | 'Care Plans'>('One-Time');
-    const animatedValues = useRef<Animated.Value[]>([]).current;
+  const isTablet = width >= 768;
+  const isLandscape = width > height;
+  const requestListColumns = isTablet ? (isLandscape ? 3 : 2) : 1;
+
+  const getRequestCardWrapperStyle = () => {
+    if (requestListColumns === 1) {
+      return { flex: 1, maxWidth: '100%' as const };
+    }
+
+    if (requestListColumns === 2) {
+      return { flex: 1, maxWidth: '48%' as const };
+    }
+
+    return { flex: 1, maxWidth: '31%' as const };
+  };
     
     useEffect(() => {
       const fetchPatientID = async () => {
@@ -31,28 +46,6 @@ export default function PatientRequestList() {
     const { data: oneTimeData, isLoading: isLoadingOneTimeData, isFetching: isFetchingOneTimeData, refetch: refetchOneTimeData} = useOneTimeRequests(patientID || 0, undefined, !!patientID);
     const { data: routineData, isLoading: isLoadingRoutineData, isFetching: isFetchingRoutineData, refetch: refetchRoutineData } = useRoutineRequests(patientID || 0, undefined, !!patientID);
     const { data: carePlansData, isLoading: isLoadingCarePlans, isFetching: isFetchingCarePlans, refetch: refetchCarePlans, error: carePlansError } = useCarePlansByCurrentUser();
-
-    useEffect(() => {
-        const currentData = selectedType === 'One-Time' ? oneTimeData : selectedType === 'Routine' ? routineData : carePlansData;
-        const dataLength = currentData?.length || 0;
-        
-        // Reset animated values array
-        animatedValues.length = 0;
-        for (let i = 0; i < dataLength; i++) {
-            animatedValues.push(new Animated.Value(0));
-        }
-
-        // Animate items in
-        const animations = animatedValues.map((anim, index) =>
-            Animated.timing(anim, {
-                toValue: 1,
-                duration: 400,
-                delay: index * 100,
-                useNativeDriver: true,
-            })
-        );
-        Animated.stagger(50, animations).start();
-    }, [selectedType, oneTimeData, routineData, carePlansData]);
 
     console.log('=== Care Plans Debug ===');
     console.log('carePlansData:', carePlansData);
@@ -94,6 +87,11 @@ export default function PatientRequestList() {
         }
     };
 
+    const handleCarePlanPress = (carePlan: any) => {
+      setCarePlanID?.(parseInt(carePlan.care_plan_id));
+      router.push('/(Patient_tabs)/care_plan/routine');
+    };
+
     const getStatusStyle = (status: string) => {
         const statusLower = status.toLowerCase();
         
@@ -109,11 +107,23 @@ export default function PatientRequestList() {
                 borderColor: 'forestgreen',
                 color: 'forestgreen',
             };
+        } else if (statusLower.includes('Active')) {
+            return {
+                backgroundColor: '#bbf7d0',
+                borderColor: 'forestgreen',
+                color: 'forestgreen',
+            };
         } else if (statusLower.includes('completed')) {
             return {
                 backgroundColor: '#f4d5d8',
                 borderColor: '#97122e',
                 color: '#97122e',
+            };
+        } else if (statusLower.includes('cancel')) {
+            return {
+                backgroundColor: '#e9d5ff',
+                borderColor: '#7c3aed',
+                color: '#7c3aed',
             };
         } else if (statusLower.includes('cancel')) {
             return {
@@ -160,66 +170,69 @@ return <SafeAreaView style={{
       {/* OneTime Tab*/}
       {selectedType === 'One-Time' && (
         <FlatList
+          key={`one-time-${requestListColumns}`}
           data={oneTimeData || []}
           scrollEnabled={false}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-around', paddingHorizontal: 10 }}
+          numColumns={requestListColumns}
+          columnWrapperStyle={requestListColumns > 1 ? { justifyContent: 'space-around', paddingHorizontal: 10 } : undefined}
+          contentContainerStyle={requestListColumns === 1 ? { paddingHorizontal: 10 } : undefined}
           keyExtractor={(item) => item.request_id.toString()}
-          renderItem={({ item: service, index }) => {
-            const opacity = animatedValues[index] || new Animated.Value(1);
-            const translateY = (animatedValues[index] || new Animated.Value(1)).interpolate({
-              inputRange: [0, 1],
-              outputRange: [20, 0],
-            });
+          renderItem={({ item: service }) => {
             const statusStyle = getStatusStyle(service.status);
 
             return (
-              <Animated.View style={{ opacity, transform: [{ translateY }], flex: 1, maxWidth: '48%' }}>
-                <Pressable onPress={() => handleRequestPress(service)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-                    <View style={styles.serviceCard}>
-                        <View style={{flexDirection: 'row', flex: 1, gap: 10}}>
-                            <View style={{ flex: 4}}>
-                                <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="contain" 
-                                style={{  width: '100%', height: 120 , borderRadius: 30 }} />
+              <View style={getRequestCardWrapperStyle()}>
+                <View style={styles.serviceCard}>
+                    <View style={{flexDirection: 'row', flex: 1, gap: 10}}>
+                        {/* <View style={{ flex: 4, justifyContent: 'center'}}>
+                            <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="cover" 
+                            style={{  width: '100%', height: 120 , borderRadius: 5 }} />
+                        </View> */}
+                        <View style={{ flex: 5, gap:5,  justifyContent: 'center'}}>
+                          
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                              <Text style={{ fontWeight: 'bold', fontSize: 14, color: '#4454c3', fontFamily: 'poppins', flex: 1 }} numberOfLines={2}>{service.service_name}</Text>
+                              <View style={[styles.statusPill, { backgroundColor: statusStyle.backgroundColor, borderColor: statusStyle.borderColor }]}>
+                                <Text style={[styles.statusPillText, { color: statusStyle.color }]}>{service.status}</Text>
+                              </View>
                             </View>
-                            <View style={{ flex: 5, gap:5,  justifyContent: 'center'}}>
-                              
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                  <Text style={{ fontWeight: 'bold', fontSize: 14, color: '#4454c3', fontFamily: 'poppins', flex: 1 }} numberOfLines={2}>{service.service_name}</Text>
-                                  <View style={[styles.statusPill, { backgroundColor: statusStyle.backgroundColor, borderColor: statusStyle.borderColor }]}>
-                                    <Text style={[styles.statusPillText, { color: statusStyle.color }]}>{service.status}</Text>
-                                  </View>
-                                </View>
 
-                                {/* Date */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="calendar-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails}>{service.preferred_date}</Text>
-                                </View>
-
-                                {/* Caregiver */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="person-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails}>
-                                    {service.assigned_caregiver_first_name && service.assigned_caregiver_last_name 
-                                      ? `${service.assigned_caregiver_first_name} ${service.assigned_caregiver_last_name}`
-                                      : 'Not Assigned'}
-                                  </Text>
-                                </View>
-
-                                {/* Facility */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="business-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails} numberOfLines={1}>
-                                    {service.facility_name || 'No Facility'}
-                                  </Text>
-                                </View>
-                              
+                            {/* Date */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="calendar-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails}>{service.preferred_date}</Text>
                             </View>
+
+                            {/* Caregiver */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="person-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails}>
+                                {service.assigned_caregiver_first_name && service.assigned_caregiver_last_name 
+                                  ? `${service.assigned_caregiver_first_name} ${service.assigned_caregiver_last_name}`
+                                  : 'Not Assigned'}
+                              </Text>
+                            </View>
+
+                            {/* Facility */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="business-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails} numberOfLines={1}>
+                                {service.facility_name || 'No Facility'}
+                              </Text>
+                            </View>
+
+                    <View style={styles.viewDetailsButtonContainer}>
+                      <Pressable onPress={() => handleRequestPress(service)} style={styles.viewDetailsButton}>
+                        <Text style={styles.viewDetailsButtonText}>View Details</Text>
+                      </Pressable>
+                    </View>
                         </View>
                     </View>
-                </Pressable>
-              </Animated.View>
+
+
+ 
+                </View>
+              </View>
             );
           }}
         />
@@ -227,73 +240,81 @@ return <SafeAreaView style={{
       {/* RoutineTab */}
       {selectedType === 'Routine' && (
         <FlatList
+          key={`routine-${requestListColumns}`}
           data={routineData || []}
           scrollEnabled={false}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-around', paddingHorizontal: 10 }}
+          numColumns={requestListColumns}
+          columnWrapperStyle={requestListColumns > 1 ? { justifyContent: 'space-around', paddingHorizontal: 10 } : undefined}
+          contentContainerStyle={requestListColumns === 1 ? { paddingHorizontal: 10 } : undefined}
           keyExtractor={(item) => item.request_id.toString()}
-          renderItem={({ item: service, index }) => {
-            const opacity = animatedValues[index] || new Animated.Value(1);
-            const translateY = (animatedValues[index] || new Animated.Value(1)).interpolate({
-              inputRange: [0, 1],
-              outputRange: [20, 0],
-            });
+          renderItem={({ item: service }) => {
             const statusStyle = getStatusStyle(service.status);
+            const routineCarePlan = (service as any)?.care_plan;
 
             return (
-              <Animated.View style={{ opacity, transform: [{ translateY }], flex: 1, maxWidth: '48%' }}>
-                <Pressable onPress={() => handleRequestPress(service)} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-                    <View style={styles.serviceCard}>
-                        <View style={{flexDirection: 'row', flex: 1, gap: 10}}>
-                            <View style={{ flex: 4}}>
-                                <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="contain" 
-                                style={{  width: '100%', height: 120 , borderRadius: 30 }} />
+              <View style={getRequestCardWrapperStyle()}>
+                <View style={styles.serviceCard}>
+                    <View style={{flexDirection: 'row', flex: 1, gap: 10}}>
+                        {/* <View style={{ flex: 4, justifyContent: 'center'}}>
+                            <Image source={require('@/assets/images/MisterMatres.png')} resizeMode="cover" 
+                            style={{  width: '100%', height: 120 , borderRadius: 5 }} />
+                        </View> */}
+                        <View style={{ flex: 5, gap:5,  justifyContent: 'center'}}>
+                          
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                              <Text style={{ fontWeight: 'bold', fontSize: 14, color: '#4454c3', fontFamily: 'poppins', flex: 1 }} numberOfLines={2}>{service.service_name}</Text>
+                              <View style={[styles.statusPill, { backgroundColor: statusStyle.backgroundColor, borderColor: statusStyle.borderColor }]}>
+                                <Text style={[styles.statusPillText, { color: statusStyle.color }]}>{service.status}</Text>
+                              </View>
                             </View>
-                            <View style={{ flex: 5, gap:5,  justifyContent: 'center'}}>
-                              
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                  <Text style={{ fontWeight: 'bold', fontSize: 14, color: '#4454c3', fontFamily: 'poppins', flex: 1 }} numberOfLines={2}>{service.service_name}</Text>
-                                  <View style={[styles.statusPill, { backgroundColor: statusStyle.backgroundColor, borderColor: statusStyle.borderColor }]}>
-                                    <Text style={[styles.statusPillText, { color: statusStyle.color }]}>{service.status}</Text>
-                                  </View>
-                                </View>
 
-                                {/* Date */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="calendar-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails}>{service.preferred_date}</Text>
-                                </View>
-
-                                {/* Caregiver */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="person-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails}>
-                                    {service.assigned_caregiver_first_name && service.assigned_caregiver_last_name 
-                                      ? `${service.assigned_caregiver_first_name} ${service.assigned_caregiver_last_name}`
-                                      : 'Not Assigned'}
-                                  </Text>
-                                </View>
-
-                                {/* Facility */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="business-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails} numberOfLines={1}>
-                                    {service.facility_name || 'No Facility'}
-                                  </Text>
-                                </View>
-                                
-                                {/* Care Plan */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                  <Ionicons name="help-circle-outline" size={12} color="#7066ac" />
-                                  <Text style={styles.serviceDetails} numberOfLines={1}>
-                                    {service?.care_plan || 'No Assigned care Plan'}
-                                  </Text>
-                                </View>
+                            {/* Date */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="calendar-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails}>{service.preferred_date}</Text>
                             </View>
+
+                            {/* Caregiver */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="person-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails}>
+                                {service.assigned_caregiver_first_name && service.assigned_caregiver_last_name 
+                                  ? `${service.assigned_caregiver_first_name} ${service.assigned_caregiver_last_name}`
+                                  : 'Not Assigned'}
+                              </Text>
+                            </View>
+
+                            {/* Facility */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="business-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails} numberOfLines={1}>
+                                {service.facility_name || 'No Facility'}
+                              </Text>
+                            </View>
+                            
+                            {/* Care Plan */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                              <Ionicons name="help-circle-outline" size={12} color="#7066ac" />
+                              <Text style={styles.serviceDetails} numberOfLines={1}>
+                                {routineCarePlan || 'No Assigned care Plan'}
+                              </Text>
+                            </View>
+
+
+                        <View style={styles.viewDetailsButtonContainer}>
+                          <Pressable onPress={() => handleRequestPress(service)} style={styles.viewDetailsButton}>
+                            <Text style={styles.viewDetailsButtonText}>View Details</Text>
+                          </Pressable>
+                        </View>
+                                               
+         
+                   
                         </View>
                     </View>
-                </Pressable>
-              </Animated.View>
+
+ 
+                </View>
+              </View>
             );
           }}
         />
@@ -304,43 +325,44 @@ return <SafeAreaView style={{
         <FlatList
           data={carePlansData || []}
           scrollEnabled={false}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-around', paddingHorizontal: 10 }}
+          key={`care-plans-${requestListColumns}`}
+          numColumns={requestListColumns}
+          columnWrapperStyle={requestListColumns > 1 ? { justifyContent: 'space-around', paddingHorizontal: 10 } : undefined}
           keyExtractor={(item) => item.care_plan_id.toString()}
-          renderItem={({ item: carePlan, index }) => {
-            const opacity = animatedValues[index] || new Animated.Value(1);
-            const translateY = (animatedValues[index] || new Animated.Value(1)).interpolate({
-              inputRange: [0, 1],
-              outputRange: [20, 0],
-            });
-
+          contentContainerStyle={requestListColumns === 1 ? { paddingHorizontal: 10 } : undefined}
+          renderItem={({ item: carePlan }) => {
             return (
-              <Animated.View style={{ opacity, transform: [{ translateY }], flex: 1, maxWidth: '48%' }}>
-                <Pressable 
-                  onPress={() => {
-                    setCarePlanID?.(parseInt(carePlan.care_plan_id));
-                    router.push('/(Patient_tabs)/care_plan/routine');
-                  }}
-                  style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              <View style={getRequestCardWrapperStyle()}>
+                <View 
+                
+                  
                 >
                   <View style={styles.carePlanCard}> 
                     <View style={styles.cardRow}>
-                      <Text style={styles.cardTitle} numberOfLines={1}>{carePlan.plan_name}</Text>
-                      <View style={styles.statusContainer}>
-                        <Text style={styles.statusText}>{carePlan.status}</Text>
+                      <Text style={{ fontSize: 14, color: '#4454c3', fontFamily: 'poppins', fontWeight: 'bold' }} numberOfLines={1}>{carePlan.plan_name}</Text>
+                      <View style={[styles.statusPill, { backgroundColor: getStatusStyle(carePlan.status).backgroundColor, borderColor: getStatusStyle(carePlan.status).borderColor }]}>
+                        <Text style={[styles.statusPillText, { color: getStatusStyle(carePlan.status).color }]}>{carePlan.status}</Text>
                       </View>
                     </View>
                     <View style={styles.cardRow}>
-                      <Text style={styles.planTypeText}>{carePlan.plan_type}</Text>
+                      <Text style={{ fontSize: 14, color: '#6b86b5' }}>{carePlan.plan_type}</Text>
                       <Ionicons name="chevron-forward" size={20} color="#6b86b5" />
                     </View>
                     <View style={[styles.cardRow, {justifyContent: 'flex-start'}]}>
                       <Ionicons name="calendar-outline" size={16} color="#6b86b5" />
-                      <Text style={styles.startDateText} numberOfLines={1}>Started: {carePlan.start_date}</Text>
+                      <Text style={{ fontSize: 12, color: '#6b86b5', marginLeft: 5 }} numberOfLines={1}>Started: {carePlan.start_date}</Text>
                     </View>
+
+                <View style={styles.viewDetailsButtonContainer}>
+                  <Pressable onPress={() => handleCarePlanPress(carePlan)} style={styles.viewDetailsButton}>
+                    <Text style={styles.viewDetailsButtonText}>View Details</Text>
+                  </Pressable>
+                </View>
                   </View>
-                </Pressable>
-              </Animated.View>
+        
+                </View>
+
+              </View>
             );
           }}
         />
@@ -384,6 +406,27 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
+  viewDetailsButtonContainer: {
+    width: '100%',
+    alignItems: 'flex-end',
+    marginTop: 10,
+  },
+
+  viewDetailsButton: {
+    width: '100%',
+    backgroundColor: '#4454c3',
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  viewDetailsButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
   statusPill: {
     borderRadius: 25,
     paddingHorizontal: 8,
@@ -422,6 +465,7 @@ const styles = StyleSheet.create({
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
     alignItems: 'center',
     width: '100%',
     paddingBottom: 5,

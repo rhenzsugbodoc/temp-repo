@@ -140,12 +140,12 @@ aboutUsContainer: {
     padding: 25
 },
 aboutUsText: {
-    color: '#53346A', 
+    color: '#15245c', 
     fontFamily: 'poppins'
 },
 
 categoryLabel: {
-    color: '#53346A', 
+    color: '#424e78', 
     fontFamily: 'poppins', 
     fontWeight: 'bold'
 },
@@ -189,7 +189,7 @@ requestButtonText: {
 
 export const requestDetailStyles = StyleSheet.create({
 headerContainer: {
-    height: 60,
+    height: 80,
     backgroundColor: '#22449e',
     justifyContent: 'center',
     paddingHorizontal: 15,

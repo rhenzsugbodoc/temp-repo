@@ -12,7 +12,7 @@ import { useEffect, useRef } from 'react';
 export default function Register() {
   const {user ,setUser} = useRegister();
   const { width: screenWidth } = useWindowDimensions();
-  const formWidth = screenWidth * 0.7;
+  const formWidth = screenWidth * 0.85;
 
   const formFields = [
     { id: '1', key: 'first_name', label: 'First Name', secure: false },
@@ -88,7 +88,7 @@ export default function Register() {
                   placeholderTextColor="#888"
                   value={user[item.key as keyof typeof user] as string || ''}
                   onChangeText={value => handleChange(item.key as keyof typeof user, value)}
-                  style={[addPatientStyles.descriptionInput, {height: 40, width: screenWidth, alignSelf: 'center'}]}
+                  style={[addPatientStyles.descriptionInput, {height: 40, width: '100%',alignSelf: 'center'}]}
                   secureTextEntry={item.secure}
                 />
               </Animated.View>

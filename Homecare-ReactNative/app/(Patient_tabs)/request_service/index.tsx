@@ -54,9 +54,9 @@ export default function RequestList() {
       : Math.min((width - 40) / 2, 400); // Portrait: 2 cards on tablet, 1 on phone
     
     return (
-      <View 
+      <Pressable 
         key={facility.facility_id} 
-        // onPress={() => handleCompanyPress(facility)} 
+        onPress={() => handleCompanyPress(facility)} 
         style={{
           // opacity: pressed ? 0.8 : 1,
           maxWidth: 600,
@@ -84,7 +84,7 @@ export default function RequestList() {
             <Text style={companyListStyles.companyText3}>{facility.facility_type}</Text>
           </View>
         </View>
-      </View>
+      </Pressable>
     );
   };
   return <SafeAreaView style={{

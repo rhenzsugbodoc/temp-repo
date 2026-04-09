@@ -9,7 +9,7 @@ import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWo
 export default function Register() {
   const { user, setUser, registerUser, isRegistering } = useRegister();
   const { width: screenWidth } = useWindowDimensions();
-  const formWidth = screenWidth * 0.7;
+  const formWidth = screenWidth * 0.85;
   const router = useRouter();
 
   const formFields = [
@@ -148,7 +148,7 @@ export default function Register() {
                   placeholderTextColor="#888"
                   value={user[item.key as keyof typeof user] ? (user[item.key as keyof typeof user] as string[]).join(', ') : ''}
                   onChangeText={value => handleChange(item.key as keyof typeof user, value.split(',').map(s => s.trim()).filter(Boolean))}
-                  style={[addPatientStyles.descriptionInput, {height: 60, width: formWidth, alignSelf: 'center'}]}
+                  style={[addPatientStyles.descriptionInput, {height: 60,  width: '100%', alignSelf: 'center'}]}
                   multiline
                 />
               </Animated.View>

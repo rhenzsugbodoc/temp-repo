@@ -275,7 +275,7 @@ export default function RequestList() {
             <View style={addPatientStyles.descriptionContainer}>
               <Text style={addPatientStyles.fieldLabel}>Home Address</Text>
               <TextInput
-                style={[addPatientStyles.descriptionInput, { height: 60, paddingHorizontal: 10, textAlignVertical: 'top' }]}
+                style={[addPatientStyles.descriptionInput, { height: 40, paddingHorizontal: 10, textAlignVertical: 'top' }]}
                 value={formData.home_address || ''}
                 onChangeText={(value) => handleChange('home_address', value)}
                 multiline
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   },
 
   headerContainer: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4454c3',
     alignItems: 'center',
     flex:1,
     flexDirection: 'row',
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#53346a',
     padding: 10,
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#4454c3f',
   },
   label: {
     fontSize: 12,
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   },
 
   editButton: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4454c3',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -663,6 +663,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#ffffff',
+    alignSelf: 'center',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    overflow: 'hidden',
   },
 
   dragHandle: {
@@ -680,7 +684,7 @@ const styles = StyleSheet.create({
   },
 
   imageButton: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#4454c3',
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',

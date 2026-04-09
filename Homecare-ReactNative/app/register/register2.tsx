@@ -1,7 +1,7 @@
 
 
 
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, FlatList, Animated, Alert, useWindowDimensions } from 'react-native';
+import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, FlatList, Animated, Alert, useWindowDimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
@@ -15,7 +15,7 @@ import {addPatientStyles} from '@/assets/styles/admin/patient_worklist/patientWo
 export default function Register() {
   const {user ,setUser} = useRegister();
   const { width: screenWidth } = useWindowDimensions();
-  const formWidth = screenWidth * 0.7;
+  const formWidth = screenWidth * 0.85;
   const uploadBoxMaxSize = screenWidth * 0.15;
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -120,9 +120,9 @@ export default function Register() {
           contentContainerStyle={{ paddingBottom: 16 }}
           ListFooterComponent={
             <>
-              <TouchableOpacity style={[registerCommonStyles.signupButton, { width: formWidth, alignSelf: 'center' }]} onPress={handleRegister}>
-                <Text style={registerCommonStyles.signupButtonText}>Next</Text>
-              </TouchableOpacity>
+        <TouchableOpacity style={[registerCommonStyles.signupButton, {marginHorizontal: 0, width: formWidth, alignSelf: 'center'}]} onPress={handleRegister}>
+          <Text style={registerCommonStyles.signupButtonText}>Next</Text>
+        </TouchableOpacity>
 
               <View style={registerCommonStyles.altLogin}>
                 <Text style={registerCommonStyles.loginText}>
@@ -152,7 +152,7 @@ export default function Register() {
                 >
                   <Text style={addPatientStyles.fieldLabel}>{item.label}</Text>
                   <TouchableOpacity
-                    style={[addPatientStyles.descriptionInput, { height: 45, justifyContent: 'center', width: formWidth, alignSelf: 'center' }]}
+                    style={[addPatientStyles.descriptionInput, { height: 45, justifyContent: 'center', width: '100%', alignSelf: 'center' }]}
                     onPress={() => setShowDatePicker(true)}
                   >
                     <Text style={{ paddingHorizontal: 10, color: user.date_of_birth ? '#000' : '#888' }}>
@@ -230,7 +230,7 @@ export default function Register() {
                         maxHeight: uploadBoxMaxSize,
                         alignSelf: 'center',
                         backgroundColor: 'transparent',
-                        borderWidth: 1,
+                        borderWidth: 0,
                         borderRadius: 20,
                         borderColor: '#4b5cbe',
                         justifyContent: 'center',
@@ -246,7 +246,7 @@ export default function Register() {
                   {imageUri && (
                     <Image 
                       source={{ uri: imageUri }} 
-                      style={{ width: 150, height: 150, borderRadius: 75, alignSelf: 'center', marginTop: 10 }} 
+                      style={{ width: 150, height: 150, borderRadius: 5, alignSelf: 'center', marginTop: 10 }} 
                       resizeMode="cover"
                     />
                   )}
@@ -266,7 +266,7 @@ export default function Register() {
                   placeholderTextColor="#888"
                   value={user[item.key as keyof typeof user] as string || ''}
                   onChangeText={value => handleChange(item.key as keyof typeof user, value)}
-                  style={[addPatientStyles.descriptionInput, {paddingHorizontal: 10, width: formWidth, alignSelf: 'center'}]}
+                  style={[addPatientStyles.descriptionInput, {paddingHorizontal: 10,  width: '100%' , alignSelf: 'center'}]}
                 />
               </Animated.View>
             );

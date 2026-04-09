@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, Pressable, Text, TextInput, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { useQuery} from '@tanstack/react-query';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {requestDetailStyles} from '@/assets/styles/patient/request/requestStyles';
+import { registerCommonStyles } from '@/assets/styles/patient/auth/registerStyles';
+import { addPatientStyles } from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
 import { CreateCarePlanData } from '@/src/services/Admin_careplanService';
 import { useCarePlan } from '@/src/context/Admin-CarePlanContext';
 import { useFacilityDoctors} from '@/src/options/serviceRequestOptions';
@@ -14,6 +14,8 @@ import { useCreateCarePlan } from '@/src/options/Admin_carePlanQueryOptions';
 
 export default function CreateCarePlan() {
     const router = useRouter();
+    const { width: screenWidth } = useWindowDimensions();
+    const formWidth = screenWidth * 0.85;
     const { requestID, patientID, facilityID, setCarePlanID } = useCarePlan();
     const createCarePlanMutation = useCreateCarePlan();
     
@@ -66,7 +68,7 @@ export default function CreateCarePlan() {
         <SafeAreaView style={{
         flex: 1,
         backgroundColor: '#ffffff',
-        padding: 10,
+       
         }} edges={['top']}>
 
             <View style={requestDetailStyles.headerContainer}>
@@ -74,12 +76,13 @@ export default function CreateCarePlan() {
             </View>
 
             <ScrollView>
+              <View style={{ width: formWidth, alignSelf: 'center' }}>
           
                 {/* Plan Name */}
-                <View style={requestDetailStyles.descriptionContainer}>
-                    <Text>Care Plan Name</Text>
+                <View style={addPatientStyles.descriptionContainer}>
+                    <Text style={addPatientStyles.fieldLabel}>Care Plan Name</Text>
                     <TextInput
-                        style={requestDetailStyles.descriptionInput}
+                        style={[addPatientStyles.descriptionInput, {height: 45, width: '100%', alignSelf: 'center', paddingHorizontal: 10}]}
                         value={form.plan_name}
                         onChangeText={(text) => setForm((prev) => ({...prev, plan_name: text}))}
                         placeholder="Enter care plan name"
@@ -87,9 +90,9 @@ export default function CreateCarePlan() {
                 </View>
 
                 {/* Plan Type Picker */}
-                <View style={requestDetailStyles.serviceTypeContainer}>
-                    <Text>Plan Type</Text>
-                    <View style={requestDetailStyles.serviceToggleItem}>
+                <View style={addPatientStyles.serviceTypeContainer}>
+                    <Text style={addPatientStyles.fieldLabel}>Plan Type</Text>
+                    <View style={addPatientStyles.serviceToggleItem}>
                         <Picker 
                             selectedValue={form.plan_type} 
                             onValueChange={(value) => setForm((prev) => ({...prev, plan_type: value}))}
@@ -104,9 +107,9 @@ export default function CreateCarePlan() {
                 </View>
 
                 {/* Doctor Selection */}
-                <View style={requestDetailStyles.serviceTypeContainer}>
-                    <Text>Select Doctor</Text>
-                    <View style={requestDetailStyles.serviceToggleItem}>
+                <View style={addPatientStyles.serviceTypeContainer}>
+                    <Text style={addPatientStyles.fieldLabel}>Select Doctor</Text>
+                    <View style={addPatientStyles.serviceToggleItem}>
                         <Picker 
                             selectedValue={form.doctor_id} 
                             onValueChange={(doctorId) => setForm((prev) => ({...prev, doctor_id: doctorId}))}
@@ -124,13 +127,13 @@ export default function CreateCarePlan() {
                 </View>
         
                 {/* End Date Picker */}
-                <View style={requestDetailStyles.datePickerWrapper}>
-                    <View style={requestDetailStyles.datePickerContainer}>
+                <View style={addPatientStyles.datePickerWrapper}>
+                    <View style={addPatientStyles.datePickerContainer}>
                         <Pressable 
                             onPress={() => setDateVisible(true)} 
-                            style={requestDetailStyles.datePickerButton}
+                            style={[addPatientStyles.datePickerButton, {height: 45, justifyContent: 'center'}]}
                         >
-                            <Text style={requestDetailStyles.datePickerText}>
+                            <Text style={addPatientStyles.datePickerText}>
                                 {form.end_date || 'End Date (Optional)'}
                             </Text>
                         </Pressable>
@@ -144,10 +147,10 @@ export default function CreateCarePlan() {
                 </View>
 
                 {/* Goals */}
-                <View style={requestDetailStyles.descriptionContainer}>
-                    <Text>Goals</Text>
+                <View style={addPatientStyles.descriptionContainer}>
+                    <Text style={addPatientStyles.fieldLabel}>Goals</Text>
                     <TextInput
-                        style={[requestDetailStyles.descriptionInput, {height: 100}]}
+                        style={[addPatientStyles.descriptionInput, {height: 100, width: '100%', alignSelf: 'center', paddingHorizontal: 10}]}
                         value={form.goals || ''}
                         onChangeText={(text) => setForm((prev) => ({...prev, goals: text}))}
                         placeholder="Enter care plan goals"
@@ -156,10 +159,10 @@ export default function CreateCarePlan() {
                 </View>
                
 
-                <View style={requestDetailStyles.descriptionContainer}>
-                    <Text>Notes</Text>
+                <View style={addPatientStyles.descriptionContainer}>
+                    <Text style={addPatientStyles.fieldLabel}>Notes</Text>
                     <TextInput
-                        style={[requestDetailStyles.descriptionInput, {height: 100}]}
+                        style={[addPatientStyles.descriptionInput, {height: 100, width: '100%', alignSelf: 'center', paddingHorizontal: 10}]}
                         value={form.notes || ''}
                         onChangeText={(text) => setForm((prev) => ({...prev, notes: text}))}
                         placeholder="Enter additional notes"
@@ -167,15 +170,13 @@ export default function CreateCarePlan() {
                     />
                 </View>
            
-            <View style={{ alignItems: 'stretch', backgroundColor: 'white',   shadowColor: '#000',
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 4,
-                elevation: 20}}>
-                <Pressable onPress={handleSubmit} style={requestDetailStyles.submitButton}>
-                    <Text style={{ color: 'white' }}>Create Care Plan</Text>
+                <Pressable
+                    onPress={handleSubmit}
+                    style={[registerCommonStyles.signupButton, {marginHorizontal: 0, width: formWidth, alignSelf: 'center'}]}
+                >
+                    <Text style={registerCommonStyles.signupButtonText}>Create Care Plan</Text>
                 </Pressable>
-            </View>
+              </View>
             </ScrollView>
    
         </SafeAreaView>

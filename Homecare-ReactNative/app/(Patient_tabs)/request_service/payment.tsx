@@ -55,7 +55,7 @@ export default function RequestService() {
                     {/* serviceItem should be Row, Image and service Details should be flex 3 and 4 */}
                     {serviceList.map( service=> (
                         <View key={service.id} style={styles.serviceItem}>
-                            <Image source={require('../../../assets/images/MisterMatres.png')} resizeMode="cover" 
+                            <Image source={require('../../../assets/images/docvisit.jpg')} resizeMode="cover" 
                             style={{ flex:2 , borderRadius: 10, width: '100%', height: 80 }} />
                             <View style={{flex: 3}}>
                                 <Text style={styles.serviceName}>{service.service_name}</Text>

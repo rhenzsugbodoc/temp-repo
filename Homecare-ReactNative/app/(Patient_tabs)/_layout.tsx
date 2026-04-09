@@ -12,7 +12,7 @@ export default function PatientTabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
       }}>
@@ -21,7 +21,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="home-outline" size={size} color="#8e98db" />
+            <Ionicons name="home-outline" size={size} color="#4454c3" />
           ),
         }}
       />
@@ -30,7 +30,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Care Plan',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="hand-left-outline" size={size} color="#8e98db" />
+            <Ionicons name="hand-left-outline" size={size} color="#4454c3" />
           ),
         }}
       />
@@ -39,7 +39,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Request',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="add-circle-outline" size={size} color="#8e98db" />
+            <Ionicons name="add-circle-outline" size={size} color="#4454c3" />
           ),
         }}
       />
@@ -48,7 +48,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Prescription',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="cart-outline" size={size} color="#8e98db" />
+            <Ionicons name="cart-outline" size={size} color="#4454c3" />
           ),
         }}
       />
@@ -74,6 +74,8 @@ export default function PatientTabLayout() {
       <Tabs.Screen name="dashboard/calendar/calendarMonth" options={{ href: null }} />
       <Tabs.Screen name="dashboard/care_team/index" options={{ href: null }} />
       <Tabs.Screen name="dashboard/care_team/care_member" options={{ href: null }} />
+
+      <Tabs.Screen name="notifications/index" options={{ href: null }} />
       {/* <Tabs.Screen name="dashboard/care_team" options={{ href: null }} /> */}
     </Tabs>
   );

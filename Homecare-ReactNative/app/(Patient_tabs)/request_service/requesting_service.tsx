@@ -1,227 +1,227 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Image, Pressable, StyleSheet, Text, Dimensions, TextInput, Button } from 'react-native';
+import { View, ScrollView, Pressable, Text, TextInput, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { useQuery} from '@tanstack/react-query';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import * as DocumentPicker from 'expo-document-picker';
-import {requestDetailStyles} from '@/assets/styles/patient/request/requestStyles';
-import {useFacility} from '@/src/context/FacilityContext';
-import {SubmitRequestData} from '@/src/services/service_requestService';
+import { requestDetailStyles } from '@/assets/styles/patient/request/requestStyles';
+import { registerCommonStyles } from '@/assets/styles/patient/auth/registerStyles';
+import { addPatientStyles } from '@/assets/styles/admin/patient_worklist/patientWorklistStyles';
+import { useFacility } from '@/src/context/FacilityContext';
+import { SubmitRequestData } from '@/src/services/service_requestService';
 import { useRequestService } from '@/src/context/RequestContext';
-import {getUserData} from '@/src/options/tokenHandler';
-import { useCreateOneTimeServiceRequest, useFacilityDoctors, useFacilityCaregivers, useCreateRoutineServiceRequest } from '@/src/options/serviceRequestOptions';
+import { getUserData } from '@/src/options/tokenHandler';
+import {
+  useCreateOneTimeServiceRequest,
+  useFacilityCaregivers,
+  useCreateRoutineServiceRequest,
+} from '@/src/options/serviceRequestOptions';
 
 export default function RequestList() {
-    const router = useRouter();
-    
-    const {form , setForm} = useRequestService();
-    const [scheduleType, setScheduleType] = useState<'One-Time' | 'Routine'>('One-Time');    
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const router = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
+  const formWidth = screenWidth * 0.85;
 
-    const [isDateVisible, setDateVisible] = useState(false);
-    const [isTimeVisible, setTimeVisible] = useState(false);
-    const {facilityID, facilityServices} = useFacility();
-    const [userData, setUserData] = useState<any>(null);
-    const oneTimeMutation = useCreateOneTimeServiceRequest();
-    const routineMutation = useCreateRoutineServiceRequest();
+  const { form, setForm } = useRequestService();
+  const [scheduleType, setScheduleType] = useState<'One-Time' | 'Routine'>('One-Time');
+  const [isDateVisible, setDateVisible] = useState(false);
+  const [isTimeVisible, setTimeVisible] = useState(false);
+  const { facilityID, facilityServices } = useFacility();
+  const [userData, setUserData] = useState<any>(null);
+  const oneTimeMutation = useCreateOneTimeServiceRequest();
+  const routineMutation = useCreateRoutineServiceRequest();
 
-    const { data: facilityCaregivers } = useFacilityCaregivers(facilityID, {
+  const { data: facilityCaregivers } = useFacilityCaregivers(facilityID, {
     enabled: !!facilityID,
-    });
+  });
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
-        const data = await getUserData();
-        setUserData(data);
+      const data = await getUserData();
+      setUserData(data);
     };
     fetchUser();
-    }, []);
-    const handleConfirmDate = (selectedDate: Date) => {
-        setForm((prev) => ({
-            ...prev,
-            preferred_date: selectedDate.toISOString().split('T')[0],
-        }));
-        setDateVisible(false);
-    };
+  }, []);
 
-    const handleConfirmTime = (selectedTime: Date) => {
-        setForm((prev) => ({
-            ...prev,
-           preferred_time: selectedTime.toISOString().split('T')[1].slice(0, 8),
-        }));
-        setTimeVisible(false);
-    };
+  const handleConfirmDate = (selectedDate: Date) => {
+    setForm((prev) => ({
+      ...prev,
+      preferred_date: selectedDate.toISOString().split('T')[0],
+    }));
+    setDateVisible(false);
+  };
 
-    const handleSubmit = async () => {
-        try {
-            // Prepare the complete form data BEFORE mutation
-            const requestData: SubmitRequestData = {
-                patient_id: userData?.user_id || null,
-                service_id: form.service_id || null,
-                // service_category: selectedCategory || null,
-                service_description: form.service_description || '',
-                preferred_date: form.preferred_date || null,
-                preferred_time: form.preferred_time || null,
-                preferred_caregiver_id: form.preferred_caregiver_id || null,
-                service_type: form.service_type || scheduleType,
-                facility_id: facilityID || null,
-                notes: form.notes || null,
-            };
+  const handleConfirmTime = (selectedTime: Date) => {
+    setForm((prev) => ({
+      ...prev,
+      preferred_time: selectedTime.toISOString().split('T')[1].slice(0, 8),
+    }));
+    setTimeVisible(false);
+  };
 
-            console.log('Submitting request data:', requestData);
+  const handleSubmit = async () => {
+    try {
+      const requestData: SubmitRequestData = {
+        patient_id: userData?.user_id || null,
+        service_id: form.service_id || null,
+        service_description: form.service_description || '',
+        preferred_date: form.preferred_date || null,
+        preferred_time: form.preferred_time || null,
+        preferred_caregiver_id: form.preferred_caregiver_id || null,
+        service_type: form.service_type || scheduleType,
+        facility_id: facilityID || null,
+        notes: form.notes || null,
+      };
 
-            if (scheduleType === 'One-Time') {
-                const result = await oneTimeMutation.mutateAsync(requestData);
-                console.log('Mutation result:', result);
-            } else if (scheduleType === 'Routine') {
-                const result = await routineMutation.mutateAsync(requestData);   
-                console.log('Mutation result:', result);
-            }
-            
-            router.push(`/request_service/payment`);
-        } catch (error) {
-            console.error('Submit error:', error);
-            // Optionally show error to user
-        }
-    };
+      if (scheduleType === 'One-Time') {
+        await oneTimeMutation.mutateAsync(requestData);
+      } else {
+        await routineMutation.mutateAsync(requestData);
+      }
 
-    const handleChange = (key: keyof typeof form, value: any) => {
-        setForm((prev)=> ({
-            ...prev,
-            [key]: value,
-        }))
-    };
+      router.push('/request_service/payment');
+    } catch (error) {
+      console.error('Submit error:', error);
+    }
+  };
 
-    // Map to actual database category_id values
-    const serviceCategories = [
-        { id: 5, label: "Assisted Living", value: 5 },
-        { id: 6, label: "Nursing Care", value: 6 },
-        { id: 9, label: "Companionship", value: 9 },
-        { id: 11, label: "Therapy", value: 11 }, 
-    ];
-
-    return (
-        <SafeAreaView style={{
+  return (
+    <SafeAreaView
+      style={{
         flex: 1,
         backgroundColor: '#ffffff',
-    
-        }} edges={['top']}>
+      }}
+      edges={['top']}
+    >
+      <View style={[requestDetailStyles.headerContainer, { marginBottom: 20, backgroundColor: '#4a5cbe' }]}>
+        <Text style={[requestDetailStyles.headerTitle, { color: 'white', fontSize: 28 }]}>Requests</Text>
+      </View>
 
-            <View style={[requestDetailStyles.headerContainer, {marginBottom: 20, }]}>
-                <Text style={requestDetailStyles.headerTitle}>Requests</Text>
+      <ScrollView>
+        <View style={{ width: formWidth, alignSelf: 'center' }}>
+          <Text style={[addPatientStyles.fieldLabel, { marginLeft: 10, marginBottom: 6 }]}>Schedule Details</Text>
+
+          <View style={requestDetailStyles.scheduleTypeContainer}>
+            <Pressable
+              onPress={() => setScheduleType('One-Time')}
+              style={[
+                registerCommonStyles.genderButton,
+                { backgroundColor: scheduleType === 'One-Time' ? '#4b5cbe' : '#8793d4' },
+              ]}
+            >
+              <Text style={registerCommonStyles.genderText}>One-Time Service</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setScheduleType('Routine')}
+              style={[
+                registerCommonStyles.genderButton,
+                { backgroundColor: scheduleType === 'Routine' ? '#4b5cbe' : '#8793d4' },
+              ]}
+            >
+              <Text style={registerCommonStyles.genderText}>Routine</Text>
+            </Pressable>
+          </View>
+
+          <View style={addPatientStyles.datePickerWrapper}>
+            <View style={addPatientStyles.datePickerContainer}>
+              <Pressable
+                onPress={() => setDateVisible(true)}
+                style={[addPatientStyles.datePickerButton, { height: 45, justifyContent: 'center' }]}
+              >
+                <Text style={addPatientStyles.datePickerText}>Date of Service</Text>
+              </Pressable>
+              <DateTimePickerModal
+                isVisible={isDateVisible}
+                mode="date"
+                onConfirm={handleConfirmDate}
+                onCancel={() => setDateVisible(false)}
+              />
             </View>
 
-            <ScrollView>
-                <Text>Schedule Details</Text>
-                <View style={requestDetailStyles.scheduleTypeContainer}> 
-                <Pressable onPress={() => setScheduleType('One-Time')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='One-Time'?'#4454c3':'#ebe9ec'}]}>
-                    <Text style={{textAlign:'center', color: scheduleType === 'One-Time' ? 'white' : 'black'}}>One-Time Service</Text>
-                </Pressable>
-                <Pressable onPress={() => setScheduleType('Routine')} style={[requestDetailStyles.scheduleTypeButton, {backgroundColor: scheduleType==='Routine'?'#4454c3':'#ebe9ec'}]}>
-                    <Text style={{textAlign:'center', color: scheduleType === 'Routine' ? 'white' : 'black'}}>Routine</Text>
-                </Pressable>
-                </View>
-                {/* date and time picker */}
-                <View style={requestDetailStyles.datePickerWrapper}>
-                    <View style={requestDetailStyles.datePickerContainer}>
-                        <Pressable 
-                            onPress={() => setDateVisible(true)} 
-                            style={requestDetailStyles.datePickerButton}                        >
-                            <Text style={requestDetailStyles.datePickerText}>Date of Service</Text>
-                        </Pressable>
-                        <DateTimePickerModal
-                        isVisible={isDateVisible}
-                        mode="date"
-                        onConfirm={handleConfirmDate}
-                        onCancel={() => setDateVisible(false)}
-                        />
-                    </View>
-                    <View style={{flex: 1}}>
-                        <Pressable 
-                            onPress={() => setTimeVisible(true)} 
-                            style={requestDetailStyles.datePickerButton}                        >
-                            <Text style={requestDetailStyles.datePickerText}>Time</Text>
-                        </Pressable>
-                        <DateTimePickerModal
-                        isVisible={isTimeVisible}
-                        mode="time"            
-                        onConfirm={handleConfirmTime}
-                        onCancel={() => setTimeVisible(false)}
-                        />
-                    </View>
-                </View>
-
-                {/* <View style={{ marginVertical: 8}}> */}
-                    {/* <View style={requestDetailStyles.serviceTypeContainer}>
-                        <Text>Select Category of Service</Text>
-                        <View style={requestDetailStyles.serviceToggleItem}>
-                            <Picker
-                                selectedValue={selectedCategory}
-                                onValueChange={(category) => setSelectedCategory(category)}
-                            >
-                                {serviceCategories.map((category) => (
-                                    <Picker.Item key={category.id} label={category.label} value={category.value} />
-                                ))}
-                            </Picker>
-                        </View>
-
-                    </View> */}
-
-                    <View style={requestDetailStyles.serviceTypeContainer}>
-                        <Text>Select Specific Service</Text>
-                            <View style={requestDetailStyles.serviceToggleItem}>
-
-                            <Picker selectedValue={form.service_id} onValueChange={(serviceId) => setForm((prev)=>({
-                                ...prev,
-                                service_id: serviceId
-                            }))}>
-                                {facilityServices.map((service) => (
-                                    <Picker.Item key={service.service_id} label={service.name} value={service.service_id} />
-                                ))}
-                            </Picker>
-                        </View>
-                    </View>
-               
-
-                <View style={requestDetailStyles.descriptionContainer}>
-                    <Text>Description</Text>
-                    <TextInput
-                        style={[requestDetailStyles.descriptionInput, {height: 200}]}
-                        value={form.service_description}
-                        onChangeText={(text) => setForm((prev)=>({...prev, service_description: text}))}
-                    />
-                </View>
-                
-                {/* <View style={requestDetailStyles.descriptionContainer}>
-                    <Text>Select File</Text>
-                    <Pressable style={requestDetailStyles.fileInput} onPress={handleChange}>
-                    </Pressable>
-                </View> */}
-
-             {/* Next Button */}
-           
-                <View>
-                    <Text>Preferred Caregiver</Text>
-                    <Picker selectedValue={form.preferred_caregiver_id} onValueChange={(caregiverID)=> setForm((prev)=>({
-                        ...prev,
-                        preferred_caregiver_id: caregiverID}))}>
-                        <Picker.Item label="No Preference" value={null} />
-                        {facilityCaregivers?.map((caregiver) => (
-                            <Picker.Item key={caregiver.caregiver_id} label={caregiver.professional_display_name} value={caregiver.caregiver_id} />
-                        ))}
-                    </Picker>
-                </View>
-           
-               <View style={{ alignItems: 'stretch', backgroundColor: 'white', marginTop: 30 }}>
-                <Pressable onPress={handleSubmit} style={requestDetailStyles.submitButton}>
-                    <Text style={{ color: 'white' }}>Next</Text>
-                </Pressable>
+            <View style={{ flex: 1 }}>
+              <Pressable
+                onPress={() => setTimeVisible(true)}
+                style={[addPatientStyles.datePickerButton, { height: 45, justifyContent: 'center' }]}
+              >
+                <Text style={addPatientStyles.datePickerText}>Time</Text>
+              </Pressable>
+              <DateTimePickerModal
+                isVisible={isTimeVisible}
+                mode="time"
+                onConfirm={handleConfirmTime}
+                onCancel={() => setTimeVisible(false)}
+              />
             </View>
-            </ScrollView>
+          </View>
 
-        </SafeAreaView>
-    );
+          <View style={addPatientStyles.serviceTypeContainer}>
+            <Text style={addPatientStyles.fieldLabel}>Select Specific Service</Text>
+            <View style={addPatientStyles.serviceToggleItem}>
+              <Picker
+                selectedValue={form.service_id}
+                onValueChange={(serviceId) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    service_id: serviceId,
+                  }))
+                }
+              >
+                {facilityServices.map((service) => (
+                  <Picker.Item key={service.service_id} label={service.name} value={service.service_id} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+
+          <View style={addPatientStyles.descriptionContainer}>
+            <Text style={addPatientStyles.fieldLabel}>Description</Text>
+            <TextInput
+              style={[
+                addPatientStyles.descriptionInput,
+                { height: 120, paddingHorizontal: 10, width: '100%', alignSelf: 'center' },
+              ]}
+              value={form.service_description}
+              onChangeText={(text) => setForm((prev) => ({ ...prev, service_description: text }))}
+              multiline
+              textAlignVertical="top"
+            />
+          </View>
+
+          <View style={addPatientStyles.serviceTypeContainer}>
+            <Text style={addPatientStyles.fieldLabel}>Preferred Caregiver</Text>
+            <View style={addPatientStyles.serviceToggleItem}>
+              <Picker
+                selectedValue={form.preferred_caregiver_id}
+                onValueChange={(caregiverID) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    preferred_caregiver_id: caregiverID,
+                  }))
+                }
+              >
+                <Picker.Item label="No Preference" value={null} />
+                {facilityCaregivers?.map((caregiver) => (
+                  <Picker.Item
+                    key={caregiver.caregiver_id}
+                    label={caregiver.professional_display_name}
+                    value={caregiver.caregiver_id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
+
+          <View style={{ alignItems: 'stretch', backgroundColor: 'white', marginTop: 30 }}>
+            <Pressable
+              onPress={handleSubmit}
+              style={[registerCommonStyles.signupButton, { marginHorizontal: 0, width: formWidth, alignSelf: 'center' }]}
+            >
+              <Text style={registerCommonStyles.signupButtonText}>Next</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }

@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { getPatientID } from '@/src/options/tokenHandler';
+import { useOneTimeRequests, useRoutineRequests } from '@/src/options/carePlanQueryOptions';
 
 // FLOW
 //      renderDayList  
@@ -20,6 +22,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } fr
 // render funcs: renderDayList, renderDaySchedule
 export default function DayCalendar() {
     const now = new Date();
+    const [patientID, setPatientID] = useState<number | null>(null);
     const [currentMonth, setCurrentMonth] = useState(now.getMonth());
     const [currentYear, setCurrentYear] = useState(now.getFullYear());
     const [selectedDay, setSelectedDay] = useState(
@@ -31,15 +34,50 @@ export default function DayCalendar() {
     const translateY = useSharedValue(1000);
     const opacity = useSharedValue(0);
     
-    const scheduleList = [
-    { id: 1, date: '2025-11-20', startTime: '09:00 AM', endTime: '10:40 AM', activity: 'Doctor Appointment' },
-    { id: 2, date: '2025-11-20', startTime: '11:00 AM', endTime: '11:30 AM', activity: 'Blood Pressure Check' },
-    { id: 3, date: '2025-11-20', startTime: '03:00 PM', endTime: '03:15 PM', activity: 'Medication Reminder' },
-    { id: 4, date: '2025-11-21', startTime: '10:30 AM', endTime: '12:00 PM', activity: 'Nurse Follow-up Visit' },
-    { id: 5, date: '2025-11-21', startTime: '01:00 PM', endTime: '02:00 PM', activity: 'Physical Therapy Session' },
-    { id: 6, date: '2025-11-22', startTime: '08:00 AM', endTime: '08:30 AM', activity: 'Morning Vital Signs Check' },
-    { id: 7, date: '2025-11-22', startTime: '02:00 PM', endTime: '02:30 PM', activity: 'Wound Care Assessment' }
-    ];
+    const { data: oneTimeData } = useOneTimeRequests(patientID || 0, undefined, !!patientID);
+    const { data: routineData } = useRoutineRequests(patientID || 0, undefined, !!patientID);
+
+    useEffect(() => {
+        const fetchPatientID = async () => {
+            const id = await getPatientID();
+            setPatientID(parseInt(id || '0'));
+        };
+        fetchPatientID();
+    }, []);
+
+    const formatTo12Hour = (rawTime: string) => {
+        const [hoursString, minutesString = '00'] = rawTime.split(':');
+        const hours24 = parseInt(hoursString, 10);
+        const minutes = parseInt(minutesString, 10);
+
+        const period = hours24 >= 12 ? 'PM' : 'AM';
+        const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+        return `${hours12.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+    };
+
+    const addOneHour = (rawTime: string) => {
+        const [hoursString, minutesString = '00', secondsString = '00'] = rawTime.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hoursString, 10), parseInt(minutesString, 10), parseInt(secondsString, 10), 0);
+        date.setHours(date.getHours() + 1);
+
+        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:00`;
+    };
+
+    const scheduleList = [...(oneTimeData || []), ...(routineData || [])]
+        .filter((item) => item.preferred_date && item.preferred_time)
+        .map((item) => {
+            const startRaw = item.preferred_time as string;
+            const endRaw = addOneHour(startRaw);
+
+            return {
+                id: Number(item.request_id),
+                date: item.preferred_date as string,
+                startTime: formatTo12Hour(startRaw),
+                endTime: formatTo12Hour(endRaw),
+                activity: item.service_name || 'Service',
+            };
+        });
     
     const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -183,6 +221,8 @@ export default function DayCalendar() {
         
     };
 
+            const hasSchedulesForSelectedDay = scheduleList.some(item => item.date === selectedDay);
+
     const openScheduleDetails = (schedule: any) => {
         setSelectedSchedule(schedule);
         setIsModalVisible(true);
@@ -285,9 +325,16 @@ return <SafeAreaView style={{
     </ScrollView>
         
 
-    <ScrollView contentContainerStyle= {[styles.card, {marginTop: 10, paddingTop: 10,  marginHorizontal: 15 }]} style={{paddingTop: 20}}>
-        {renderDaySchedule(selectedDay)}
-    </ScrollView>
+        {hasSchedulesForSelectedDay ? (
+            <ScrollView contentContainerStyle= {[styles.card, {marginTop: 10, paddingTop: 10,  marginHorizontal: 15 }]} style={{paddingTop: 20}}>
+                    {renderDaySchedule(selectedDay)}
+            </ScrollView>
+        ) : (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Ionicons name="happy-outline" size={40} color="#818181" />
+                <Text style={{ marginTop: 8, color: '#818181', fontSize: 14, textAlign: 'center' }}>No appointments today</Text>
+            </View>
+        )}
 
     {renderScheduleDetails()}
 

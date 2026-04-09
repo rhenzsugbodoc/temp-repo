@@ -21,7 +21,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="home-outline" size={size} color="#8e98db" />
+            <Ionicons name="home-outline" size={size} color="#4454c3" />
           ),
         }}
       />
@@ -30,7 +30,7 @@ export default function PatientTabLayout() {
         options={{
           title: 'Service Requests',
           tabBarIcon: ({ color, size = 28 }) => (
-            <Ionicons name="hand-left-outline" size={size} color="#8e98db" />
+            <Ionicons name="hand-left-outline" size={size} color="#4454c3" />
           ),
         }}
       />

@@ -114,7 +114,7 @@ export default function Login() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Image source={require('@/assets/images/Homecare_Logo.png')} style={styles.logo} />                     
+          <Image source={require('@/assets/images/Homecare_Logo2.png')} style={styles.logo} />                     
                                 
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>

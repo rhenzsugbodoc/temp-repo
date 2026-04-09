@@ -117,7 +117,7 @@ export default function AdminDashboard() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} 
         contentContainerStyle={{flexDirection: 'row' ,justifyContent: 'space-between', gap: 15}}>
             {items2.map(item => (
-              <View key={item.id} style={[styles.card, {width: screenWidth * 0.2, alignItems:'center', marginHorizontal: 0}]}>
+              <View key={item.id} style={[styles.card, {width: screenWidth * 0.4, alignItems:'center', marginHorizontal: 0}]}>
                 <Text style={styles.staffLabel}>{item.label}</Text>
                 <Pressable style={[styles.iconCircle, {borderWidth: 0,width: 50, height: 50, borderRadius: 25,}]}>
                   <Ionicons name={item.name as any} size={30} color="#4454c3" />

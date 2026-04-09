@@ -60,7 +60,7 @@ const CompanyDetails = () => {
 
           <View style= {companyDetailStyles.aboutUsContainer}>
             <Text style={companyDetailStyles.categoryLabel}>ABOUT US</Text>
-            <Text style= {companyDetailStyles.aboutUsText}>{facility?.facility_description}RAH </Text>
+            <Text style= {companyDetailStyles.aboutUsText}>{facility?.facility_description} </Text>
             {/* <Text style= {companyDetailStyles.aboutUsText}>{company.description}</Text> */}
           </View>
           

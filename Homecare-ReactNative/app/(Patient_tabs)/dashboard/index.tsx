@@ -98,6 +98,10 @@ export default function PatientDashboard() {
           Hello {patientInfo?.first_name || 'User'}!
         </Text>
 
+        <Pressable style={styles.iconCircle} onPress={() => router.push('/(Patient_tabs)/notifications')}>
+          <Ionicons name="notifications" size={24} color="#4454c3" />
+        </Pressable>
+
         <Pressable style={styles.iconCircle} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={24} color="#4454c3" />
         </Pressable>
