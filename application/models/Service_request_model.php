@@ -12,10 +12,7 @@ class Service_request_model extends CI_Model {
         }
         return false;
     }
-    /**
-     * Get ONE-TIME service requests for a facility
-     * Facility ID is derived from current_user_id via facility table
-     */
+
     public function get_onetime_facility_requests($user_id) {
         $this->db->select('service_requests.request_id,
             service_requests.patient_id,

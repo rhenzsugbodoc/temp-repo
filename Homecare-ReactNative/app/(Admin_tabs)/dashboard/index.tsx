@@ -20,7 +20,6 @@ export default function AdminDashboard() {
       router.replace('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Still navigate to login even if API call fails
       router.replace('/login');
     }
   };
