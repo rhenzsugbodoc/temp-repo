@@ -15,29 +15,6 @@ export default function Login() {
   const loginMutation = useLoginMutation();
   const { width: screenWidth } = useWindowDimensions();
   const maxWidth = screenWidth * 0.7;
-//   useEffect(() => {
-//     const checkExistingUser = async () => {
-//       const userData = await getUserData<User>();
-
-//       if (userData) {
-//         let dashboardRoute: string;
-
-//         if (userData.role === 'Admin') {
-//           dashboardRoute = '/(Admin_tabs)/dashboard';
-//         } else if (userData.role === 'Pharmacy_Owner') {
-//           dashboardRoute = '/(Pharmacy_Owner)/index';
-//         } else if (userData.role === 'Patient') {
-//           dashboardRoute = '/(Patient_tabs)/dashboard';
-//         }
-
-//         router.replace(dashboardRoute);
-//       }
-//     };
-
-//   checkExistingUser();
-// }, []);
-
-//yey
 
   const handleLogin = async () => {
     // Basic validation
